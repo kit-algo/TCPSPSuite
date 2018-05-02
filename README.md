@@ -1,7 +1,7 @@
 TCPSPSuite
 ==========
 
-This is the TCPSPSuite, a software suite for optimizing various flavours of the Time Constrained Project Scheduling Problem. Refer to [the documentation](TODO) for details.
+This is the TCPSPSuite, a software suite for optimizing various flavours of the Time Constrained Project Scheduling Problem. Refer to [the documentation](https://kit-algo.github.io/TCPSPSuite/) for details.
 
 Requirements
 ------------
