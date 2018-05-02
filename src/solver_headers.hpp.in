@@ -1,0 +1,6 @@
+#ifndef SOLVER_HEADERS_HPP
+#define SOLVER_HEADERS_HPP
+
+@SOLVER_HEADERS@
+
+#endif

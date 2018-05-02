@@ -1,0 +1,149 @@
+{
+  "jobs": [
+    {
+      "usages": {
+        "0": 2.3418780527858964
+      },
+      "successors": {},
+      "deadline": 41,
+      "id": 0,
+      "release": 0,
+      "duration": 15
+    },
+    {
+      "usages": {
+        "0": 5.843456444789602
+      },
+      "successors": {
+        "3": {
+          "drain_factor": 0,
+          "max_recharge": 0,
+          "lag": 0
+        }
+      },
+      "deadline": 48,
+      "id": 1,
+      "release": 0,
+      "duration": 2
+    },
+    {
+      "usages": {
+        "0": 5.851301166996085
+      },
+      "successors": {},
+      "deadline": 56,
+      "id": 2,
+      "release": 0,
+      "duration": 5
+    },
+    {
+      "usages": {
+        "0": 3.2213776904291427
+      },
+      "successors": {
+        "9": {
+          "drain_factor": 0,
+          "max_recharge": 0,
+          "lag": 0
+        }
+      },
+      "deadline": 61,
+      "id": 3,
+      "release": 0,
+      "duration": 7
+    },
+    {
+      "usages": {
+        "0": 6.991037309660767
+      },
+      "successors": {},
+      "deadline": 53,
+      "id": 4,
+      "release": 0,
+      "duration": 11
+    },
+    {
+      "usages": {
+        "0": 7.829613001080443
+      },
+      "successors": {
+        "4": {
+          "drain_factor": 0,
+          "max_recharge": 0,
+          "lag": 15
+        }
+      },
+      "deadline": 66,
+      "id": 5,
+      "release": 0,
+      "duration": 14
+    },
+    {
+      "usages": {
+        "0": 6.429256806124268
+      },
+      "successors": {
+        "8": {
+          "drain_factor": 0,
+          "max_recharge": 0,
+          "lag": 2
+        }
+      },
+      "deadline": 56,
+      "id": 6,
+      "release": 0,
+      "duration": 13
+    },
+    {
+      "usages": {
+        "0": 0.2640342771503441
+      },
+      "successors": {
+        "8": {
+          "drain_factor": 0,
+          "max_recharge": 0,
+          "lag": 15
+        }
+      },
+      "deadline": 55,
+      "id": 7,
+      "release": 0,
+      "duration": 3
+    },
+    {
+      "usages": {
+        "0": 4.570327834309941
+      },
+      "successors": {},
+      "deadline": 34,
+      "id": 8,
+      "release": 0,
+      "duration": 7
+    },
+    {
+      "usages": {
+        "0": 3.304880200228859
+      },
+      "successors": {},
+      "deadline": 47,
+      "id": 9,
+      "release": 0,
+      "duration": 7
+    }
+  ],
+  "id": "c416875f-7f16-4555-a5df-8f2bd0cdf5b7",
+  "seed": 1493055620,
+  "resources": [
+    {
+      "id": 0,
+      "investment_costs": [
+        [
+          10,
+          1
+        ]
+      ],
+      "overshoot_costs": [],
+      "free_amount": 0
+    }
+  ]
+}
