@@ -1,9 +1,0 @@
-[submodule "src/contrib/sparsehash"]
-	path = src/contrib/sparsehash
-	url = https://github.com/tinloaf/sparsehash-c11.git
-[submodule "src/contrib/ilpabstraction"]
-	path = src/contrib/ilpabstraction
-	url = https://github.com/kit-algo/ilp-abstraction.git
-[submodule "src/contrib/intervaltree"]
-	path = src/contrib/intervaltree
-	url = https://github.com/tinloaf/ygg.git
