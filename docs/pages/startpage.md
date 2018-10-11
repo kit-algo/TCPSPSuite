@@ -9,6 +9,7 @@ Documentation
 * @ref instancefileformat describes how instances input file format, i.e., how instances are specified.
 * @ref dbformat specifies how TCPSPSuite writes its results.
 * @ref solvers lists the available optimization algorithms.
+* @ref solver_configurations shows how to create a solver configuration file
 
 License
 =======

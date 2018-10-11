@@ -6,13 +6,16 @@ This is the TCPSPSuite, a software suite for optimizing various flavours of the 
 Requirements
 ------------
 
-All the libraries listed here must be installed including development headers. On many Linux distributions, the development package names end in `-dev`.
+TCPSPSuite should work on any moderately recent GNU/Linux system. All the libraries listed here must be installed including development headers. On many Linux distributions, the development package names end in `-dev`.
 
 * Boost >= 1.61
-* A recent C++ compiler: GCC >= 7 or cmake >= 4 will do.
+* A recent C++ compiler: GCC >= 7 or clang >= 4 will do.
 * SQLite3
 * ODB == 2.4.0, including the SQLite runtime (this one: https://www.codesynthesis.com/products/odb/) - **Note**: You most probably need exactly version 2.4.0, since we need to patch its header files to work with C++17. If you try it with a different version of ODB and it works, please let us know!
 * For using the ILP solver: Gurobi >= 7.0 or a recent CPLEX version
+* CMake >= 3.0
+
+Installing some of these requirements, especially Gurobi, can be tricky. Please refer to [the getting started page of the documentation](https://kit-algo.github.io/TCPSPSuite/gettingstarted.html)
 
 Getting the Source
 ------------------
@@ -43,7 +46,9 @@ mkdir build
 cd build
 cmake ../TCPSPSuite
 ```
-At this point you should be notified if any required library (see Requirements above) is not found. You either need to install the respective library or make sure that CMake is able to find it. Please note that at the bottom of the output, CMake tells you which optional packages could be found resp. not found, and which solvers need which optional packages. If an optional package is not being found, no solvers that need it will be built.
+At this point you should be notified if any required library (see Requirements above) is not found. You either need to install the respective library or make sure that CMake is able to find it. 
+
+**Important**: Please note that at the bottom of the output, CMake tells you which optional packages could be found resp. not found, and which solvers need which optional packages. If an optional package is not being found, no solvers that need it will be built. The package will build fine without any solvers at all - however, you won't be able to do any optimization!
 
 - Build TCPSPSuite:
 ```
