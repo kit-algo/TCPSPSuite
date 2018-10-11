@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['result_20database_20format',['Result Database Format',['../dbformat.html',1,'']]]
+  ['license',['License',['../license.html',1,'']]],
+  ['license',['license',['../md_pages_license.html',1,'']]]
 ];
