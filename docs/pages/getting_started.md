@@ -21,7 +21,7 @@ Installing Gurobi can be tricky sometimes. Here are some pointers:
 * **Most importantly**: Most modern compilers can't work with the shipped `libgurobi_c++.a`. This yields compilation errors like `undefined reference to <something about gurobi>` in the linking step. To fix this problem, you need to copy the file ``/path/to/gurobi/lib/libgurobi_g++<highest version available>.a` over the file `/path/to/gurobi/lib/libgurobi_c++.a`. The actually available versions of that file differ depending on your Gurobi version. Just use the most recent version. 
 * Set the `GUROBI_HOME` environment variable to the path where you installed Gurobi to. It should point to the `linux64` folder, which contains e.g. `lib`, `setup.py`, etc.
 * Set the `GRB_LICENSE_FILE` environment variable to the path where you put the license file downloaded via `grbgetkey` (see the Gurobi documentation)
-
+* The file `FindGUROBI.cmake` in the `cmake/modules` subdirectory for technical reasons has a hard-coded list of Gurobi versions that are detected. Currently, the most recent detected version is Gurobi 8.0. If you have a more recent version of Gurobi, you might need to add it to the list of detected Gurobi versions in that file.
 
 Getting the Source
 ------------------
