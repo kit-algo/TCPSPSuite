@@ -1,5 +1,4 @@
 var searchData=
 [
-  ['getting_20started',['Getting Started',['../gettingstarted.html',1,'']]],
-  ['getting_5fstarted',['getting_started',['../md_pages_getting_started.html',1,'']]]
+  ['instance_20file_20format',['Instance File Format',['../instancefileformat.html',1,'']]]
 ];

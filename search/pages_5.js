@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['result_20database_20format',['Result Database Format',['../dbformat.html',1,'']]]
+  ['solver_20configurations',['Solver Configurations',['../solver_configurations.html',1,'']]]
 ];
