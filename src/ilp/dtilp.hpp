@@ -30,6 +30,7 @@ public:
 	                          Maybe<unsigned int> extension_time_limit,
 														Maybe<unsigned int> extension_job_limit);
 	void run();
+	static std::string get_id();
 
 private:
 	Log l;
@@ -48,6 +49,11 @@ private:
 
 	// Switch-On-Variables
 	std::vector<std::vector<Variable>> variables;
+
+	/* First entry: First time step at which the job can be executed (i.e., the time step
+	 * that the first switch-on variable is associated with).
+	 * Second entry: The number of switch-on variables, i.e., the window size (taking possible
+	 * window extension into account). */
 	std::vector<std::pair<unsigned int, unsigned int>> time_step_bounds;
 
 	// Sum up duration, force overduration
@@ -56,6 +62,9 @@ private:
 	// Overduration indicator variables
 	std::vector<std::vector<Variable>> overduration_variables;
 
+	// Overshoot of each resource in every timestep
+	std::vector<std::vector<Variable>> overshoot_variables;
+
 	// Overduration / switch-on ANDing
 	// overduration_and_swon_variables[i][x][y] will indicate whether:
 	// job i
@@ -63,7 +72,7 @@ private:
 	//   - and is switched on at (job-relative) time step x
 	std::vector<std::vector<std::vector<Variable>>> overduration_and_swon_variables;
 
-	void prepare_derived();
+	void prepare_start_point_constraints();
 
 	void prepare_variables();
 
@@ -73,6 +82,26 @@ private:
 
 	// constraint (6)
 	void prepare_job_constraints();
+
+	// Overshoot costs
+	void prepare_overshoot_costs();
+
+	void prepare_extension_constraints();
+
+	// TODO totally switch these three off
+	// Window-left-extension variables
+	// IMPLEMENTATION must define these
+	std::vector<Variable> left_extension_var;
+
+	// Window-right-extension variables
+	// IMPLEMENTATION must define these
+	std::vector<Variable> right_extension_var;
+
+
+	Variable window_extension_time_var;
+	Variable window_extension_job_var;
+	Constraint window_extension_time_constraint;
+	Constraint window_extension_job_constraint;
 
 	/*
 	 * Warmstart-related things
@@ -85,6 +114,8 @@ private:
 	 * Options
 	 */
 	bool use_sos1_for_starts;
+
+	void print_profile() const;
 };
 
 // Register the solver

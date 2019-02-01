@@ -3,8 +3,8 @@
 
 #include "generated_config.hpp"
 
-#include "solvers.hpp"
 #include "solver_headers.hpp"
+#include "solvers.hpp"
 
 #include "../baselines/earlyscheduler.hpp"
 #include "../util/randomizer.hpp"
@@ -21,12 +21,15 @@ namespace hana = boost::hana;
 
 class Selector {
 public:
-  inline Selector(Storage &storage, std::string run_id);
-  inline void run_all(const Instance &instance, const SolverConfig & solver_cfg);
+	inline Selector(Storage & storage, std::string run_id, int thread_id);
+  inline void run_all(const Instance & instance,
+                      const SolverConfig & solver_cfg);
+
 private:
   Storage & storage;
   std::string run_id;
-
+	int thread_id;
+	
   Log l;
 };
 

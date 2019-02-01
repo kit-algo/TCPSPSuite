@@ -3,12 +3,13 @@
 #include <ext/alloc_traits.h>                                  // for __allo...
 #include <algorithm>                                           // for move, max
 #include <cmath>                                               // for ceil
-#include <functional>                                          // for refere...
+#include <functional>                                          // IWYU pragma: keep // for refere...
 #include <limits>                                              // for numeri...
 #include <memory>                                              // for allocator
 #include <string>                                              // for stream...
 #include <tuple>                                               // for tuple
 #include <unordered_map>                                       // for unorde...
+#include <unordered_set>
 #include <vector>                                              // for vector
 #include "../datastructures/maybe.hpp"                      // for Maybe
 #include "../manager/errors.hpp"                               // for Incons...
@@ -128,8 +129,8 @@ Solution::compute_durations() const
 }
 
 // TODO should that seed be passed in the constructor?
-void
-Solution::verify(int seed) const
+bool
+Solution::verify(int seed, InconsistentResultError * error_out) const
 {
   // TODO completeness!
 
@@ -145,10 +146,16 @@ Solution::verify(int seed) const
 		// Step 1: Verify that release / deadline constraints are met
 		for (unsigned int j = 0 ; j < this->instance->job_count() ; ++j) {
 			if ((unsigned int)this->start_times[j] < this->instance->get_job(j).get_release()) {
-				throw InconsistentResultError(*(this->instance), seed, FAULT_START_BEFORE_RELEASE, std::string("Job ") + std::to_string(j) + " started before its release.");
+				if (error_out != nullptr) {
+					*error_out = InconsistentResultError(*(this->instance), seed, FAULT_START_BEFORE_RELEASE, std::string("Job ") + std::to_string(j) + " started before its release.");
+				}
+				return false;
 			}
 			if (this->start_times[j] + this->durations[j] > this->instance->get_job(j).get_deadline()) {
-				throw InconsistentResultError(*(this->instance), seed, FAULT_END_AFTER_DEADLINE, std::string("Job ") + std::to_string(j) + " continuing after its deadline.");
+				if (error_out != nullptr) {
+					*error_out = InconsistentResultError(*(this->instance), seed, FAULT_END_AFTER_DEADLINE, std::string("Job ") + std::to_string(j) + " continuing after its deadline.");
+				}
+				return false;
 			}
 		}
 	} else {
@@ -163,27 +170,28 @@ Solution::verify(int seed) const
 				window_extension_sum += this->instance->get_job(j).get_release()
 															  - (unsigned int)this->start_times[j];
 				window_extension_job_sum += 1;
-				BOOST_LOG(l.d(5)) << "/// Job " << j << " extends its window to the left by " << this->instance->get_job(j).get_release()
-				                                                                                 - (unsigned int)this->start_times[j];
 			}
 			if (this->start_times[j] + this->durations[j] > this->instance->get_job(j).get_deadline()) {
 				window_extension_sum += (unsigned int)this->start_times[j] + this->durations[j]
 				                        - this->instance->get_job(j).get_deadline();
 				window_extension_job_sum += 1;
-				BOOST_LOG(l.d(5)) << "/// Job " << j << " extends its window to the right by " <<
-				                                                                               (unsigned int)this->start_times[j] + this->durations[j]
-				                                                                               - this->instance->get_job(j).get_deadline();
 			}
 		}
 
 		if (window_extension_sum > this->instance->get_window_extension_limit()) {
-			throw InconsistentResultError(*(this->instance), seed, FAULT_WINDOW_EXTENSION_SUM,
-			                              std::string("Window extension limit violated."));
+			if (error_out != nullptr) {
+				*error_out = InconsistentResultError(*(this->instance), seed, FAULT_WINDOW_EXTENSION_SUM,
+								                              std::string("Window extension limit violated."));
+			}
+			return false;
 		}
 
 		if (window_extension_job_sum > this->instance->get_window_extension_job_limit()) {
-			throw InconsistentResultError(*(this->instance), seed, FAULT_WINDOW_EXTENSION_JOB_SUM,
+			if (error_out != nullptr) {
+				*error_out = InconsistentResultError(*(this->instance), seed, FAULT_WINDOW_EXTENSION_JOB_SUM,
 			                              std::string("Window extension job limit violated."));
+			}
+			return false;
 		}
 	}
 
@@ -195,11 +203,17 @@ Solution::verify(int seed) const
     int &lag = edge.lag;
 
     if ((int)this->start_times[s] + lag > (int)this->start_times[t]) {
-      throw InconsistentResultError(*this->instance, seed, FAULT_START_BEFORE_LAG, std::string("Job ") + std::to_string(t) + " starts before its lag from job " + std::to_string(s));
+    	if (error_out != nullptr) {
+    		*error_out = InconsistentResultError(*this->instance, seed, FAULT_START_BEFORE_LAG,
+																						 std::string("Job ") + std::to_string(t)
+    		                                     + " starts before its lag from job " + std::to_string(s));
+    	}
+    	return false;
     }
   }
 
   BOOST_LOG(l.i()) << "Solution is valid." ;
+  return true;
 }
 
 void
@@ -208,12 +222,11 @@ Solution::print_jobs() const
   BOOST_LOG(l.d(2)) << ">>>>>>>>>>>> PRINTING JOBS >>>>>>>>>>>>" ;
   for (unsigned int j = 0 ; j < this->instance->job_count() ; ++j) {
     unsigned int start = this->start_times[j];
-    BOOST_LOG(l.d(2)) << "Job " << j << ": \t\t" << start << " \t-> " << start + this->durations[j] - 1 ;
+    BOOST_LOG(l.d(2)) << "Job " << j << ": \t[" << start << " \t-> " << start + this->durations[j] << ")" ;
   }
   BOOST_LOG(l.d(2)) << "<<<<<<<<<<<< PRINTING JOBS <<<<<<<<<<<<" ;
 }
 
-/*
 void
 Solution::print_profile() const
 {
@@ -255,16 +268,22 @@ Solution::print_profile() const
   std::unordered_map<unsigned int, double> current;
   std::vector<double> overshoot_sums(this->instance->resource_count(), 0.0);
 
+  std::vector<double> max_res_usage(this->instance->resource_count(), 0.0);
+  std::vector<std::vector<Job::JobId>> max_usage_jobs(this->instance->resource_count());
+  std::vector<unsigned int> max_usage_time(this->instance->resource_count(), 0);
+
   for (unsigned int r = 0 ; r < this->instance->resource_count() ; ++r) {
     current[r] = 0.0;
   }
 
   unsigned int last_t = std::get<0>(events[0]);
 
-  std::vector<std::vector<unsigned int, double>::const_iterator> availability_its;
+	std::vector<decltype(this->instance->get_resource(0).get_availability().begin())> availability_its;
   for (unsigned int rid = 0 ; rid < this->instance->resource_count() ; ++rid) {
     availability_its.push_back(this->instance->get_resource(rid).get_availability().begin());
   }
+
+  std::unordered_set<Job::JobId> active_jobs;
 
   for (std::tuple<unsigned int, bool, const Job &> ev : events) {
     bool start;
@@ -291,7 +310,7 @@ Solution::print_profile() const
                     std::max((current[r] - availability_its[r]->second), 0.0);
       }
 
-      double free_amount = this->instance->get_resource(r).get_free_amount();
+      double free_amount = this->instance->get_resource(r).get_availability().get_flat_available();
       double interval_costs;
       if (free_amount >= current[r]) {
         interval_costs = 0;
@@ -307,11 +326,22 @@ Solution::print_profile() const
     }
 
     // Update values
+    if (start) {
+    	active_jobs.insert(j.get_jid());
+    } else {
+    	active_jobs.erase(j.get_jid());
+    }
     for (unsigned int r = 0 ; r < this->instance->resource_count() ; ++r) {
       if (start) {
         current[r] += j.get_resource_usage(r);
       } else {
         current[r] -= j.get_resource_usage(r);
+      }
+
+      if (current[r] > max_res_usage[r]) {
+      	max_res_usage[r] = current[r];
+      	max_usage_time[r] = t;
+      	max_usage_jobs[r] = std::vector<Job::JobId>(active_jobs.begin(), active_jobs.end());
       }
     }
 
@@ -324,10 +354,15 @@ Solution::print_profile() const
   for (unsigned int r = 0 ; r < this->instance->resource_count() ; ++r) {
     BOOST_LOG(l.d()) << "======> Overshoot sum for Res " << r << ": " << overshoot_sums[r] ;
     BOOST_LOG(l.d()) << "======> Profile Overshoot sum for Res " << r << ": " << profile_overshoot_sum[r] ;
+  }
 
+  for (unsigned int r = 0 ; r < this->instance->resource_count() ; ++r) {
+    BOOST_LOG(l.d()) << "====> Maximum usage for Res " << r << ": " << max_res_usage[r] ;
+    BOOST_LOG(l.d()) << "~~~~~~> At time " << max_usage_time[r];
+    std::cout << "~~~~~~> Active Jobs: " << max_usage_jobs[r] << "\n";
   }
 }
-*/
+
 
 void
 Solution::print() const

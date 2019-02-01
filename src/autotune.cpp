@@ -12,7 +12,9 @@
 #include "contrib/tinydir.h"                               // for tinydir_dir
 #include "datastructures/maybe.hpp"                        // for Maybe
 #include "generated_config.hpp"                            // for CATCH_EXCE...
+#if defined(GUROBI_FOUND)
 #include "gurobi_c++.h"                                    // for GRBException
+#endif
 #include "instance/instance.hpp"  // for Instance
 #include "io/jsonreader.hpp"                               // for JsonReader
 #include "db/storage.hpp"          // for Storage
@@ -112,7 +114,7 @@ void handle_uncaught()
 
   try {
     std::rethrow_exception (exc);
-  } catch (ArgumentException) {
+  } catch (const ArgumentException &) {
     print_help();
     exit(-1);
   } catch (...) {
@@ -213,6 +215,7 @@ int main(int argc, const char **argv) {
   Randomizer randomizer(cfg.get_global_seed());
   BOOST_LOG(l.d()) << "Global seed is: " << randomizer.get_global_seed() ;
 
+  Storage::initialize(cfg.get_storage_path(), argc, argv);
   Storage store(cfg.get_storage_path());
 
   std::vector<std::string> instances;

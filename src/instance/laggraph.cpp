@@ -335,8 +335,8 @@ LagGraph::check_consistency()
 void
 LagGraph::check_edge_iterator_consistency()
 {
-  for (auto edge : this->edges()) {
-    if (this->get_edge(edge.s, edge.t) == nullptr) {
+  for (auto edge_it : this->edges()) {
+    if (this->get_edge(edge_it.s, edge_it.t) == nullptr) {
       assert(false);
     }
   }

@@ -1,0 +1,2129 @@
+{
+  "id": "351a8258-0e13-417b-87dd-4eb891d2b0b0",
+  "window_extension": {
+    "job_limit": 9,
+    "time_limit": 261
+  },
+  "resources": [
+    {
+      "id": 0,
+      "overshoot_costs": [],
+      "investment_costs": [
+        [
+          1.0,
+          1.0
+        ]
+      ],
+      "free_amount": 0
+    }
+  ],
+  "jobs": [
+    {
+      "id": 0,
+      "deadline": 172,
+      "usages": {
+        "0": 0.03580984675337315
+      },
+      "duration": 21,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_08-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 151
+    },
+    {
+      "id": 1,
+      "deadline": 151,
+      "usages": {
+        "0": 1.8365766302510769
+      },
+      "duration": 48,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 103
+    },
+    {
+      "id": 2,
+      "deadline": 1083,
+      "usages": {
+        "0": 0.40551101739225615
+      },
+      "duration": 116,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 967
+    },
+    {
+      "id": 3,
+      "deadline": 475,
+      "usages": {
+        "0": 0.5164043307772211
+      },
+      "duration": 23,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 452
+    },
+    {
+      "id": 4,
+      "deadline": 1083,
+      "usages": {
+        "0": 0.029291765492463744
+      },
+      "duration": 47,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1036
+    },
+    {
+      "id": 5,
+      "deadline": 1037,
+      "usages": {
+        "0": 0.8229526681766871
+      },
+      "duration": 76,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 961
+    },
+    {
+      "id": 6,
+      "deadline": 1341,
+      "usages": {
+        "0": 0.796848116366959
+      },
+      "duration": 51,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1290
+    },
+    {
+      "id": 7,
+      "deadline": 454,
+      "usages": {
+        "0": 0.42476155531717696
+      },
+      "duration": 57,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 397
+    },
+    {
+      "id": 8,
+      "deadline": 1073,
+      "usages": {
+        "0": 0.7993508201512467
+      },
+      "duration": 66,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 1007
+    },
+    {
+      "id": 9,
+      "deadline": 145,
+      "usages": {
+        "0": 0.5279465463652371
+      },
+      "duration": 19,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 126
+    },
+    {
+      "id": 10,
+      "deadline": 161,
+      "usages": {
+        "0": 1.6104473025489885
+      },
+      "duration": 39,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 3
+      },
+      "release": 122
+    },
+    {
+      "id": 11,
+      "deadline": 1055,
+      "usages": {
+        "0": 0.42241444493329056
+      },
+      "duration": 85,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 970
+    },
+    {
+      "id": 12,
+      "deadline": 1327,
+      "usages": {
+        "0": 0.12465893848182763
+      },
+      "duration": 71,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1256
+    },
+    {
+      "id": 13,
+      "deadline": 1304,
+      "usages": {
+        "0": 1.897284446610666
+      },
+      "duration": 16,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 1288
+    },
+    {
+      "id": 14,
+      "deadline": 146,
+      "usages": {
+        "0": 0.6194351832353531
+      },
+      "duration": 19,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_08-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 127
+    },
+    {
+      "id": 15,
+      "deadline": 1360,
+      "usages": {
+        "0": 0.8171628556075703
+      },
+      "duration": 44,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1316
+    },
+    {
+      "id": 16,
+      "deadline": 469,
+      "usages": {
+        "0": 0.8037731349409544
+      },
+      "duration": 19,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_08-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 449
+    },
+    {
+      "id": 17,
+      "deadline": 153,
+      "usages": {
+        "0": 0.22543992541184835
+      },
+      "duration": 27,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 126
+    },
+    {
+      "id": 18,
+      "deadline": 644,
+      "usages": {
+        "0": 0.010367805331215637
+      },
+      "duration": 255,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 389
+    },
+    {
+      "id": 19,
+      "deadline": 1017,
+      "usages": {
+        "0": 0.3978799431917954
+      },
+      "duration": 76,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 941
+    },
+    {
+      "id": 20,
+      "deadline": 410,
+      "usages": {
+        "0": 5.502175728352195
+      },
+      "duration": 15,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 395
+    },
+    {
+      "id": 21,
+      "deadline": 991,
+      "usages": {
+        "0": 0.7013478907997195
+      },
+      "duration": 50,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 941
+    },
+    {
+      "id": 22,
+      "deadline": 1333,
+      "usages": {
+        "0": 5.456784530291101
+      },
+      "duration": 11,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1322
+    },
+    {
+      "id": 23,
+      "deadline": 138,
+      "usages": {
+        "0": 1.056876393811279
+      },
+      "duration": 9,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_08-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 129
+    },
+    {
+      "id": 24,
+      "deadline": 1005,
+      "usages": {
+        "0": 0.8592443173842702
+      },
+      "duration": 36,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 969
+    },
+    {
+      "id": 25,
+      "deadline": 1339,
+      "usages": {
+        "0": 0.9473953836422828
+      },
+      "duration": 68,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1271
+    },
+    {
+      "id": 26,
+      "deadline": 105,
+      "usages": {
+        "0": 2.4186757089365813
+      },
+      "duration": 19,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 86
+    },
+    {
+      "id": 27,
+      "deadline": 1002,
+      "usages": {
+        "0": 3.163828014512615
+      },
+      "duration": 14,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 988
+    },
+    {
+      "id": 28,
+      "deadline": 1050,
+      "usages": {
+        "0": 2.613874055023695
+      },
+      "duration": 17,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 1033
+    },
+    {
+      "id": 29,
+      "deadline": 773,
+      "usages": {
+        "0": 3.59268938804715
+      },
+      "duration": 10,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 763
+    },
+    {
+      "id": 30,
+      "deadline": 1298,
+      "usages": {
+        "0": 0.8966710384357308
+      },
+      "duration": 45,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 1253
+    },
+    {
+      "id": 31,
+      "deadline": 1069,
+      "usages": {
+        "0": 5.549649489514059
+      },
+      "duration": 15,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1053
+    },
+    {
+      "id": 32,
+      "deadline": 752,
+      "usages": {
+        "0": 0.4499453449673883
+      },
+      "duration": 50,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 702
+    },
+    {
+      "id": 33,
+      "deadline": 656,
+      "usages": {
+        "0": 0.04658950557555126
+      },
+      "duration": 229,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 427
+    },
+    {
+      "id": 34,
+      "deadline": 1343,
+      "usages": {
+        "0": 0.8269733593724176
+      },
+      "duration": 48,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 1295
+    },
+    {
+      "id": 35,
+      "deadline": 521,
+      "usages": {
+        "0": 0.6307710799004791
+      },
+      "duration": 48,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 473
+    },
+    {
+      "id": 36,
+      "deadline": 436,
+      "usages": {
+        "0": 8.94988147139561
+      },
+      "duration": 5,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 431
+    },
+    {
+      "id": 37,
+      "deadline": 737,
+      "usages": {
+        "0": 0.6096993514264077
+      },
+      "duration": 32,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_08-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 705
+    },
+    {
+      "id": 38,
+      "deadline": 783,
+      "usages": {
+        "0": 1.276836330783064
+      },
+      "duration": 43,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 740
+    },
+    {
+      "id": 39,
+      "deadline": 458,
+      "usages": {
+        "0": 0.492044990156846
+      },
+      "duration": 65,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 393
+    },
+    {
+      "id": 40,
+      "deadline": 193,
+      "usages": {
+        "0": 1.1275980981016276
+      },
+      "duration": 37,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 156
+    },
+    {
+      "id": 41,
+      "deadline": 496,
+      "usages": {
+        "0": 0.08811937141936876
+      },
+      "duration": 103,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 392
+    },
+    {
+      "id": 42,
+      "deadline": 729,
+      "usages": {
+        "0": 0.0769759089462595
+      },
+      "duration": 49,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 680
+    },
+    {
+      "id": 43,
+      "deadline": 521,
+      "usages": {
+        "0": 0.061446985432309045
+      },
+      "duration": 94,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 427
+    },
+    {
+      "id": 44,
+      "deadline": 1060,
+      "usages": {
+        "0": 0.6228431014106972
+      },
+      "duration": 69,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 990
+    },
+    {
+      "id": 45,
+      "deadline": 470,
+      "usages": {
+        "0": 0.43259209547036287
+      },
+      "duration": 44,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 426
+    },
+    {
+      "id": 46,
+      "deadline": 1331,
+      "usages": {
+        "0": 10.741642669662756
+      },
+      "duration": 7,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1324
+    },
+    {
+      "id": 47,
+      "deadline": 1435,
+      "usages": {
+        "0": 0.4012300062703223
+      },
+      "duration": 164,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 1271
+    },
+    {
+      "id": 48,
+      "deadline": 1347,
+      "usages": {
+        "0": 0.527654974306348
+      },
+      "duration": 92,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1255
+    },
+    {
+      "id": 49,
+      "deadline": 770,
+      "usages": {
+        "0": 1.1464892879250623
+      },
+      "duration": 69,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 701
+    },
+    {
+      "id": 50,
+      "deadline": 706,
+      "usages": {
+        "0": 0.8796537894933529
+      },
+      "duration": 36,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 670
+    },
+    {
+      "id": 51,
+      "deadline": 585,
+      "usages": {
+        "0": 0.1980717539092961
+      },
+      "duration": 213,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 372
+    },
+    {
+      "id": 52,
+      "deadline": 715,
+      "usages": {
+        "0": 0.11087657602908907
+      },
+      "duration": 318,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 397
+    },
+    {
+      "id": 53,
+      "deadline": 989,
+      "usages": {
+        "0": 0.4023890490432483
+      },
+      "duration": 20,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 969
+    },
+    {
+      "id": 54,
+      "deadline": 490,
+      "usages": {
+        "0": 0.22104867491996175
+      },
+      "duration": 96,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 393
+    },
+    {
+      "id": 55,
+      "deadline": 192,
+      "usages": {
+        "0": 0.1303265056831876
+      },
+      "duration": 95,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 97
+    },
+    {
+      "id": 56,
+      "deadline": 1261,
+      "usages": {
+        "0": 13.302015581342282
+      },
+      "duration": 6,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 1255
+    },
+    {
+      "id": 57,
+      "deadline": 983,
+      "usages": {
+        "0": 1.8985779991652298
+      },
+      "duration": 35,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 948
+    },
+    {
+      "id": 58,
+      "deadline": 770,
+      "usages": {
+        "0": 0.5565680785066095
+      },
+      "duration": 68,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 702
+    },
+    {
+      "id": 59,
+      "deadline": 463,
+      "usages": {
+        "0": 0.3271895770955493
+      },
+      "duration": 47,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 416
+    },
+    {
+      "id": 60,
+      "deadline": 1195,
+      "usages": {
+        "0": 0.21301492115589768
+      },
+      "duration": 212,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 983
+    },
+    {
+      "id": 61,
+      "deadline": 591,
+      "usages": {
+        "0": 0.04980572967588356
+      },
+      "duration": 219,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 372
+    },
+    {
+      "id": 62,
+      "deadline": 1034,
+      "usages": {
+        "0": 0.15744678914153035
+      },
+      "duration": 66,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 968
+    },
+    {
+      "id": 63,
+      "deadline": 1355,
+      "usages": {
+        "0": 0.2633524674584938
+      },
+      "duration": 84,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 1271
+    },
+    {
+      "id": 64,
+      "deadline": 517,
+      "usages": {
+        "0": 0.4098546265747622
+      },
+      "duration": 90,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 427
+    },
+    {
+      "id": 65,
+      "deadline": 737,
+      "usages": {
+        "0": 0.7837590271795667
+      },
+      "duration": 4,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 733
+    },
+    {
+      "id": 66,
+      "deadline": 1061,
+      "usages": {
+        "0": 1.6197142162606213
+      },
+      "duration": 18,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 1043
+    },
+    {
+      "id": 67,
+      "deadline": 994,
+      "usages": {
+        "0": 0.5545329034495421
+      },
+      "duration": 29,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 965
+    },
+    {
+      "id": 68,
+      "deadline": 1026,
+      "usages": {
+        "0": 0.4454014988072619
+      },
+      "duration": 38,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 988
+    },
+    {
+      "id": 69,
+      "deadline": 784,
+      "usages": {
+        "0": 0.12098008365986644
+      },
+      "duration": 53,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 731
+    },
+    {
+      "id": 70,
+      "deadline": 277,
+      "usages": {
+        "0": 0.05493958623631806
+      },
+      "duration": 172,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 105
+    },
+    {
+      "id": 71,
+      "deadline": 1268,
+      "usages": {
+        "0": 1.5090621127374135
+      },
+      "duration": 15,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 1253
+    },
+    {
+      "id": 72,
+      "deadline": 1045,
+      "usages": {
+        "0": 0.4042755834291394
+      },
+      "duration": 78,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 967
+    },
+    {
+      "id": 73,
+      "deadline": 1311,
+      "usages": {
+        "0": 0.7490531556094983
+      },
+      "duration": 58,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 1253
+    },
+    {
+      "id": 74,
+      "deadline": 231,
+      "usages": {
+        "0": 1.373598111004102
+      },
+      "duration": 29,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 202
+    },
+    {
+      "id": 75,
+      "deadline": 1253,
+      "usages": {
+        "0": 2.7282147076818215
+      },
+      "duration": 13,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 1240
+    },
+    {
+      "id": 76,
+      "deadline": 439,
+      "usages": {
+        "0": 0.6117973821410471
+      },
+      "duration": 23,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 415
+    },
+    {
+      "id": 77,
+      "deadline": 721,
+      "usages": {
+        "0": 1.5537367063545242
+      },
+      "duration": 51,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_10-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 669
+    },
+    {
+      "id": 78,
+      "deadline": 775,
+      "usages": {
+        "0": 0.5738694007317332
+      },
+      "duration": 80,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 695
+    },
+    {
+      "id": 79,
+      "deadline": 1269,
+      "usages": {
+        "0": 0.39495987287614776
+      },
+      "duration": 30,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 1238
+    },
+    {
+      "id": 80,
+      "deadline": 721,
+      "usages": {
+        "0": 1.5694368809842312
+      },
+      "duration": 39,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 681
+    },
+    {
+      "id": 81,
+      "deadline": 493,
+      "usages": {
+        "0": 0.4040713816178858
+      },
+      "duration": 66,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 427
+    },
+    {
+      "id": 82,
+      "deadline": 1045,
+      "usages": {
+        "0": 1.3619192693500375
+      },
+      "duration": 24,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 1020
+    },
+    {
+      "id": 83,
+      "deadline": 719,
+      "usages": {
+        "0": 0.6962655390217344
+      },
+      "duration": 38,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 681
+    },
+    {
+      "id": 84,
+      "deadline": 921,
+      "usages": {
+        "0": 0.13438726225831799
+      },
+      "duration": 244,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 677
+    },
+    {
+      "id": 85,
+      "deadline": 137,
+      "usages": {
+        "0": 0.10080368617890798
+      },
+      "duration": 51,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 86
+    },
+    {
+      "id": 86,
+      "deadline": 491,
+      "usages": {
+        "0": 0.23790225011084376
+      },
+      "duration": 98,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 393
+    },
+    {
+      "id": 87,
+      "deadline": 208,
+      "usages": {
+        "0": 1.3921803216566984
+      },
+      "duration": 36,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 172
+    },
+    {
+      "id": 88,
+      "deadline": 697,
+      "usages": {
+        "0": 0.4219888082008959
+      },
+      "duration": 17,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 680
+    },
+    {
+      "id": 89,
+      "deadline": 726,
+      "usages": {
+        "0": 2.144312224383269
+      },
+      "duration": 25,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 701
+    },
+    {
+      "id": 90,
+      "deadline": 757,
+      "usages": {
+        "0": 5.397113492098852
+      },
+      "duration": 25,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 732
+    },
+    {
+      "id": 91,
+      "deadline": 773,
+      "usages": {
+        "0": 3.854706571556827
+      },
+      "duration": 12,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 761
+    },
+    {
+      "id": 92,
+      "deadline": 224,
+      "usages": {
+        "0": 0.4565631234662791
+      },
+      "duration": 68,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 156
+    },
+    {
+      "id": 93,
+      "deadline": 1315,
+      "usages": {
+        "0": 0.17765261633325918
+      },
+      "duration": 58,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1257
+    },
+    {
+      "id": 94,
+      "deadline": 489,
+      "usages": {
+        "0": 0.14166661426576346
+      },
+      "duration": 96,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 393
+    },
+    {
+      "id": 95,
+      "deadline": 420,
+      "usages": {
+        "0": 0.12068470193352508
+      },
+      "duration": 23,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 397
+    },
+    {
+      "id": 96,
+      "deadline": 102,
+      "usages": {
+        "0": 3.726260799510753
+      },
+      "duration": 24,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 3
+      },
+      "release": 78
+    },
+    {
+      "id": 97,
+      "deadline": 1085,
+      "usages": {
+        "0": 1.3508168872612698
+      },
+      "duration": 32,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1053
+    },
+    {
+      "id": 98,
+      "deadline": 1026,
+      "usages": {
+        "0": 0.7506320907488572
+      },
+      "duration": 30,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 996
+    },
+    {
+      "id": 99,
+      "deadline": 712,
+      "usages": {
+        "0": 10.653100831546203
+      },
+      "duration": 11,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 701
+    },
+    {
+      "id": 100,
+      "deadline": 1380,
+      "usages": {
+        "0": 0.38913609109430985
+      },
+      "duration": 52,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 1327
+    },
+    {
+      "id": 101,
+      "deadline": 1030,
+      "usages": {
+        "0": 1.1105169165960769
+      },
+      "duration": 46,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 984
+    },
+    {
+      "id": 102,
+      "deadline": 1334,
+      "usages": {
+        "0": 3.9486720970544087
+      },
+      "duration": 13,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 1321
+    },
+    {
+      "id": 103,
+      "deadline": 460,
+      "usages": {
+        "0": 1.2133385882362484
+      },
+      "duration": 15,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 445
+    },
+    {
+      "id": 104,
+      "deadline": 782,
+      "usages": {
+        "0": 1.416011899903538
+      },
+      "duration": 38,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 3
+      },
+      "release": 744
+    },
+    {
+      "id": 105,
+      "deadline": 784,
+      "usages": {
+        "0": 0.09707886400742262
+      },
+      "duration": 51,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 733
+    },
+    {
+      "id": 106,
+      "deadline": 1349,
+      "usages": {
+        "0": 1.0914884502568691
+      },
+      "duration": 43,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 1306
+    },
+    {
+      "id": 107,
+      "deadline": 1371,
+      "usages": {
+        "0": 0.6913968564865025
+      },
+      "duration": 55,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1316
+    },
+    {
+      "id": 108,
+      "deadline": 755,
+      "usages": {
+        "0": 0.6450386691265373
+      },
+      "duration": 73,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 681
+    },
+    {
+      "id": 109,
+      "deadline": 794,
+      "usages": {
+        "0": 0.6281435798473036
+      },
+      "duration": 61,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 732
+    },
+    {
+      "id": 110,
+      "deadline": 1330,
+      "usages": {
+        "0": 1.4186307402820573
+      },
+      "duration": 54,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 3
+      },
+      "release": 1276
+    },
+    {
+      "id": 111,
+      "deadline": 217,
+      "usages": {
+        "0": 1.0018396699059147
+      },
+      "duration": 61,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 156
+    },
+    {
+      "id": 112,
+      "deadline": 950,
+      "usages": {
+        "0": 2.307934139682834
+      },
+      "duration": 9,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 941
+    },
+    {
+      "id": 113,
+      "deadline": 1314,
+      "usages": {
+        "0": 1.2349214558403063
+      },
+      "duration": 54,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1259
+    },
+    {
+      "id": 114,
+      "deadline": 1019,
+      "usages": {
+        "0": 0.9139377908428193
+      },
+      "duration": 24,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_08-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 995
+    },
+    {
+      "id": 115,
+      "deadline": 1384,
+      "usages": {
+        "0": 0.08074299113187909
+      },
+      "duration": 84,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 1300
+    },
+    {
+      "id": 116,
+      "deadline": 268,
+      "usages": {
+        "0": 0.2149630095202455
+      },
+      "duration": 112,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 156
+    },
+    {
+      "id": 117,
+      "deadline": 518,
+      "usages": {
+        "0": 0.34852314088247976
+      },
+      "duration": 129,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 389
+    },
+    {
+      "id": 118,
+      "deadline": 171,
+      "usages": {
+        "0": 0.6877249330474859
+      },
+      "duration": 23,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 148
+    },
+    {
+      "id": 119,
+      "deadline": 264,
+      "usages": {
+        "0": 0.8347647883788382
+      },
+      "duration": 62,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 202
+    },
+    {
+      "id": 120,
+      "deadline": 1078,
+      "usages": {
+        "0": 1.0169815330653602
+      },
+      "duration": 89,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 989
+    },
+    {
+      "id": 121,
+      "deadline": 877,
+      "usages": {
+        "0": 0.2711816873261294
+      },
+      "duration": 217,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 660
+    },
+    {
+      "id": 122,
+      "deadline": 1360,
+      "usages": {
+        "0": 0.39830912862316664
+      },
+      "duration": 53,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 1307
+    },
+    {
+      "id": 123,
+      "deadline": 221,
+      "usages": {
+        "0": 0.16790979913432735
+      },
+      "duration": 102,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 119
+    },
+    {
+      "id": 124,
+      "deadline": 158,
+      "usages": {
+        "0": 0.2337321941503826
+      },
+      "duration": 56,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_10-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 102
+    },
+    {
+      "id": 125,
+      "deadline": 742,
+      "usages": {
+        "0": 0.6866063837720752
+      },
+      "duration": 62,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 680
+    },
+    {
+      "id": 126,
+      "deadline": 1013,
+      "usages": {
+        "0": 0.5619503873413817
+      },
+      "duration": 46,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 967
+    },
+    {
+      "id": 127,
+      "deadline": 185,
+      "usages": {
+        "0": 0.7332702665414376
+      },
+      "duration": 23,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_08-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 161
+    },
+    {
+      "id": 128,
+      "deadline": 1308,
+      "usages": {
+        "0": 0.8660265919540139
+      },
+      "duration": 34,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1274
+    },
+    {
+      "id": 129,
+      "deadline": 795,
+      "usages": {
+        "0": 0.22391990397392686
+      },
+      "duration": 47,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_09-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 748
+    },
+    {
+      "id": 130,
+      "deadline": 400,
+      "usages": {
+        "0": 10.717966775995638
+      },
+      "duration": 9,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 391
+    },
+    {
+      "id": 131,
+      "deadline": 1334,
+      "usages": {
+        "0": 3.026436062727626
+      },
+      "duration": 39,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 1295
+    },
+    {
+      "id": 132,
+      "deadline": 988,
+      "usages": {
+        "0": 1.1842166308968574
+      },
+      "duration": 19,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 969
+    },
+    {
+      "id": 133,
+      "deadline": 139,
+      "usages": {
+        "0": 6.093340700981761
+      },
+      "duration": 17,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 3
+      },
+      "release": 122
+    },
+    {
+      "id": 134,
+      "deadline": 140,
+      "usages": {
+        "0": 0.4394796985572053
+      },
+      "duration": 13,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_08-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 127
+    },
+    {
+      "id": 135,
+      "deadline": 1288,
+      "usages": {
+        "0": 1.536878239310008
+      },
+      "duration": 52,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 1236
+    },
+    {
+      "id": 136,
+      "deadline": 1081,
+      "usages": {
+        "0": 0.37587507494724487
+      },
+      "duration": 81,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 1000
+    },
+    {
+      "id": 137,
+      "deadline": 462,
+      "usages": {
+        "0": 0.1739226842716835
+      },
+      "duration": 63,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 399
+    },
+    {
+      "id": 138,
+      "deadline": 1342,
+      "usages": {
+        "0": 1.3970202778365213
+      },
+      "duration": 47,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_05-014_4NBL_S_kVA",
+        "PID": 1
+      },
+      "release": 1295
+    },
+    {
+      "id": 139,
+      "deadline": 497,
+      "usages": {
+        "0": 1.5510428131372047
+      },
+      "duration": 51,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 3
+      },
+      "release": 445
+    },
+    {
+      "id": 140,
+      "deadline": 730,
+      "usages": {
+        "0": 2.140943698948261
+      },
+      "duration": 32,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 3
+      },
+      "release": 698
+    },
+    {
+      "id": 141,
+      "deadline": 760,
+      "usages": {
+        "0": 0.26487979069949785
+      },
+      "duration": 60,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 700
+    },
+    {
+      "id": 142,
+      "deadline": 732,
+      "usages": {
+        "0": 0.6694036190685004
+      },
+      "duration": 50,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 681
+    },
+    {
+      "id": 143,
+      "deadline": 429,
+      "usages": {
+        "0": 4.389437765975114
+      },
+      "duration": 17,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_03-014_4NBL_S_kVA",
+        "PID": 3
+      },
+      "release": 412
+    },
+    {
+      "id": 144,
+      "deadline": 781,
+      "usages": {
+        "0": 0.9006575780886977
+      },
+      "duration": 51,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 730
+    },
+    {
+      "id": 145,
+      "deadline": 1388,
+      "usages": {
+        "0": 0.1664268960694511
+      },
+      "duration": 130,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_01-006_1BL_S_kVA",
+        "PID": 2
+      },
+      "release": 1258
+    },
+    {
+      "id": 146,
+      "deadline": 1349,
+      "usages": {
+        "0": 2.814861994827184
+      },
+      "duration": 22,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_02-014_4NBL_S_kVA",
+        "PID": 2
+      },
+      "release": 1327
+    },
+    {
+      "id": 147,
+      "deadline": 761,
+      "usages": {
+        "0": 0.7637807723552628
+      },
+      "duration": 16,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_06-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 745
+    },
+    {
+      "id": 148,
+      "deadline": 128,
+      "usages": {
+        "0": 0.7876093893527227
+      },
+      "duration": 51,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 77
+    },
+    {
+      "id": 149,
+      "deadline": 455,
+      "usages": {
+        "0": 0.19287312142569854
+      },
+      "duration": 43,
+      "successors": {},
+      "additional": {
+        "MID": "AVT_04-006_1BL_S_kVA",
+        "PID": 1
+      },
+      "release": 412
+    }
+  ],
+  "additional": {
+    "time_scaling_factor": 0.2,
+    "grouping_key": "034b43d9-dc4b-4edb-bbf1-1f450824367f",
+    "we_jobs": 9,
+    "days": 5,
+    "we_time_percent": 0.03
+  }
+}

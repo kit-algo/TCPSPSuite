@@ -14,8 +14,6 @@ class Instance;
 class SolverConfig;
 class Traits;
 
-// TODO SOS1-Constraint statt Big-M?
-
 /* This is the basic discrete-time formulation of Kone et al. taken from
  * 10.1016/j.cor.2009.12.011
  *
@@ -39,18 +37,16 @@ public:
 	using ParamType = ilpabstraction::ParamType;
 	using ModelStatus = ilpabstraction::ModelStatus;
 	using Constraint = typename MIPSolverT::Constraint;
+	using MIPFeatures = ilpabstraction::Features;
 
-	Solution get_solution();
-  static std::string get_id();
   Maybe<double> get_lower_bound();
 
   static const Traits &get_requirements();
 
+  Solution get_solution();
+
 protected:
 	const Instance &instance;
-
-  void print_profile() const;
-
   class Callback : public MIPSolverT::Callback {
   public:
     Callback(const Timer & timer, AdditionalResultStorage & additional_storage, Log & l);
@@ -71,10 +67,11 @@ protected:
     Log & l;
   };
 
+	void prepare_base_variables();
 	void prepare_pre();
 	void prepare_post();
 
-	void prepare_extension_constraints();
+	void base_run();
 
 	// constraint (4)
   void prepare_edge_constraints();
@@ -88,31 +85,40 @@ protected:
   void solve(Maybe<unsigned int> time_limit);
   void compute_values();
 
+	Solution get_solution_by_start_vars();
+
 	MIPSolver env;
 	Model model;
 
-	// Start points
+	/* Solution
+	 *
+	 * Must be set by the implementation if start_points are not being used
+	 */
+	std::vector<Maybe<unsigned int>> computed_solution_start_times;
+
+	/* Start points
+	 * IMPLEMENTATION must define these for:
+	 * 	 * job dependencies
+	 *   * automatic solution retrieval
+	 * If they are generated, implementation must make sure to introduce constraints
+ 	 * on them! */
+	void generate_vars_start_points();
+	bool start_points_set;
   std::vector<Variable> start_points;
 
   // Duration variables
-  std::vector<Maybe<Variable>> duration_variables;
+  // IMPLEMENTATION must define these
+  std::vector<Variable> duration_variables;
 
   // Maximum usage of the resources
+  // IMPLEMENTATION must define these
   std::vector<Variable> max_usage_variables;
 
-  // Overshoot of each resource in every timestep
-  std::vector<std::vector<Variable>> overshoot_variables;
-
-	// TODO totally switch these three off
-	// Window-left-extension variables
-	std::vector<Variable> left_extension_var;
-
-	// Window-right-extension variables
-	std::vector<Variable> right_extension_var;
-
 	// Window-not-modified indicators
+	// IMPLEMENTATION must define these
 	std::vector<Variable> window_not_modified_var;
 
+	// IMPLEMENTATION must define these using constraints
 	Variable overshoot_cost_variable;
 	Variable investment_cost_variable;
 
@@ -124,6 +130,7 @@ protected:
   bool optimized;
 
 	bool initialize_with_early;
+	bool collect_kappa_stats;
 
   static const Traits required_traits;
 
@@ -134,11 +141,6 @@ protected:
 	Callback cb;
 
   Log l;
-
-	Variable window_extension_time_var;
-	Variable window_extension_job_var;
-	Constraint window_extension_time_constraint;
-	Constraint window_extension_job_constraint;
 };
 
 #endif

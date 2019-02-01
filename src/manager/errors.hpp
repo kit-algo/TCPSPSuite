@@ -1,12 +1,11 @@
 #ifndef ERRORS_H
 #define ERRORS_H
 
-#include <exception>        // for exception
-#include <string>           // for string
-#include <vector>           // for vector
-#include "../util/log.hpp"  // for Log
+#include "../util/log.hpp"
+
 class Instance;
 class Storage;
+class SolverConfig;
 
 class RuntimeError : public std::exception {
 public:
@@ -23,36 +22,48 @@ public:
 protected:
   int seed;
   int fault_code;
-  const Instance &instance;
+  const Instance  * instance;
   std::string reason;
   std::vector<std::string> bt;
 };
 
 class InconsistentResultError : public RuntimeError {
 public:
-  InconsistentResultError(const Instance &instance, int seed, int fault_code_in, std::string reason = std::string("")) noexcept;
+  InconsistentResultError(const Instance &instance, int seed, int fault_code_in,
+													std::string reason = std::string("")) noexcept;
 
   virtual unsigned int EXCEPTION_ID() const { return 1 ; };
 };
 
 class InconsistentDataError : public RuntimeError {
 public:
-  InconsistentDataError(const Instance &instance, int seed, int fault_code_in, std::string reason = std::string("")) noexcept;
+  InconsistentDataError(const Instance &instance, int seed, int fault_code_in,
+												std::string reason = std::string("")) noexcept;
 
   virtual unsigned int EXCEPTION_ID() const { return 2 ; };
 };
 
 class ConfigurationError : public RuntimeError {
 public:
-  ConfigurationError(const Instance &instance, int seed, int fault_code_in, std::string reason = std::string("")) noexcept;
+  ConfigurationError(const Instance &instance, int seed, int fault_code_in,
+										 std::string reason = std::string("")) noexcept;
 
   virtual unsigned int EXCEPTION_ID() const { return 3 ; };
+};
+
+class IOError : public RuntimeError {
+public:
+	IOError(const Instance &instance, int seed, int fault_code_in,
+					std::string reason = std::string("")) noexcept;
+
+  virtual unsigned int EXCEPTION_ID() const { return 4 ; };
 };
 
 // TODO handle reason!
 class ErrorHandler {
 public:
-  ErrorHandler(Storage &storage, std::string solver_id, std::string run_id, std::string config_id_in);
+  ErrorHandler(Storage &storage, std::string solver_id, std::string run_id,
+               std::string config_id_in, const SolverConfig *sconf_in = nullptr);
   void handle(const RuntimeError &exception);
 
 private:
@@ -64,7 +75,8 @@ private:
   std::string solver_id;
   std::string run_id;
   std::string config_id;
-
+	const SolverConfig * sconf;
+	
   Log l;
 };
 

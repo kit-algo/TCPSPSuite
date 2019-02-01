@@ -1,8 +1,9 @@
 #ifndef GRAPHALGOS_H
 #define GRAPHALGOS_H
 
-#include "../instance/laggraph.hpp"
-#include "../instance/instance.hpp"
+#include <vector>                    // for vector
+#include "../instance/laggraph.hpp"  // for LagGraph, LagGraph::vertex
+class Instance;
 
 template <typename visit_func, typename backtrack_func, typename traverse_func>
 class DFS {

@@ -10,6 +10,10 @@
 #include "../util/solverconfig.hpp"
 #include "../instance/laggraph.hpp"
 #include "../instance/resource.hpp"
+#include "../util/fault_codes.hpp"                        // for FAULT_INVAL...
+#include "../manager/errors.hpp"                          // for Inconsisten...
+#include "../instance/job.hpp"
+#include "../instance/instance.hpp" // IWYU pragma: keep
 
 #if defined(GUROBI_FOUND)
 #include "../contrib/ilpabstraction/src/ilpa_gurobi.hpp"
@@ -39,7 +43,7 @@ DTILP<SolverT>::prepare_warmstart()
 
 template <class SolverT>
 void
-DTILP<SolverT>::prepare_derived()
+DTILP<SolverT>::prepare_start_point_constraints()
 {
 	for (unsigned int jid = 0 ; jid < this->instance.job_count() ; ++jid) {
 		Expression expr = this->env.create_expression();
@@ -51,17 +55,49 @@ DTILP<SolverT>::prepare_derived()
 	}
 }
 
+template<class SolverT>
+void
+DTILP<SolverT>::prepare_overshoot_costs()
+{
+	Expression overshoot_sum = this->env.create_expression();
+
+	for (unsigned int i = 0 ; i < this->instance.resource_count() ; ++i) {
+		const Resource & res = this->instance.get_resource(i);
+
+		// Overshoot costs
+		polynomial overshoot_costs = res.get_overshoot_costs();
+		for (poly_term term : overshoot_costs) {
+			double coefficient = std::get<0>(term);
+			double exponent = std::get<1>(term);
+			if ((exponent > 1.0) || (exponent < 1.0)) {
+				throw InconsistentResultError(this->instance,
+				                              this->seed,
+				                              FAULT_INVALID_COST_EXPONENTS,
+				                              "Only 1.0 is supported as exponent");
+			}
+
+			for (unsigned int t = 0; t <= this->latest_deadline; ++t) {
+				overshoot_sum += coefficient * this->overshoot_variables[i][t];
+			}
+		}
+	}
+
+	this->model.add_constraint(overshoot_sum, this->overshoot_cost_variable, MIPSolver::INFTY);
+}
+
 template <class SolverT>
 void
 DTILP<SolverT>::prepare_variables()
 {
-	this->start_points.resize(this->instance.job_count());
+	// We use the start-variables from the base ILP
+	this->generate_vars_start_points();
+
+	// Switch-On-Variables
 	this->variables.resize(this->instance.job_count());
 	this->time_step_bounds.resize(this->instance.job_count());
 
 	this->overduration_and_swon_variables.resize(this->instance.job_count());
 
-	// Switch-On-Variables
 	std::vector<double> sos1_weights;
 
 	for (unsigned int i = 0 ; i < this->instance.job_count() ; i++) {
@@ -72,7 +108,7 @@ DTILP<SolverT>::prepare_variables()
 		                                   + (int)this->instance.get_window_extension_limit();
 		this->time_step_bounds[i] = {
 			earliest_start_with_extension,
-			latest_finish_with_extension - earliest_start_with_extension - job.get_duration() + 1
+			latest_finish_with_extension - earliest_start_with_extension - (int)job.get_duration() + 1
 		};
 
 		this->variables[i].resize(this->time_step_bounds[i].second);
@@ -104,15 +140,6 @@ DTILP<SolverT>::prepare_variables()
 
 	}
 
-	// Start points
-	for (unsigned int i = 0 ; i < this->instance.job_count() ; i++) {
-		this->start_points[i] = this->model.add_var(ilpabstraction::VariableType::INTEGER,
-		                                            this->time_step_bounds[i].first,
-						                                    this->time_step_bounds[i].first +
-						                                            this->time_step_bounds[i].second,
-		                                            std::string("start_point_" + std::to_string(i)));
-	}
-
 	// Duration variables
 	/*
 	this->duration_variables.resize(this->instance.job_count());
@@ -131,11 +158,8 @@ DTILP<SolverT>::prepare_variables()
 	*/
 
 	// Duration & Overduration variables
-	this->duration_variables.clear();
-	this->duration_variables.resize(this->instance.job_count());
 	this->overduration_variables.resize(this->instance.job_count());
 	for (unsigned int i = 0 ; i < this->instance.job_count() ; i++) {
-		const Job & job = this->instance.get_job(i);
 		unsigned int max_overduration = 0;
 
 		for (const auto & edge : this->instance.get_laggraph().reverse_neighbors(i)) {
@@ -143,13 +167,6 @@ DTILP<SolverT>::prepare_variables()
 		}
 
 		if (max_overduration > 0) {
-			// Create a duration variable
-			// TODO hint this to the jobs duration
-			this->duration_variables[i] = this->model.add_var(ilpabstraction::VariableType::INTEGER,
-			                                                  job.get_duration(),
-			                                                  job.get_duration() + max_overduration,
-			                                                  std::string("duration_") + std::to_string(i));
-
 			// Create Overduration indicators
 			for (unsigned int t = 1 ; t <= max_overduration ; ++t) {
 				this->overduration_variables[i].push_back(
@@ -176,11 +193,7 @@ DTILP<SolverT>::prepare_variables()
 	}
 
 	this->overshoot_variables.resize(this->instance.resource_count());
-	this->max_usage_variables.resize(this->instance.resource_count());
 	for (unsigned int i = 0 ; i < this->instance.resource_count() ; i++) {
-		this->max_usage_variables[i] = this->model.add_var(ilpabstraction::VariableType::CONTINUOUS, 0, MIPSolver::INFTY,
-		                                                   std::string("max_res_") + std::to_string(i));
-
 		this->overshoot_variables[i].resize((unsigned int)this->latest_deadline + 1);
 		for (unsigned int j = 0 ; j <= this->latest_deadline ; j++) {
 			this->overshoot_variables[i][j] = this->model.add_var(ilpabstraction::VariableType::CONTINUOUS, 0,
@@ -190,12 +203,6 @@ DTILP<SolverT>::prepare_variables()
 			                                                      + std::to_string(j));
 		}
 	}
-
-	this->overshoot_cost_variable = this->model.add_var(ilpabstraction::VariableType::CONTINUOUS, 0, MIPSolver::INFTY,
-	                                                    std::string("overshoot_costs"));
-
-	this->investment_cost_variable = this->model.add_var(ilpabstraction::VariableType::CONTINUOUS, 0, MIPSolver::INFTY,
-	                                                     std::string("investment_costs"));
 
 	/*
 	 * Extension variables
@@ -224,6 +231,39 @@ DTILP<SolverT>::prepare_variables()
 	this->model.commit_variables();
 }
 
+template <class SolverT>
+void
+DTILP<SolverT>::prepare_extension_constraints()
+{
+	/*
+	 * Limit the sum of the extensions / number of extended jobs
+	 */
+	Expression extension_sum = this->env.create_expression();
+	Expression modified_sum = this->env.create_expression();
+	for (unsigned int i = 0; i < this->instance.job_count(); ++i) {
+		extension_sum += this->left_extension_var[i];
+		extension_sum += this->right_extension_var[i];
+		modified_sum += (1 - this->window_not_modified_var[i]);
+	}
+
+	this->model.add_constraint(extension_sum, this->window_extension_time_var, MIPSolver::INFTY);
+	this->model.add_constraint(modified_sum, this->window_extension_job_var, MIPSolver::INFTY);
+
+	this->window_extension_time_constraint =
+					this->model.add_constraint(MIPSolver::NEGATIVE_INFTY, this->window_extension_time_var,
+					                           this->instance.get_window_extension_limit());
+	this->window_extension_job_constraint =
+					this->model.add_constraint(MIPSolver::NEGATIVE_INFTY, this->window_extension_job_var,
+					                           this->instance.get_window_extension_job_limit());
+
+	/*
+	 * Force unmodified-var to zero
+	 */
+	for (unsigned int i = 0; i < this->instance.job_count(); ++i) {
+		this->model.add_sos1_constraint({this->left_extension_var[i], this->right_extension_var[i],
+		                                 this->window_not_modified_var[i]}, {});
+	}
+}
 
 template <class SolverT>
 void
@@ -297,7 +337,6 @@ DTILP<SolverT>::prepare_job_constraints()
 		unsigned int deadline = job.get_deadline();
 		unsigned int release = job.get_release();
 
-		// TODO FIXME latest_deadline must be extended by window extension!
 		for (unsigned int t = 0 ; t < this->time_step_bounds[job_no].second; ++t) {
 			expr += this->variables[job_no][t];
 		}
@@ -318,17 +357,10 @@ DTILP<SolverT>::prepare_job_constraints()
 		Expression deadline_expr = this->env.create_expression();
 		deadline_expr += deadline;
 		deadline_expr += this->right_extension_var[job_no];
-		if (this->duration_variables[job_no].valid()) {
-			this->model.add_constraint(0,
-			                           this->start_points[job_no] + this->duration_variables[job_no],
-			                           deadline_expr,
-			                           std::string("deadline_constraint_") + std::to_string(job_no));
-		} else {
-			this->model.add_constraint(0,
-			                           this->start_points[job_no] + job.get_duration(),
-			                           deadline_expr,
-			                           std::string("deadline_constraint_") + std::to_string(job_no));
-		}
+		this->model.add_constraint(0,
+		                           this->start_points[job_no] + this->duration_variables[job_no],
+		                           deadline_expr,
+		                           std::string("deadline_constraint_") + std::to_string(job_no));
 	}
 }
 
@@ -338,22 +370,21 @@ DTILP<SolverT>::prepare()
 {
 	this->prepare_pre();
 
-	this->compute_values();
 	BOOST_LOG(l.d()) << "Preparing Variables";
 	this->prepare_variables();
-	BOOST_LOG(l.d()) << "Preparing Derived";
-	this->prepare_derived();
+	BOOST_LOG(l.d()) << "Preparing Start Point Constraints";
+	this->prepare_start_point_constraints();
 	BOOST_LOG(l.d()) << "Preparing Job Constraints";
 	this->prepare_job_constraints();
 	BOOST_LOG(l.d()) << "Preparing Duration Constraints";
 	this->prepare_duration_constraint();
-	BOOST_LOG(l.d()) << "Preparing Edge Constraints";
-	this->prepare_edge_constraints();
 	BOOST_LOG(l.d()) << "Preparing Resource Constraints";
 	//BOOST_LOG(l.d()) << std::flush;
 	this->prepare_resource_constraints();
-	BOOST_LOG(l.d()) << "Preparing Objective";
-	this->prepare_objective();
+	BOOST_LOG(l.d()) << "Preparing Extension Constraints";
+	this->prepare_extension_constraints();
+	BOOST_LOG(l.d()) << "Preparing overshoot costs";
+	this->prepare_overshoot_costs();
 
 	this->prepare_post();
 }
@@ -364,10 +395,6 @@ void
 DTILP<SolverT>::prepare_duration_constraint()
 {
 	for (unsigned int jid = 0 ; jid < this->instance.job_count(); ++jid) {
-		if (! this->duration_variables[jid].valid()) {
-			continue; // This job has a fixed duration
-		}
-
 		Expression dur_expr = this->env.create_expression();
 		dur_expr += this->instance.get_job(jid).get_duration();
 
@@ -432,6 +459,27 @@ DTILP<SolverT>::prepare_duration_constraint()
 								MIPSolver::INFTY);
 			}
 		}
+	}
+}
+
+template <class SolverT>
+void
+DTILP<SolverT>::print_profile() const
+{
+	std::vector<double> sums(this->instance.resource_count(), 0.0);
+
+	for (unsigned int t = 0 ; t < this->latest_deadline ; t++) {
+		BOOST_LOG(l.d(2)) << "====> Step " << t ;
+		for (unsigned int r = 0 ; r < this->instance.resource_count() ; ++r) {
+			double overshoot = this->model.get_variable_assignment(this->overshoot_variables[r][t]);
+			//double overshoot = this->overshoot_variables[r][t].get(GRB_DoubleAttr_X);
+			sums[r] += overshoot;
+			BOOST_LOG(l.d(2)) << "    Res " << r << " overshoot: " << overshoot ;
+		}
+	}
+
+	for (unsigned int r = 0 ; r < this->instance.resource_count() ; ++r) {
+		BOOST_LOG(l.d(2)) << "======> Overshoot sum for Res " << r << ": " << sums[r] ;
 	}
 }
 
@@ -517,49 +565,14 @@ void
 DTILP<SolverT>::run()
 {
 	this->prepare();
+	this->base_run();
+}
 
-	if (this->sconf.has_config("dump_path")) {
-		std::string dump_path = this->sconf["dump_path"];
-		this->model.write(dump_path + std::string(".lp"));
-	}
-
-	unsigned int num_vars = this->model.get_variable_count();
-	unsigned int num_constr = this->model.get_constraint_count();
-	unsigned int num_nzs = this->model.get_nonzero_count();
-
-	AdditionalResultStorage::ExtendedMeasure em_vars {
-					"ILP_SIZE_VARIABLES",
-					Maybe<unsigned int>(),
-					Maybe<double>(),
-					AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-					{(int)num_vars}};
-	this->additional_storage.extended_measures.push_back(em_vars);
-
-	AdditionalResultStorage::ExtendedMeasure em_constr {
-					"ILP_SIZE_CONSTRAINTS",
-					Maybe<unsigned int>(),
-					Maybe<double>(),
-					AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-					{(int)num_constr}};
-	this->additional_storage.extended_measures.push_back(em_constr);
-
-	AdditionalResultStorage::ExtendedMeasure em_nzs {
-					"ILP_SIZE_NONZEROES",
-					Maybe<unsigned int>(),
-					Maybe<double>(),
-					AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-					{(int)num_nzs}};
-	this->additional_storage.extended_measures.push_back(em_nzs);
-
-	Maybe<unsigned int> time_limit;
-	if (this->timelimit > 0) {
-		time_limit = Maybe<unsigned int>(this->timelimit); // TODO refactor this
-	}
-	this->solve(time_limit);
-
-	if (this->sconf.has_config("dump_solution_path")) {
-		this->model.write_solution(this->sconf["dump_solution_path"]);
-	}
+template <class SolverT>
+std::string
+DTILP<SolverT>::get_id()
+{
+	return "DTILP v2.3 (" + std::string(SolverT::NAME) + ")";
 }
 
 // explicit instantiation

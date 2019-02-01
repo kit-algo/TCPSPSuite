@@ -1,0 +1,24 @@
+[
+		{
+				"regex" : {"type" : "enum", "value" : ["solver1"]},
+				"time_limit" : {"type" : "enum", "value" : ["200"]},
+				
+				"foo" : {"type" : "linear", "min" : 100, "max" : 200, "step" : 100},
+				"foo2" : {"type" : "enum", "value" : [1,4,9,25]},
+				"foo3" : {"type" : "linear", "min" : 0.5, "max" : 0.7, "step" : 0.1},
+				
+				"bar" : {"type" : "fixed", "value" : true},
+				"bar2" : {"type" : "linear", "min" : true}
+		},
+		{
+				"regex" : {"type" : "enum", "value" : ["solver2"]},
+				"time_limit" : {"type" : "enum", "value" : ["200"]},
+				
+				"might" : {"type" : "linear", "min" : 100, "max" : 200, "step" : 100},
+				"have" : {"type" : "enum", "value" : [1,4,9,25]},
+				"some" : {"type" : "linear", "min" : 0.5, "max" : 0.7, "step" : 0.1},
+				
+				"different" : {"type" : "fixed", "value" : true},
+				"options" : {"type" : "linear", "min" : true}
+		}
+]

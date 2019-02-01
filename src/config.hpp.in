@@ -9,7 +9,7 @@
 #cmakedefine SOFT_FAIL
 #cmakedefine CATCH_EXCEPTIONS
 #cmakedefine EXIT_ON_SIGINT
-
+#cmakedefine INSTRUMENT_MALLOC
 #cmakedefine NUMA_OPTIMIZE
 
 #cmakedefine GUROBI_FOUND
@@ -18,10 +18,17 @@
 #cmakedefine IPOPT_FOUND
 #cmakedefine CAIRO_FOUND
 
+#cmakedefine PAPI_FOUND
+
+// DB Backends
+#cmakedefine ODB_SQLITE_FOUND
+#cmakedefine ODB_MYSQL_FOUND
+
 #define Boost_MAJOR_VERSION @Boost_MAJOR_VERSION@
 #define Boost_MINOR_VERSION @Boost_MINOR_VERSION@
 
 #define MAX_DBG_LEVEL @MAX_DBG_LEVEL@
+#define OPTIMAL_RESOURCE_COUNT @OPTIMAL_RESOURCE_COUNT@
 
 #define DOUBLE_DELTA 0.001
 

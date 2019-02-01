@@ -1,14 +1,17 @@
 #include "graphalgos.hpp"
-#include <assert.h>                             // for assert
-#include <ext/alloc_traits.h>                   // for __alloc_traits<>::val...
-#include <algorithm>                            // for max, move, reverse
-#include <functional>                           // for function
-#include "../util/fault_codes.hpp"              // for FAULT_CRITICAL_PATH_I...
-#include "../manager/errors.hpp"
+#include "../manager/errors.hpp"   // for InconsistentDataError
+#include "../util/fault_codes.hpp" // for FAULT_CRITICAL_PATH_INFEASIBLE
+#include "instance/instance.hpp"   // for Instance
+#include "instance/job.hpp"        // for Job
+#include "instance/laggraph.hpp"   // for LagGraph, LagGraph::(anonymous)
+#include <algorithm>               // for move, max, reverse
+#include <assert.h>                // for assert
+#include <bits/std_function.h>     // for function
+#include <ext/alloc_traits.h>      // for __alloc_traits<>::value_type
+#include <functional>              // for function
+#include <string>                  // for string
 
-TopologicalSort::TopologicalSort(const LagGraph & graph_in)
-  : graph(graph_in)
-{}
+TopologicalSort::TopologicalSort(const LagGraph & graph_in) : graph(graph_in) {}
 
 std::vector<LagGraph::vertex>
 TopologicalSort::get()
@@ -19,12 +22,13 @@ TopologicalSort::get()
 
   unsigned int index = (unsigned int)(this->graph.vertex_count() - 1);
 
-  std::function<bool(vertex,vertex)> visit = [&](vertex v, vertex from) {
+  std::function<bool(vertex, vertex)> visit = [&](vertex v, vertex from) {
     (void)from;
     (void)v;
     return true;
   };
-  std::function<void(vertex,vertex,int)> traverse = [&](vertex from, vertex to, int lag) {
+  std::function<void(vertex, vertex, int)> traverse = [&](vertex from,
+                                                          vertex to, int lag) {
     (void)from;
     (void)to;
     (void)lag;
@@ -42,19 +46,19 @@ TopologicalSort::get()
 
   std::vector<bool> visited;
 
-  for (vertex v = 0 ; v < this->graph.vertex_count() ; ++v) {
+  for (vertex v = 0; v < this->graph.vertex_count(); ++v) {
     if (this->graph.reverse_neighbor_count(v) > 0) {
       continue; // Only select vertices without incoming edges as roots
     }
     assert(indices[v] == 0);
-    DFS<decltype(visit), decltype(backtrack), decltype(traverse)>(this->graph, v, visit, backtrack, traverse);
+    DFS<decltype(visit), decltype(backtrack), decltype(traverse)>(
+        this->graph, v, visit, backtrack, traverse);
 
 #ifdef ASSERTIONS
     if (index == ((unsigned int)0 - 1)) {
       finished = true;
     }
 #endif
-
   }
 
 #ifdef ASSERTIONS
@@ -62,7 +66,7 @@ TopologicalSort::get()
 #endif
 
   std::vector<vertex> ordered(this->graph.vertex_count());
-  for (vertex v = 0 ; v < this->graph.vertex_count() ; ++v) {
+  for (vertex v = 0; v < this->graph.vertex_count(); ++v) {
     ordered[indices[v]] = v;
   }
 
@@ -70,7 +74,7 @@ TopologicalSort::get()
 }
 
 CriticalPathComputer::CriticalPathComputer(const Instance & instance_in)
-  : instance(instance_in)
+    : instance(instance_in)
 {}
 
 std::vector<unsigned int>
@@ -88,12 +92,12 @@ CriticalPathComputer::get_forward()
 
   for (auto v : topological_order) {
     const auto ec = graph.neighbors(v);
-    for (auto edge = ec.cbegin() ; edge != ec.cend() ; ++edge) {
+    for (auto edge = ec.cbegin(); edge != ec.cend(); ++edge) {
       unsigned int new_start;
       if (edge->lag < -1 * (int)earliest_start[v]) {
-        new_start = 0;
+	new_start = 0;
       } else {
-        new_start = (unsigned int)((int)earliest_start[v] + edge->lag);
+	new_start = (unsigned int)((int)earliest_start[v] + edge->lag);
       }
 
       earliest_start[edge->t] = std::max(earliest_start[edge->t], new_start);
@@ -119,20 +123,23 @@ CriticalPathComputer::get_reverse()
   }
 
   for (auto v : topological_order) {
-    for (const auto & edge : graph.reverse_neighbors(v)) {
+    for (auto edge : graph.reverse_neighbors(v)) {
       assert(edge.s == v);
       auto t = edge.t;
-      auto t_job = this->instance.get_job(t);
-      auto s_job = this->instance.get_job(v);
+      const Job & t_job = this->instance.get_job(t);
+      const Job & s_job = this->instance.get_job(v);
 
-      int new_finish = (int)latest_finish[t] - (int)t_job.get_duration() + (int)s_job.get_duration() - (int)edge.lag;
+      int new_finish = (int)latest_finish[v] - (int)s_job.get_duration() +
+                       (int)t_job.get_duration() - (int)edge.lag;
 
       if (new_finish < 0) {
-        throw InconsistentDataError(this->instance, -1, FAULT_CRITICAL_PATH_INFEASIBLE, "Negative latest finish time");
+	throw InconsistentDataError(this->instance, -1,
+	                            FAULT_CRITICAL_PATH_INFEASIBLE,
+	                            "Negative latest finish time");
       }
 
-      if ((unsigned int)new_finish < latest_finish[v]) {
-        latest_finish[v] = (unsigned int)new_finish;
+      if ((unsigned int)new_finish < latest_finish[t]) {
+	latest_finish[t] = (unsigned int)new_finish;
       }
     }
   }
@@ -140,19 +147,20 @@ CriticalPathComputer::get_reverse()
   return latest_finish;
 }
 
-APLPComputer::APLPComputer(const Instance & instance_in)
-  : instance(instance_in)
+APLPComputer::APLPComputer(const Instance & instance_in) : instance(instance_in)
 {}
 
 std::vector<std::vector<int>>
 APLPComputer::get()
 {
   this->result.clear();
-  this->result.resize(this->instance.job_count(), std::vector<int>(this->instance.job_count(), -1));
+  this->result.resize(this->instance.job_count(),
+                      std::vector<int>(this->instance.job_count(), -1));
 
-  this->topological_order = TopologicalSort(this->instance.get_laggraph()).get();
+  this->topological_order =
+      TopologicalSort(this->instance.get_laggraph()).get();
 
-  for (unsigned int jid = 0 ; jid < this->instance.job_count() ; ++jid) {
+  for (unsigned int jid = 0; jid < this->instance.job_count(); ++jid) {
     this->compute_SSLP(jid);
   }
 
@@ -189,7 +197,8 @@ APLPComputer::compute_SSLP(unsigned int start_job)
       int relaxed_dist = this->result[start_job][v] + edge.lag;
       assert(relaxed_dist >= 0); // negative paths break things for now
 
-      this->result[start_job][edge.t] = std::max(this->result[start_job][edge.t], relaxed_dist);
+      this->result[start_job][edge.t] =
+          std::max(this->result[start_job][edge.t], relaxed_dist);
     }
   }
 }

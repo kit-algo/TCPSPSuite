@@ -12,5 +12,7 @@
 #define FAULT_NEGATIVE_TIME_INTERVAL      9
 #define FAULT_WINDOW_EXTENSION_SUM        10
 #define FAULT_WINDOW_EXTENSION_JOB_SUM    11
-
+#define FAULT_TIME_LIMIT_NEEDED						12
+#define FAULT_DATABASE_FAILED							13
+#define FAULT_OUT_OF_MEMORY               14
 #endif

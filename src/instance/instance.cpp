@@ -1,84 +1,70 @@
 #include "instance.hpp"
-#include <assert.h>                                         // for assert
-#include <algorithm>                                        // for move, swap
-#include <limits>                                           // for numeric_l...
-#include "../algorithms/graphalgos.hpp"                     // for CriticalP...
-#include "generated_config.hpp"                             // for CRASH_ON_...
-#include "laggraph.hpp"                                     // for LagGraph
-#include "job.hpp"                                 // for Job
-#include "resource.hpp"                            // for Resource
-#include "traits.hpp"                              // for Traits
+#include "../algorithms/graphalgos.hpp" // for CriticalP...
+#include "generated_config.hpp"         // for CRASH_ON_...
+#include "job.hpp"                      // for Job
+#include "laggraph.hpp"                 // for LagGraph
+#include "resource.hpp"                 // for Resource
+#include "traits.hpp"                   // for Traits
+#include <algorithm>                    // for move, swap
+#include <assert.h>                     // for assert
+#include <boost/container/vector.hpp>   // for vector
+#include <limits>                       // for numeric_l...
+#include <memory>                       // for __shared_ptr_access, __share...
+#include <set>                          // for set
+#include <tuple>                        // for get, make_tuple, tuple
 
+Instance::Instance()
+    : resources(std::make_shared<std::vector<Resource>>()),
+      jobs(std::make_shared<std::vector<Job>>()),
+      instance_id(std::make_shared<std::string>("")),
+      laggraph(std::make_shared<LagGraph>()), job_is_substituted(),
+      cached_container(this), window_extension_limit(0),
+      window_extension_job_limit(0), wanted_traits(Traits()),
+      computed_traits(Traits())
+{}
 
-Instance::Instance() :
-  resources(std::make_shared<std::vector<Resource>>()),
-  jobs(std::make_shared<std::vector<Job>>()),
-  instance_id(std::make_shared<std::string>("")),
-  laggraph(std::make_shared<LagGraph>()),
-  job_is_substituted(),
-  cached_container(this),
-  window_extension_limit(0),
-  window_extension_job_limit(0),
-  wanted_traits(Traits()),
-  computed_traits(Traits())
-{
-}
-
-Instance::Instance(const std::string instance_id_in, Traits wanted_traits_in) :
-  resources(std::make_shared<std::vector<Resource>>()),
-  jobs(std::make_shared<std::vector<Job>>()),
-  instance_id(std::make_shared<std::string>(instance_id_in)),
-  laggraph(std::make_shared<LagGraph>()),
-  job_is_substituted(),
-  cached_container(this),
-  window_extension_limit(0),
-  window_extension_job_limit(0),
-  wanted_traits(wanted_traits_in),
-  computed_traits(wanted_traits_in)
+Instance::Instance(const std::string instance_id_in, Traits wanted_traits_in)
+    : resources(std::make_shared<std::vector<Resource>>()),
+      jobs(std::make_shared<std::vector<Job>>()),
+      instance_id(std::make_shared<std::string>(instance_id_in)),
+      laggraph(std::make_shared<LagGraph>()), job_is_substituted(),
+      cached_container(this), window_extension_limit(0),
+      window_extension_job_limit(0), wanted_traits(wanted_traits_in),
+      computed_traits(wanted_traits_in)
 {}
 
 Instance::Instance(const Instance & origin,
-      std::vector<bool> && job_is_substituted_in,
-      std::vector<Job> && substitutions_in) :
-  resources(origin.resources),
-  jobs(origin.jobs),
-  instance_id(origin.instance_id),
-  laggraph(origin.laggraph),
-  job_is_substituted(std::forward<std::vector<bool>>(job_is_substituted_in)),
-  substitutions(std::forward<std::vector<Job>>(substitutions_in)),
-  cached_container(this),
-  window_extension_limit(0),
-  window_extension_job_limit(0),
-  wanted_traits(origin.wanted_traits),
-  computed_traits(origin.computed_traits)
+                   std::vector<bool> && job_is_substituted_in,
+                   std::vector<Job> && substitutions_in)
+    : resources(origin.resources), jobs(origin.jobs),
+      instance_id(origin.instance_id), laggraph(origin.laggraph),
+      job_is_substituted(
+          std::forward<std::vector<bool>>(job_is_substituted_in)),
+      substitutions(std::forward<std::vector<Job>>(substitutions_in)),
+      cached_container(this), window_extension_limit(0),
+      window_extension_job_limit(0), wanted_traits(origin.wanted_traits),
+      computed_traits(origin.computed_traits)
 {}
 
 Instance::Instance(const Instance & origin)
-  : resources(origin.resources),
-    jobs(origin.jobs),
-    instance_id(origin.instance_id),
-    laggraph(origin.laggraph),
-    job_is_substituted(origin.job_is_substituted),
-    substitutions(origin.substitutions),
-    cached_container(this),
-    window_extension_limit(0),
-    window_extension_job_limit(0),
-    wanted_traits(origin.wanted_traits),
-    computed_traits(origin.computed_traits)
+    : resources(origin.resources), jobs(origin.jobs),
+      instance_id(origin.instance_id), laggraph(origin.laggraph),
+      job_is_substituted(origin.job_is_substituted),
+      substitutions(origin.substitutions), cached_container(this),
+      window_extension_limit(0), window_extension_job_limit(0),
+      wanted_traits(origin.wanted_traits),
+      computed_traits(origin.computed_traits)
 {}
 
 Instance::Instance(Instance && origin)
-  : resources(std::move(origin.resources)),
-    jobs(std::move(origin.jobs)),
-    instance_id(std::move(origin.instance_id)),
-    laggraph(std::move(origin.laggraph)),
-    job_is_substituted(std::move(origin.job_is_substituted)),
-    substitutions(std::move(origin.substitutions)),
-    cached_container(this),
-    window_extension_limit(0),
-    window_extension_job_limit(0),
-    wanted_traits(std::move(origin.wanted_traits)),
-    computed_traits(std::move(origin.computed_traits))
+    : resources(std::move(origin.resources)), jobs(std::move(origin.jobs)),
+      instance_id(std::move(origin.instance_id)),
+      laggraph(std::move(origin.laggraph)),
+      job_is_substituted(std::move(origin.job_is_substituted)),
+      substitutions(std::move(origin.substitutions)), cached_container(this),
+      window_extension_limit(0), window_extension_job_limit(0),
+      wanted_traits(std::move(origin.wanted_traits)),
+      computed_traits(std::move(origin.computed_traits))
 {}
 
 void
@@ -120,16 +106,15 @@ Instance::clone() const
 
   cloned.laggraph = std::make_shared<LagGraph>(this->laggraph->clone());
 
-  cloned.set_window_extension(this->window_extension_limit, this->window_extension_job_limit);
+  cloned.set_window_extension(this->window_extension_limit,
+                              this->window_extension_job_limit);
 
   cloned.computed_traits = this->computed_traits.clone();
 
   return cloned;
 }
 
-Instance::~Instance()
-{
-}
+Instance::~Instance() {}
 
 const std::string &
 Instance::get_id() const
@@ -144,23 +129,26 @@ Instance::get_jobs() const
 }
 
 unsigned int
-Instance::add_job(Job &&job)
+Instance::add_job(Job && job)
 {
   decltype(*this->jobs) & job_vec = *this->jobs;
 
-  if ((job_vec.size() > 0) && (this->wanted_traits.has_flag(Traits::COMMON_RELEASE))) {
+  if ((job_vec.size() > 0) &&
+      (this->wanted_traits.has_flag(Traits::COMMON_RELEASE))) {
     if (job.get_release() != this->get_job(0).get_release()) {
       throw TraitViolatedError("Release times must be aligned.\n");
     }
   }
 
-  if ((job_vec.size() > 0) && (this->wanted_traits.has_flag(Traits::COMMON_DEADLINE))) {
+  if ((job_vec.size() > 0) &&
+      (this->wanted_traits.has_flag(Traits::COMMON_DEADLINE))) {
     if (job.get_deadline() != this->get_job(0).get_deadline()) {
       throw TraitViolatedError("Deadline times must be aligned.\n");
     }
   }
 
-  if ((job_vec.size() > 0) && (this->wanted_traits.has_flag(Traits::COMMON_DURATION))) {
+  if ((job_vec.size() > 0) &&
+      (this->wanted_traits.has_flag(Traits::COMMON_DURATION))) {
     if (job.get_duration() != this->get_job(0).get_duration()) {
       throw TraitViolatedError("Duration times must be equal.\n");
     }
@@ -173,11 +161,11 @@ Instance::add_job(Job &&job)
 
   this->job_is_substituted.push_back(false);
 
-  #ifdef ENABLE_ASSERTIONS
+#ifdef ENABLE_ASSERTIONS
   assert(vertex == (unsigned int)(job_vec.size() - 1));
   assert(job_vec.size() < std::numeric_limits<unsigned int>::max());
   assert(this->job_is_substituted.size() == job_vec.size());
-  #endif
+#endif
 
   return (unsigned int)(job_vec.size() - 1);
 }
@@ -251,7 +239,7 @@ Instance::get_resource(unsigned int i) const
 }
 
 Instance::JobContainer::JobContainer(const Instance * instance_in)
-  : instance(instance_in)
+    : instance(instance_in)
 {}
 
 bool
@@ -261,15 +249,15 @@ Instance::JobContainer::operator==(const Instance::JobContainer & other) const
 }
 
 Instance::JobContainer::iterator::iterator(const Instance::JobContainer & c_in)
-  : c(c_in), i(0)
+    : c(c_in), i(0)
 {}
 
-Instance::JobContainer::iterator::iterator(const Instance::JobContainer & c_in, unsigned int pos)
-  : c(c_in), i(pos)
+Instance::JobContainer::iterator::iterator(const Instance::JobContainer & c_in,
+                                           unsigned int pos)
+    : c(c_in), i(pos)
 {}
 
-const Job &
-Instance::JobContainer::iterator::operator*()
+const Job & Instance::JobContainer::iterator::operator*()
 {
   if (this->c.instance->job_is_substituted[this->i]) {
     return this->c.instance->substitutions[this->i];
@@ -278,8 +266,7 @@ Instance::JobContainer::iterator::operator*()
   }
 }
 
-const Job *
-Instance::JobContainer::iterator::operator->()
+const Job * Instance::JobContainer::iterator::operator->()
 {
   return &(*(*this));
 }
@@ -336,7 +323,8 @@ Instance::JobContainer::iterator
 Instance::JobContainer::end() const
 {
 #ifdef OMG_VERIFY
-  assert(this->instance->jobs->size() < std::numeric_limits<unsigned int>::max());
+  assert(this->instance->jobs->size() <
+         std::numeric_limits<unsigned int>::max());
 #endif
   return iterator(*this, (unsigned int)this->instance->jobs->size());
 }
@@ -380,19 +368,21 @@ Instance::get_window_extension_limit() const
 }
 
 double
-Instance::calculate_max_costs(const std::vector<unsigned int>& solution) const
+Instance::calculate_max_costs(const std::vector<unsigned int> & solution) const
 {
   double maxCost = 0;
   std::set<std::tuple<unsigned int, int, unsigned int>> events;
-  for (const Job& job : get_jobs()) {
-    // the -1 event has to happen before the +1 events for the same Time to calculate the correct result!!!
-    // as we order by < this should always happen...
+  for (const Job & job : get_jobs()) {
+    // the -1 event has to happen before the +1 events for the same Time to
+    // calculate the correct result!!! as we order by < this should always
+    // happen...
     events.insert(std::make_tuple(solution[job.get_jid()], +1, job.get_jid()));
-    events.insert(std::make_tuple(solution[job.get_jid()] + 1 + job.get_duration(), -1, job.get_jid()));
+    events.insert(std::make_tuple(
+        solution[job.get_jid()] + 1 + job.get_duration(), -1, job.get_jid()));
   }
-  std::vector<double> ressources(resource_count());
+  ResVec ressources(resource_count());
   for (auto event : events) {
-    const Job& job = get_job(std::get<2>(event));
+    const Job & job = get_job(std::get<2>(event));
     for (unsigned int rid = 0; rid < ressources.size(); rid++) {
       ressources[rid] += std::get<1>(event) * job.get_resource_usage(rid);
     }
@@ -402,12 +392,14 @@ Instance::calculate_max_costs(const std::vector<unsigned int>& solution) const
 }
 
 double
-Instance::calculate_costs(const std::vector<double>& ressource_usage, const std::vector<double>& additional_usage) const
+Instance::calculate_costs(const ResVec & ressource_usage,
+                          const ResVec & additional_usage) const
 {
   double sum = 0;
   for (unsigned int rid = 0; rid < resource_count(); rid++) {
-    const Resource& resource = get_resource(rid);
-    double usage = ressource_usage[rid] + additional_usage[rid] - resource.get_availability().get_flat_available();
+    const Resource & resource = get_resource(rid);
+    double usage = ressource_usage[rid] + additional_usage[rid] -
+                   resource.get_availability().get_flat_available();
     if (usage > 0) {
       sum += apply_polynomial(resource.get_investment_costs(), usage);
       sum += apply_polynomial(resource.get_overshoot_costs(), usage);
@@ -417,12 +409,13 @@ Instance::calculate_costs(const std::vector<double>& ressource_usage, const std:
 }
 
 double
-Instance::calculate_costs(const std::vector<double>& ressource_usage) const
+Instance::calculate_costs(const ResVec & ressource_usage) const
 {
   double sum = 0;
   for (unsigned int rid = 0; rid < resource_count(); rid++) {
-    const Resource& resource = get_resource(rid);
-    double usage = ressource_usage[rid] - resource.get_availability().get_flat_available();
+    const Resource & resource = get_resource(rid);
+    double usage =
+        ressource_usage[rid] - resource.get_availability().get_flat_available();
     if (usage > 0) {
       sum += apply_polynomial(resource.get_investment_costs(), usage);
       sum += apply_polynomial(resource.get_overshoot_costs(), usage);
@@ -435,7 +428,7 @@ unsigned int
 Instance::get_latest_deadline() const
 {
   unsigned int ret = 0;
-  for (unsigned int jid = 0 ; jid  < this->job_count() ; ++jid) {
+  for (unsigned int jid = 0; jid < this->job_count(); ++jid) {
     ret = std::max(ret, this->get_job(jid).get_deadline());
   }
 

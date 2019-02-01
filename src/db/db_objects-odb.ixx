@@ -2,6 +2,8 @@
 // compiler for C++.
 //
 
+#include <odb/database.hxx>
+
 namespace odb
 {
   // DBConfigKV
@@ -33,6 +35,71 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (e);
   }
 
+  inline
+  void access::object_traits_impl< ::DBConfigKV, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBConfigKV, id_common >::pointer_type
+  access::object_traits_impl< ::DBConfigKV, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBConfigKV, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBConfigKV, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBConfigKV, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBConfigKV, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBConfigKV, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBConfigKV, id_common >::object_type >
+  access::object_traits_impl< ::DBConfigKV, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBConfigKV, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
+  }
+
   // DBConfig
   //
 
@@ -60,6 +127,165 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (db);
     ODB_POTENTIALLY_UNUSED (x);
     ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBConfig, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBConfig, id_common >::pointer_type
+  access::object_traits_impl< ::DBConfig, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBConfig, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBConfig, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBConfig, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBConfig, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBConfig, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBConfig, id_common >::object_type >
+  access::object_traits_impl< ::DBConfig, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBConfig, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
+  }
+
+  // DBInvocation
+  //
+
+  inline
+  access::object_traits< ::DBInvocation >::id_type
+  access::object_traits< ::DBInvocation >::
+  id (const object_type& o)
+  {
+    return o.id_;
+  }
+
+  inline
+  void access::object_traits< ::DBInvocation >::
+  callback (database& db, object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::DBInvocation >::
+  callback (database& db, const object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBInvocation, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBInvocation, id_common >::pointer_type
+  access::object_traits_impl< ::DBInvocation, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBInvocation, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBInvocation, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBInvocation, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBInvocation, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBInvocation, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBInvocation, id_common >::object_type >
+  access::object_traits_impl< ::DBInvocation, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBInvocation, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
   }
 
   // DBResult
@@ -91,6 +317,259 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (e);
   }
 
+  inline
+  void access::object_traits_impl< ::DBResult, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBResult, id_common >::pointer_type
+  access::object_traits_impl< ::DBResult, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBResult, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBResult, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBResult, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBResult, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBResult, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBResult, id_common >::object_type >
+  access::object_traits_impl< ::DBResult, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBResult, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
+  }
+
+  // DBResourcesInfo
+  //
+
+  inline
+  access::object_traits< ::DBResourcesInfo >::id_type
+  access::object_traits< ::DBResourcesInfo >::
+  id (const object_type& o)
+  {
+    return o.id_;
+  }
+
+  inline
+  void access::object_traits< ::DBResourcesInfo >::
+  callback (database& db, object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::DBResourcesInfo >::
+  callback (database& db, const object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBResourcesInfo, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBResourcesInfo, id_common >::pointer_type
+  access::object_traits_impl< ::DBResourcesInfo, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBResourcesInfo, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBResourcesInfo, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBResourcesInfo, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBResourcesInfo, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBResourcesInfo, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBResourcesInfo, id_common >::object_type >
+  access::object_traits_impl< ::DBResourcesInfo, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBResourcesInfo, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
+  }
+
+  // DBPapiMeasurement
+  //
+
+  inline
+  access::object_traits< ::DBPapiMeasurement >::id_type
+  access::object_traits< ::DBPapiMeasurement >::
+  id (const object_type& o)
+  {
+    return o.id_;
+  }
+
+  inline
+  void access::object_traits< ::DBPapiMeasurement >::
+  callback (database& db, object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::DBPapiMeasurement >::
+  callback (database& db, const object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBPapiMeasurement, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBPapiMeasurement, id_common >::pointer_type
+  access::object_traits_impl< ::DBPapiMeasurement, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBPapiMeasurement, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBPapiMeasurement, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBPapiMeasurement, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBPapiMeasurement, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBPapiMeasurement, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBPapiMeasurement, id_common >::object_type >
+  access::object_traits_impl< ::DBPapiMeasurement, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBPapiMeasurement, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
+  }
+
   // DBSolution
   //
 
@@ -118,6 +597,71 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (db);
     ODB_POTENTIALLY_UNUSED (x);
     ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBSolution, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBSolution, id_common >::pointer_type
+  access::object_traits_impl< ::DBSolution, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBSolution, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBSolution, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBSolution, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBSolution, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBSolution, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBSolution, id_common >::object_type >
+  access::object_traits_impl< ::DBSolution, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBSolution, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
   }
 
   // DBSolutionJob
@@ -149,6 +693,71 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (e);
   }
 
+  inline
+  void access::object_traits_impl< ::DBSolutionJob, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBSolutionJob, id_common >::pointer_type
+  access::object_traits_impl< ::DBSolutionJob, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBSolutionJob, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBSolutionJob, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBSolutionJob, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBSolutionJob, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBSolutionJob, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBSolutionJob, id_common >::object_type >
+  access::object_traits_impl< ::DBSolutionJob, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBSolutionJob, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
+  }
+
   // DBIntermediate
   //
 
@@ -176,6 +785,71 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (db);
     ODB_POTENTIALLY_UNUSED (x);
     ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBIntermediate, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBIntermediate, id_common >::pointer_type
+  access::object_traits_impl< ::DBIntermediate, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBIntermediate, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBIntermediate, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBIntermediate, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBIntermediate, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBIntermediate, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBIntermediate, id_common >::object_type >
+  access::object_traits_impl< ::DBIntermediate, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBIntermediate, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
   }
 
   // DBError
@@ -207,6 +881,71 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (e);
   }
 
+  inline
+  void access::object_traits_impl< ::DBError, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBError, id_common >::pointer_type
+  access::object_traits_impl< ::DBError, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBError, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBError, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBError, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBError, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBError, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBError, id_common >::object_type >
+  access::object_traits_impl< ::DBError, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBError, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
+  }
+
   // DBExtendedMeasure
   //
 
@@ -235,164 +974,90 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (x);
     ODB_POTENTIALLY_UNUSED (e);
   }
-}
 
-namespace odb
-{
-  // DBConfigKV
+  inline
+  void access::object_traits_impl< ::DBExtendedMeasure, id_common >::
+  persist (database& db, object_type& o)
+  {
+    function_table[db.id ()]->persist (db, o);
+  }
+
+  inline
+  access::object_traits_impl< ::DBExtendedMeasure, id_common >::pointer_type
+  access::object_traits_impl< ::DBExtendedMeasure, id_common >::
+  find (database& db, const id_type& id)
+  {
+    return function_table[db.id ()]->find1 (db, id);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBExtendedMeasure, id_common >::
+  find (database& db, const id_type& id, object_type& o)
+  {
+    return function_table[db.id ()]->find2 (db, id, o);
+  }
+
+  inline
+  bool access::object_traits_impl< ::DBExtendedMeasure, id_common >::
+  reload (database& db, object_type& o)
+  {
+    return function_table[db.id ()]->reload (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBExtendedMeasure, id_common >::
+  update (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->update (db, o);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBExtendedMeasure, id_common >::
+  erase (database& db, const id_type& id)
+  {
+    function_table[db.id ()]->erase1 (db, id);
+  }
+
+  inline
+  void access::object_traits_impl< ::DBExtendedMeasure, id_common >::
+  erase (database& db, const object_type& o)
+  {
+    function_table[db.id ()]->erase2 (db, o);
+  }
+
+  inline
+  result< access::object_traits_impl< ::DBExtendedMeasure, id_common >::object_type >
+  access::object_traits_impl< ::DBExtendedMeasure, id_common >::
+  query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->query (db, q);
+  }
+
+  inline
+  unsigned long long access::object_traits_impl< ::DBExtendedMeasure, id_common >::
+  erase_query (database& db, const query_base_type& q)
+  {
+    return function_table[db.id ()]->erase_query (db, q);
+  }
+
+  // ConfigGetterView
   //
 
   inline
-  void access::object_traits_impl< ::DBConfigKV, id_sqlite >::
-  erase (database& db, const object_type& obj)
+  void access::view_traits< ::ConfigGetterView >::
+  callback (database& db, view_type& x, callback_event e)
   {
-    callback (db, obj, callback_event::pre_erase);
-    erase (db, id (obj));
-    callback (db, obj, callback_event::post_erase);
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
   }
 
   inline
-  void access::object_traits_impl< ::DBConfigKV, id_sqlite >::
-  load_ (statements_type& sts,
-         object_type& obj,
-         bool)
+  result< access::view_traits_impl< ::ConfigGetterView, id_common >::view_type >
+  access::view_traits_impl< ::ConfigGetterView, id_common >::
+  query (database& db, const query_base_type& q)
   {
-    ODB_POTENTIALLY_UNUSED (sts);
-    ODB_POTENTIALLY_UNUSED (obj);
-  }
-
-  // DBConfig
-  //
-
-  inline
-  void access::object_traits_impl< ::DBConfig, id_sqlite >::
-  erase (database& db, const object_type& obj)
-  {
-    callback (db, obj, callback_event::pre_erase);
-    erase (db, id (obj));
-    callback (db, obj, callback_event::post_erase);
-  }
-
-  // DBResult
-  //
-
-  inline
-  void access::object_traits_impl< ::DBResult, id_sqlite >::
-  erase (database& db, const object_type& obj)
-  {
-    callback (db, obj, callback_event::pre_erase);
-    erase (db, id (obj));
-    callback (db, obj, callback_event::post_erase);
-  }
-
-  inline
-  void access::object_traits_impl< ::DBResult, id_sqlite >::
-  load_ (statements_type& sts,
-         object_type& obj,
-         bool)
-  {
-    ODB_POTENTIALLY_UNUSED (sts);
-    ODB_POTENTIALLY_UNUSED (obj);
-  }
-
-  // DBSolution
-  //
-
-  inline
-  void access::object_traits_impl< ::DBSolution, id_sqlite >::
-  erase (database& db, const object_type& obj)
-  {
-    callback (db, obj, callback_event::pre_erase);
-    erase (db, id (obj));
-    callback (db, obj, callback_event::post_erase);
-  }
-
-  // DBSolutionJob
-  //
-
-  inline
-  void access::object_traits_impl< ::DBSolutionJob, id_sqlite >::
-  erase (database& db, const object_type& obj)
-  {
-    callback (db, obj, callback_event::pre_erase);
-    erase (db, id (obj));
-    callback (db, obj, callback_event::post_erase);
-  }
-
-  inline
-  void access::object_traits_impl< ::DBSolutionJob, id_sqlite >::
-  load_ (statements_type& sts,
-         object_type& obj,
-         bool)
-  {
-    ODB_POTENTIALLY_UNUSED (sts);
-    ODB_POTENTIALLY_UNUSED (obj);
-  }
-
-  // DBIntermediate
-  //
-
-  inline
-  void access::object_traits_impl< ::DBIntermediate, id_sqlite >::
-  erase (database& db, const object_type& obj)
-  {
-    callback (db, obj, callback_event::pre_erase);
-    erase (db, id (obj));
-    callback (db, obj, callback_event::post_erase);
-  }
-
-  inline
-  void access::object_traits_impl< ::DBIntermediate, id_sqlite >::
-  load_ (statements_type& sts,
-         object_type& obj,
-         bool)
-  {
-    ODB_POTENTIALLY_UNUSED (sts);
-    ODB_POTENTIALLY_UNUSED (obj);
-  }
-
-  // DBError
-  //
-
-  inline
-  void access::object_traits_impl< ::DBError, id_sqlite >::
-  erase (database& db, const object_type& obj)
-  {
-    callback (db, obj, callback_event::pre_erase);
-    erase (db, id (obj));
-    callback (db, obj, callback_event::post_erase);
-  }
-
-  inline
-  void access::object_traits_impl< ::DBError, id_sqlite >::
-  load_ (statements_type& sts,
-         object_type& obj,
-         bool)
-  {
-    ODB_POTENTIALLY_UNUSED (sts);
-    ODB_POTENTIALLY_UNUSED (obj);
-  }
-
-  // DBExtendedMeasure
-  //
-
-  inline
-  void access::object_traits_impl< ::DBExtendedMeasure, id_sqlite >::
-  erase (database& db, const object_type& obj)
-  {
-    callback (db, obj, callback_event::pre_erase);
-    erase (db, id (obj));
-    callback (db, obj, callback_event::post_erase);
-  }
-
-  inline
-  void access::object_traits_impl< ::DBExtendedMeasure, id_sqlite >::
-  load_ (statements_type& sts,
-         object_type& obj,
-         bool)
-  {
-    ODB_POTENTIALLY_UNUSED (sts);
-    ODB_POTENTIALLY_UNUSED (obj);
+    return function_table[db.id ()]->query (db, q);
   }
 }
 

@@ -5,7 +5,52 @@
 #ifndef TCPSPSUITE_TEMPLATE_MAGIC_HPP
 #define TCPSPSUITE_TEMPLATE_MAGIC_HPP
 
+#include <type_traits>
+
 namespace utilities {
+
+/*
+ * Allows your classes to optionally contain members, without re-writing the
+ * whole class in a partial specialization.
+ */
+template<class T, bool enabled>
+struct OptionalMember {} ;
+
+template<class T>
+struct OptionalMember<T, false> {
+	/* Accept anything inside the constructor */
+	template<class ... Ts>
+	OptionalMember(Ts ...) {}
+};
+
+template<class T>
+struct OptionalMember<T, true> : public T
+{
+public:
+        using T::T;
+};
+
+	/*
+	 * Allows switching of member types based on a constexpr
+	 * bool expression.
+	 */
+	template<class TrueType, class FalseType, bool b>
+	struct ConditionalMember {};
+
+	template<class TrueType, class FalseType>
+	struct ConditionalMember<TrueType, FalseType, true> : public TrueType
+	{
+	public:
+		using TrueType::TrueType;
+	};
+
+	template<class TrueType, class FalseType>
+	struct ConditionalMember<TrueType, FalseType, false> : public FalseType
+	{
+	public:
+		using FalseType::FalseType;
+	};
+
 
 /*
  * This is inspired by

@@ -1,9 +1,11 @@
 #ifndef SOLUTION_HPP
 #define SOLUTION_HPP
 
-#include "instance.hpp"
-#include "../datastructures/maybe.hpp"
-#include "../util/log.hpp"
+#include <vector>                       // for vector
+#include "../datastructures/maybe.hpp"  // for Maybe
+#include "../util/log.hpp"              // for Log
+class InconsistentResultError;
+class Instance;
 
 /**
  * @brief a soultion for a TCPSP instance
@@ -79,7 +81,7 @@ public:
   /**
    * logs the profile
    */
-  //void print_profile() const;
+  void print_profile() const;
 
 
   /**
@@ -157,10 +159,8 @@ public:
 
   /**
    * verifies that this solution is correct all constraints are met
-   *
-   * @throws InconsistentResultError if any constraint is not met
    */
-  void verify(int seed) const;
+  bool verify(int seed, InconsistentResultError * error_out = nullptr) const;
 
 private:
   const Instance * instance;

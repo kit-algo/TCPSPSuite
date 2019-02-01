@@ -1,17 +1,17 @@
 #include "traits.hpp"
-#include <stdlib.h>                                         // for size_t, exit
-#include <algorithm>                                        // for reverse
-#include <functional>                                       // for function
-#include <iostream>                                         // for operator<<
-#include <limits>                                           // for numeric_l...
-#include "../algorithms/graphalgos.hpp"                     // for CriticalP...
-#include "../util/util.hpp"                                 // for hash
-#include "instance.hpp"                                     // for Instance
-#include "laggraph.hpp"  // for LagGraph
-#include "../datastructures/maybe.hpp"             // for Maybe
-#include "job.hpp"                                 // for Job
-#include "transform.hpp"                                    // for Transformer
-#include "resource.hpp"
+#include <bits/std_function.h>           // for function
+#include <stdlib.h>                      // for size_t, exit
+#include <algorithm>                     // for reverse
+#include <iostream>                      // for cout
+#include <limits>                        // for numeric_limits
+#include "../algorithms/graphalgos.hpp"  // for CriticalPathComputer, Topolo...
+#include "../datastructures/maybe.hpp"   // for Maybe
+#include "generated_config.hpp"          // for DOUBLE_DELTA
+#include "instance.hpp"                  // for Instance
+#include "job.hpp"                       // for Job
+#include "laggraph.hpp"                  // for LagGraph, LagGraph::vertex
+#include "resource.hpp"                  // for Resource, polynomial, Availa...
+#include "transform.hpp"                 // for Transformer
 
 const unsigned long Traits::NO_LAGS                    = 1 << 0;
 const unsigned long Traits::LAGS_ONLY_SUCCESSORS       = 1 << 1;

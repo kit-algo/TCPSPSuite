@@ -25,9 +25,13 @@
 #include <odb/wrapper-traits.hxx>
 #include <odb/pointer-traits.hxx>
 #include <odb/container-traits.hxx>
-#include <odb/no-op-cache-traits.hxx>
+#include <odb/session.hxx>
+#include <odb/cache-traits.hxx>
+#include <odb/query-dynamic.hxx>
 #include <odb/result.hxx>
 #include <odb/simple-object-result.hxx>
+#include <odb/view-image.hxx>
+#include <odb/view-result.hxx>
 
 #include <odb/details/unused.hxx>
 #include <odb/details/shared-ptr.hxx>
@@ -47,7 +51,7 @@ namespace odb
   {
     public:
     typedef ::DBConfigKV object_type;
-    typedef ::DBConfigKV* pointer_type;
+    typedef ::std::shared_ptr< ::DBConfigKV > pointer_type;
     typedef odb::pointer_traits<pointer_type> pointer_traits;
 
     static const bool polymorphic = false;
@@ -61,12 +65,18 @@ namespace odb
     static id_type
     id (const object_type&);
 
+    struct cfg_tag;
+
     typedef
-    no_op_pointer_cache_traits<pointer_type>
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
     pointer_cache_traits;
 
     typedef
-    no_op_reference_cache_traits<object_type>
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
     reference_cache_traits;
 
     static void
@@ -74,6 +84,104 @@ namespace odb
 
     static void
     callback (database&, const object_type&, callback_event);
+  };
+
+  template <typename A>
+  struct pointer_query_columns< ::DBConfigKV, id_common, A >
+  {
+    // cfg
+    //
+    typedef odb::query_column< long unsigned int > cfg_type_;
+
+    static cfg_type_ cfg;
+
+    // key
+    //
+    typedef odb::query_column< ::std::string > key_type_;
+
+    static key_type_ key;
+
+    // value
+    //
+    typedef odb::query_column< ::std::string > value_type_;
+
+    static value_type_ value;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename pointer_query_columns< ::DBConfigKV, id_common, A >::cfg_type_
+  pointer_query_columns< ::DBConfigKV, id_common, A >::cfg;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBConfigKV, id_common, A >::key_type_
+  pointer_query_columns< ::DBConfigKV, id_common, A >::key;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBConfigKV, id_common, A >::value_type_
+  pointer_query_columns< ::DBConfigKV, id_common, A >::value;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBConfigKV, id_common, A >::id_type_
+  pointer_query_columns< ::DBConfigKV, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <>
+  class access::object_traits_impl< ::DBConfigKV, id_common >:
+    public access::object_traits< ::DBConfigKV >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static void
+    persist (database&, object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
   };
 
   // DBConfig
@@ -89,7 +197,7 @@ namespace odb
   {
     public:
     typedef ::DBConfig object_type;
-    typedef ::DBConfig* pointer_type;
+    typedef ::std::shared_ptr< ::DBConfig > pointer_type;
     typedef odb::pointer_traits<pointer_type> pointer_traits;
 
     static const bool polymorphic = false;
@@ -104,11 +212,15 @@ namespace odb
     id (const object_type&);
 
     typedef
-    no_op_pointer_cache_traits<pointer_type>
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
     pointer_cache_traits;
 
     typedef
-    no_op_reference_cache_traits<object_type>
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
     reference_cache_traits;
 
     static void
@@ -116,6 +228,260 @@ namespace odb
 
     static void
     callback (database&, const object_type&, callback_event);
+  };
+
+  template <typename A>
+  struct query_columns< ::DBConfig, id_common, A >
+  {
+    // name
+    //
+    typedef odb::query_column< ::std::string > name_type_;
+
+    static name_type_ name;
+
+    // time_limit
+    //
+    typedef odb::query_column< unsigned int > time_limit_type_;
+
+    static time_limit_type_ time_limit;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename query_columns< ::DBConfig, id_common, A >::name_type_
+  query_columns< ::DBConfig, id_common, A >::name;
+
+  template <typename A>
+  typename query_columns< ::DBConfig, id_common, A >::time_limit_type_
+  query_columns< ::DBConfig, id_common, A >::time_limit;
+
+  template <typename A>
+  typename query_columns< ::DBConfig, id_common, A >::id_type_
+  query_columns< ::DBConfig, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  struct pointer_query_columns< ::DBConfig, id_common, A >:
+    query_columns< ::DBConfig, id_common, A >
+  {
+  };
+
+  template <>
+  class access::object_traits_impl< ::DBConfig, id_common >:
+    public access::object_traits< ::DBConfig >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static void
+    persist (database&, object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
+  };
+
+  // DBInvocation
+  //
+  template <>
+  struct class_traits< ::DBInvocation >
+  {
+    static const class_kind kind = class_object;
+  };
+
+  template <>
+  class access::object_traits< ::DBInvocation >
+  {
+    public:
+    typedef ::DBInvocation object_type;
+    typedef ::std::shared_ptr< ::DBInvocation > pointer_type;
+    typedef odb::pointer_traits<pointer_type> pointer_traits;
+
+    static const bool polymorphic = false;
+
+    typedef long unsigned int id_type;
+
+    static const bool auto_id = true;
+
+    static const bool abstract = false;
+
+    static id_type
+    id (const object_type&);
+
+    typedef
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
+    pointer_cache_traits;
+
+    typedef
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
+    reference_cache_traits;
+
+    static void
+    callback (database&, object_type&, callback_event);
+
+    static void
+    callback (database&, const object_type&, callback_event);
+  };
+
+  template <typename A>
+  struct query_columns< ::DBInvocation, id_common, A >
+  {
+    // cmdline
+    //
+    typedef odb::query_column< ::std::string > cmdline_type_;
+
+    static cmdline_type_ cmdline;
+
+    // git_revision
+    //
+    typedef odb::query_column< ::std::string > git_revision_type_;
+
+    static git_revision_type_ git_revision;
+
+    // hostname
+    //
+    typedef odb::query_column< ::std::string > hostname_type_;
+
+    static hostname_type_ hostname;
+
+    // time
+    //
+    typedef odb::query_column< long unsigned int > time_type_;
+
+    static time_type_ time;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename query_columns< ::DBInvocation, id_common, A >::cmdline_type_
+  query_columns< ::DBInvocation, id_common, A >::cmdline;
+
+  template <typename A>
+  typename query_columns< ::DBInvocation, id_common, A >::git_revision_type_
+  query_columns< ::DBInvocation, id_common, A >::git_revision;
+
+  template <typename A>
+  typename query_columns< ::DBInvocation, id_common, A >::hostname_type_
+  query_columns< ::DBInvocation, id_common, A >::hostname;
+
+  template <typename A>
+  typename query_columns< ::DBInvocation, id_common, A >::time_type_
+  query_columns< ::DBInvocation, id_common, A >::time;
+
+  template <typename A>
+  typename query_columns< ::DBInvocation, id_common, A >::id_type_
+  query_columns< ::DBInvocation, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  struct pointer_query_columns< ::DBInvocation, id_common, A >:
+    query_columns< ::DBInvocation, id_common, A >
+  {
+  };
+
+  template <>
+  class access::object_traits_impl< ::DBInvocation, id_common >:
+    public access::object_traits< ::DBInvocation >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static void
+    persist (database&, object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
   };
 
   // DBResult
@@ -131,7 +497,7 @@ namespace odb
   {
     public:
     typedef ::DBResult object_type;
-    typedef ::DBResult* pointer_type;
+    typedef ::std::shared_ptr< ::DBResult > pointer_type;
     typedef odb::pointer_traits<pointer_type> pointer_traits;
 
     static const bool polymorphic = false;
@@ -145,12 +511,19 @@ namespace odb
     static id_type
     id (const object_type&);
 
+    struct invocation_tag;
+    struct cfg_tag;
+
     typedef
-    no_op_pointer_cache_traits<pointer_type>
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
     pointer_cache_traits;
 
     typedef
-    no_op_reference_cache_traits<object_type>
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
     reference_cache_traits;
 
     static void
@@ -158,6 +531,556 @@ namespace odb
 
     static void
     callback (database&, const object_type&, callback_event);
+  };
+
+  template <typename A>
+  struct pointer_query_columns< ::DBResult, id_common, A >
+  {
+    // run
+    //
+    typedef odb::query_column< ::std::string > run_type_;
+
+    static run_type_ run;
+
+    // instance
+    //
+    typedef odb::query_column< ::std::string > instance_type_;
+
+    static instance_type_ instance;
+
+    // score
+    //
+    typedef odb::query_column< double > score_type_;
+
+    static score_type_ score;
+
+    // algorithm
+    //
+    typedef odb::query_column< ::std::string > algorithm_type_;
+
+    static algorithm_type_ algorithm;
+
+    // config
+    //
+    typedef odb::query_column< ::std::string > config_type_;
+
+    static config_type_ config;
+
+    // seed
+    //
+    typedef odb::query_column< int > seed_type_;
+
+    static seed_type_ seed;
+
+    // optimal
+    //
+    typedef odb::query_column< bool > optimal_type_;
+
+    static optimal_type_ optimal;
+
+    // feasible
+    //
+    typedef odb::query_column< bool > feasible_type_;
+
+    static feasible_type_ feasible;
+
+    // lower_bound
+    //
+    typedef odb::query_column< double > lower_bound_type_;
+
+    static lower_bound_type_ lower_bound;
+
+    // elapsed
+    //
+    typedef odb::query_column< double > elapsed_type_;
+
+    static elapsed_type_ elapsed;
+
+    // time
+    //
+    typedef odb::query_column< long unsigned int > time_type_;
+
+    static time_type_ time;
+
+    // invocation
+    //
+    typedef odb::query_column< long unsigned int > invocation_type_;
+
+    static invocation_type_ invocation;
+
+    // cfg
+    //
+    typedef odb::query_column< long unsigned int > cfg_type_;
+
+    static cfg_type_ cfg;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::run_type_
+  pointer_query_columns< ::DBResult, id_common, A >::run;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::instance_type_
+  pointer_query_columns< ::DBResult, id_common, A >::instance;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::score_type_
+  pointer_query_columns< ::DBResult, id_common, A >::score;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::algorithm_type_
+  pointer_query_columns< ::DBResult, id_common, A >::algorithm;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::config_type_
+  pointer_query_columns< ::DBResult, id_common, A >::config;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::seed_type_
+  pointer_query_columns< ::DBResult, id_common, A >::seed;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::optimal_type_
+  pointer_query_columns< ::DBResult, id_common, A >::optimal;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::feasible_type_
+  pointer_query_columns< ::DBResult, id_common, A >::feasible;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::lower_bound_type_
+  pointer_query_columns< ::DBResult, id_common, A >::lower_bound;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::elapsed_type_
+  pointer_query_columns< ::DBResult, id_common, A >::elapsed;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::time_type_
+  pointer_query_columns< ::DBResult, id_common, A >::time;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::invocation_type_
+  pointer_query_columns< ::DBResult, id_common, A >::invocation;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::cfg_type_
+  pointer_query_columns< ::DBResult, id_common, A >::cfg;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResult, id_common, A >::id_type_
+  pointer_query_columns< ::DBResult, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <>
+  class access::object_traits_impl< ::DBResult, id_common >:
+    public access::object_traits< ::DBResult >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static void
+    persist (database&, object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
+  };
+
+  // DBResourcesInfo
+  //
+  template <>
+  struct class_traits< ::DBResourcesInfo >
+  {
+    static const class_kind kind = class_object;
+  };
+
+  template <>
+  class access::object_traits< ::DBResourcesInfo >
+  {
+    public:
+    typedef ::DBResourcesInfo object_type;
+    typedef ::std::shared_ptr< ::DBResourcesInfo > pointer_type;
+    typedef odb::pointer_traits<pointer_type> pointer_traits;
+
+    static const bool polymorphic = false;
+
+    typedef long unsigned int id_type;
+
+    static const bool auto_id = true;
+
+    static const bool abstract = false;
+
+    static id_type
+    id (const object_type&);
+
+    struct res_tag;
+
+    typedef
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
+    pointer_cache_traits;
+
+    typedef
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
+    reference_cache_traits;
+
+    static void
+    callback (database&, object_type&, callback_event);
+
+    static void
+    callback (database&, const object_type&, callback_event);
+  };
+
+  template <typename A>
+  struct pointer_query_columns< ::DBResourcesInfo, id_common, A >
+  {
+    // res
+    //
+    typedef odb::query_column< long unsigned int > res_type_;
+
+    static res_type_ res;
+
+    // major_pagefaults
+    //
+    typedef odb::query_column< ::size_t > major_pagefaults_type_;
+
+    static major_pagefaults_type_ major_pagefaults;
+
+    // minor_pagefaults
+    //
+    typedef odb::query_column< ::size_t > minor_pagefaults_type_;
+
+    static minor_pagefaults_type_ minor_pagefaults;
+
+    // user_usecs
+    //
+    typedef odb::query_column< long unsigned int > user_usecs_type_;
+
+    static user_usecs_type_ user_usecs;
+
+    // system_usecs
+    //
+    typedef odb::query_column< long unsigned int > system_usecs_type_;
+
+    static system_usecs_type_ system_usecs;
+
+    // max_rss_size
+    //
+    typedef odb::query_column< long unsigned int > max_rss_size_type_;
+
+    static max_rss_size_type_ max_rss_size;
+
+    // max_data_size
+    //
+    typedef odb::query_column< long unsigned int > max_data_size_type_;
+
+    static max_data_size_type_ max_data_size;
+
+    // malloc_max_size
+    //
+    typedef odb::query_column< long unsigned int > malloc_max_size_type_;
+
+    static malloc_max_size_type_ malloc_max_size;
+
+    // malloc_count
+    //
+    typedef odb::query_column< long unsigned int > malloc_count_type_;
+
+    static malloc_count_type_ malloc_count;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResourcesInfo, id_common, A >::res_type_
+  pointer_query_columns< ::DBResourcesInfo, id_common, A >::res;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResourcesInfo, id_common, A >::major_pagefaults_type_
+  pointer_query_columns< ::DBResourcesInfo, id_common, A >::major_pagefaults;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResourcesInfo, id_common, A >::minor_pagefaults_type_
+  pointer_query_columns< ::DBResourcesInfo, id_common, A >::minor_pagefaults;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResourcesInfo, id_common, A >::user_usecs_type_
+  pointer_query_columns< ::DBResourcesInfo, id_common, A >::user_usecs;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResourcesInfo, id_common, A >::system_usecs_type_
+  pointer_query_columns< ::DBResourcesInfo, id_common, A >::system_usecs;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResourcesInfo, id_common, A >::max_rss_size_type_
+  pointer_query_columns< ::DBResourcesInfo, id_common, A >::max_rss_size;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResourcesInfo, id_common, A >::max_data_size_type_
+  pointer_query_columns< ::DBResourcesInfo, id_common, A >::max_data_size;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResourcesInfo, id_common, A >::malloc_max_size_type_
+  pointer_query_columns< ::DBResourcesInfo, id_common, A >::malloc_max_size;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResourcesInfo, id_common, A >::malloc_count_type_
+  pointer_query_columns< ::DBResourcesInfo, id_common, A >::malloc_count;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBResourcesInfo, id_common, A >::id_type_
+  pointer_query_columns< ::DBResourcesInfo, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <>
+  class access::object_traits_impl< ::DBResourcesInfo, id_common >:
+    public access::object_traits< ::DBResourcesInfo >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static void
+    persist (database&, object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
+  };
+
+  // DBPapiMeasurement
+  //
+  template <>
+  struct class_traits< ::DBPapiMeasurement >
+  {
+    static const class_kind kind = class_object;
+  };
+
+  template <>
+  class access::object_traits< ::DBPapiMeasurement >
+  {
+    public:
+    typedef ::DBPapiMeasurement object_type;
+    typedef ::std::shared_ptr< ::DBPapiMeasurement > pointer_type;
+    typedef odb::pointer_traits<pointer_type> pointer_traits;
+
+    static const bool polymorphic = false;
+
+    typedef long unsigned int id_type;
+
+    static const bool auto_id = true;
+
+    static const bool abstract = false;
+
+    static id_type
+    id (const object_type&);
+
+    struct res_tag;
+
+    typedef
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
+    pointer_cache_traits;
+
+    typedef
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
+    reference_cache_traits;
+
+    static void
+    callback (database&, object_type&, callback_event);
+
+    static void
+    callback (database&, const object_type&, callback_event);
+  };
+
+  template <typename A>
+  struct pointer_query_columns< ::DBPapiMeasurement, id_common, A >
+  {
+    // res
+    //
+    typedef odb::query_column< long unsigned int > res_type_;
+
+    static res_type_ res;
+
+    // event_type
+    //
+    typedef odb::query_column< ::std::string > event_type_type_;
+
+    static event_type_type_ event_type;
+
+    // event_count
+    //
+    typedef odb::query_column< long long int > event_count_type_;
+
+    static event_count_type_ event_count;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename pointer_query_columns< ::DBPapiMeasurement, id_common, A >::res_type_
+  pointer_query_columns< ::DBPapiMeasurement, id_common, A >::res;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBPapiMeasurement, id_common, A >::event_type_type_
+  pointer_query_columns< ::DBPapiMeasurement, id_common, A >::event_type;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBPapiMeasurement, id_common, A >::event_count_type_
+  pointer_query_columns< ::DBPapiMeasurement, id_common, A >::event_count;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBPapiMeasurement, id_common, A >::id_type_
+  pointer_query_columns< ::DBPapiMeasurement, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <>
+  class access::object_traits_impl< ::DBPapiMeasurement, id_common >:
+    public access::object_traits< ::DBPapiMeasurement >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static void
+    persist (database&, object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
   };
 
   // DBSolution
@@ -173,7 +1096,7 @@ namespace odb
   {
     public:
     typedef ::DBSolution object_type;
-    typedef ::DBSolution* pointer_type;
+    typedef ::std::shared_ptr< ::DBSolution > pointer_type;
     typedef odb::pointer_traits<pointer_type> pointer_traits;
 
     static const bool polymorphic = false;
@@ -187,12 +1110,18 @@ namespace odb
     static id_type
     id (const object_type&);
 
+    struct res_tag;
+
     typedef
-    no_op_pointer_cache_traits<pointer_type>
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
     pointer_cache_traits;
 
     typedef
-    no_op_reference_cache_traits<object_type>
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
     reference_cache_traits;
 
     static void
@@ -200,6 +1129,84 @@ namespace odb
 
     static void
     callback (database&, const object_type&, callback_event);
+  };
+
+  template <typename A>
+  struct pointer_query_columns< ::DBSolution, id_common, A >
+  {
+    // res
+    //
+    typedef odb::query_column< long unsigned int > res_type_;
+
+    static res_type_ res;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename pointer_query_columns< ::DBSolution, id_common, A >::res_type_
+  pointer_query_columns< ::DBSolution, id_common, A >::res;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBSolution, id_common, A >::id_type_
+  pointer_query_columns< ::DBSolution, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <>
+  class access::object_traits_impl< ::DBSolution, id_common >:
+    public access::object_traits< ::DBSolution >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static void
+    persist (database&, object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
   };
 
   // DBSolutionJob
@@ -215,7 +1222,7 @@ namespace odb
   {
     public:
     typedef ::DBSolutionJob object_type;
-    typedef ::DBSolutionJob* pointer_type;
+    typedef ::std::shared_ptr< ::DBSolutionJob > pointer_type;
     typedef odb::pointer_traits<pointer_type> pointer_traits;
 
     static const bool polymorphic = false;
@@ -229,12 +1236,18 @@ namespace odb
     static id_type
     id (const object_type&);
 
+    struct sol_tag;
+
     typedef
-    no_op_pointer_cache_traits<pointer_type>
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
     pointer_cache_traits;
 
     typedef
-    no_op_reference_cache_traits<object_type>
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
     reference_cache_traits;
 
     static void
@@ -242,6 +1255,104 @@ namespace odb
 
     static void
     callback (database&, const object_type&, callback_event);
+  };
+
+  template <typename A>
+  struct pointer_query_columns< ::DBSolutionJob, id_common, A >
+  {
+    // sol
+    //
+    typedef odb::query_column< long unsigned int > sol_type_;
+
+    static sol_type_ sol;
+
+    // job_id
+    //
+    typedef odb::query_column< unsigned int > job_id_type_;
+
+    static job_id_type_ job_id;
+
+    // start_time
+    //
+    typedef odb::query_column< unsigned int > start_time_type_;
+
+    static start_time_type_ start_time;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename pointer_query_columns< ::DBSolutionJob, id_common, A >::sol_type_
+  pointer_query_columns< ::DBSolutionJob, id_common, A >::sol;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBSolutionJob, id_common, A >::job_id_type_
+  pointer_query_columns< ::DBSolutionJob, id_common, A >::job_id;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBSolutionJob, id_common, A >::start_time_type_
+  pointer_query_columns< ::DBSolutionJob, id_common, A >::start_time;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBSolutionJob, id_common, A >::id_type_
+  pointer_query_columns< ::DBSolutionJob, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <>
+  class access::object_traits_impl< ::DBSolutionJob, id_common >:
+    public access::object_traits< ::DBSolutionJob >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static void
+    persist (database&, object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
   };
 
   // DBIntermediate
@@ -257,7 +1368,7 @@ namespace odb
   {
     public:
     typedef ::DBIntermediate object_type;
-    typedef ::DBIntermediate* pointer_type;
+    typedef ::std::shared_ptr< ::DBIntermediate > pointer_type;
     typedef odb::pointer_traits<pointer_type> pointer_traits;
 
     static const bool polymorphic = false;
@@ -271,12 +1382,19 @@ namespace odb
     static id_type
     id (const object_type&);
 
+    struct res_tag;
+    struct solution_tag;
+
     typedef
-    no_op_pointer_cache_traits<pointer_type>
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
     pointer_cache_traits;
 
     typedef
-    no_op_reference_cache_traits<object_type>
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
     reference_cache_traits;
 
     static void
@@ -284,6 +1402,134 @@ namespace odb
 
     static void
     callback (database&, const object_type&, callback_event);
+  };
+
+  template <typename A>
+  struct pointer_query_columns< ::DBIntermediate, id_common, A >
+  {
+    // res
+    //
+    typedef odb::query_column< long unsigned int > res_type_;
+
+    static res_type_ res;
+
+    // time
+    //
+    typedef odb::query_column< double > time_type_;
+
+    static time_type_ time;
+
+    // iteration
+    //
+    typedef odb::query_column< unsigned int > iteration_type_;
+
+    static iteration_type_ iteration;
+
+    // costs
+    //
+    typedef odb::query_column< double > costs_type_;
+
+    static costs_type_ costs;
+
+    // bound
+    //
+    typedef odb::query_column< double > bound_type_;
+
+    static bound_type_ bound;
+
+    // solution
+    //
+    typedef odb::query_column< long unsigned int > solution_type_;
+
+    static solution_type_ solution;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename pointer_query_columns< ::DBIntermediate, id_common, A >::res_type_
+  pointer_query_columns< ::DBIntermediate, id_common, A >::res;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBIntermediate, id_common, A >::time_type_
+  pointer_query_columns< ::DBIntermediate, id_common, A >::time;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBIntermediate, id_common, A >::iteration_type_
+  pointer_query_columns< ::DBIntermediate, id_common, A >::iteration;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBIntermediate, id_common, A >::costs_type_
+  pointer_query_columns< ::DBIntermediate, id_common, A >::costs;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBIntermediate, id_common, A >::bound_type_
+  pointer_query_columns< ::DBIntermediate, id_common, A >::bound;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBIntermediate, id_common, A >::solution_type_
+  pointer_query_columns< ::DBIntermediate, id_common, A >::solution;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBIntermediate, id_common, A >::id_type_
+  pointer_query_columns< ::DBIntermediate, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <>
+  class access::object_traits_impl< ::DBIntermediate, id_common >:
+    public access::object_traits< ::DBIntermediate >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static void
+    persist (database&, object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
   };
 
   // DBError
@@ -299,7 +1545,7 @@ namespace odb
   {
     public:
     typedef ::DBError object_type;
-    typedef ::DBError* pointer_type;
+    typedef ::std::shared_ptr< ::DBError > pointer_type;
     typedef odb::pointer_traits<pointer_type> pointer_traits;
 
     static const bool polymorphic = false;
@@ -314,11 +1560,15 @@ namespace odb
     id (const object_type&);
 
     typedef
-    no_op_pointer_cache_traits<pointer_type>
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
     pointer_cache_traits;
 
     typedef
-    no_op_reference_cache_traits<object_type>
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
     reference_cache_traits;
 
     static void
@@ -326,6 +1576,180 @@ namespace odb
 
     static void
     callback (database&, const object_type&, callback_event);
+  };
+
+  template <typename A>
+  struct query_columns< ::DBError, id_common, A >
+  {
+    // timestamp
+    //
+    typedef odb::query_column< long unsigned int > timestamp_type_;
+
+    static timestamp_type_ timestamp;
+
+    // run
+    //
+    typedef odb::query_column< ::std::string > run_type_;
+
+    static run_type_ run;
+
+    // instance
+    //
+    typedef odb::query_column< ::std::string > instance_type_;
+
+    static instance_type_ instance;
+
+    // algorithm
+    //
+    typedef odb::query_column< ::std::string > algorithm_type_;
+
+    static algorithm_type_ algorithm;
+
+    // config
+    //
+    typedef odb::query_column< ::std::string > config_type_;
+
+    static config_type_ config;
+
+    // seed
+    //
+    typedef odb::query_column< int > seed_type_;
+
+    static seed_type_ seed;
+
+    // fault_code
+    //
+    typedef odb::query_column< int > fault_code_type_;
+
+    static fault_code_type_ fault_code;
+
+    // error_id
+    //
+    typedef odb::query_column< int > error_id_type_;
+
+    static error_id_type_ error_id;
+
+    // time
+    //
+    typedef odb::query_column< long unsigned int > time_type_;
+
+    static time_type_ time;
+
+    // git_revision
+    //
+    typedef odb::query_column< ::std::string > git_revision_type_;
+
+    static git_revision_type_ git_revision;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::timestamp_type_
+  query_columns< ::DBError, id_common, A >::timestamp;
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::run_type_
+  query_columns< ::DBError, id_common, A >::run;
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::instance_type_
+  query_columns< ::DBError, id_common, A >::instance;
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::algorithm_type_
+  query_columns< ::DBError, id_common, A >::algorithm;
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::config_type_
+  query_columns< ::DBError, id_common, A >::config;
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::seed_type_
+  query_columns< ::DBError, id_common, A >::seed;
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::fault_code_type_
+  query_columns< ::DBError, id_common, A >::fault_code;
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::error_id_type_
+  query_columns< ::DBError, id_common, A >::error_id;
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::time_type_
+  query_columns< ::DBError, id_common, A >::time;
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::git_revision_type_
+  query_columns< ::DBError, id_common, A >::git_revision;
+
+  template <typename A>
+  typename query_columns< ::DBError, id_common, A >::id_type_
+  query_columns< ::DBError, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  struct pointer_query_columns< ::DBError, id_common, A >:
+    query_columns< ::DBError, id_common, A >
+  {
+  };
+
+  template <>
+  class access::object_traits_impl< ::DBError, id_common >:
+    public access::object_traits< ::DBError >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static void
+    persist (database&, object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
   };
 
   // DBExtendedMeasure
@@ -341,7 +1765,7 @@ namespace odb
   {
     public:
     typedef ::DBExtendedMeasure object_type;
-    typedef ::DBExtendedMeasure* pointer_type;
+    typedef ::std::shared_ptr< ::DBExtendedMeasure > pointer_type;
     typedef odb::pointer_traits<pointer_type> pointer_traits;
 
     static const bool polymorphic = false;
@@ -355,12 +1779,18 @@ namespace odb
     static id_type
     id (const object_type&);
 
+    struct res_tag;
+
     typedef
-    no_op_pointer_cache_traits<pointer_type>
+    odb::pointer_cache_traits<
+      pointer_type,
+      odb::session >
     pointer_cache_traits;
 
     typedef
-    no_op_reference_cache_traits<object_type>
+    odb::reference_cache_traits<
+      object_type,
+      odb::session >
     reference_cache_traits;
 
     static void
@@ -369,2206 +1799,106 @@ namespace odb
     static void
     callback (database&, const object_type&, callback_event);
   };
-}
 
-#include <odb/details/buffer.hxx>
-
-#include <odb/sqlite/version.hxx>
-#include <odb/sqlite/forward.hxx>
-#include <odb/sqlite/binding.hxx>
-#include <odb/sqlite/sqlite-types.hxx>
-#include <odb/sqlite/query.hxx>
-
-namespace odb
-{
-  // DBConfigKV
-  //
   template <typename A>
-  struct pointer_query_columns< ::DBConfigKV, id_sqlite, A >
+  struct pointer_query_columns< ::DBExtendedMeasure, id_common, A >
   {
-    // cfg
+    // res
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    cfg_type_;
+    typedef odb::query_column< long unsigned int > res_type_;
 
-    static const cfg_type_ cfg;
+    static res_type_ res;
 
     // key
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    key_type_;
+    typedef odb::query_column< ::std::string > key_type_;
 
-    static const key_type_ key;
-
-    // value
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    value_type_;
-
-    static const value_type_ value;
-
-    // id
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
-
-    static const id_type_ id;
-  };
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBConfigKV, id_sqlite, A >::cfg_type_
-  pointer_query_columns< ::DBConfigKV, id_sqlite, A >::
-  cfg (A::table_name, "\"cfg\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBConfigKV, id_sqlite, A >::key_type_
-  pointer_query_columns< ::DBConfigKV, id_sqlite, A >::
-  key (A::table_name, "\"key\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBConfigKV, id_sqlite, A >::value_type_
-  pointer_query_columns< ::DBConfigKV, id_sqlite, A >::
-  value (A::table_name, "\"value\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBConfigKV, id_sqlite, A >::id_type_
-  pointer_query_columns< ::DBConfigKV, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
-
-  template <>
-  class access::object_traits_impl< ::DBConfigKV, id_sqlite >:
-    public access::object_traits< ::DBConfigKV >
-  {
-    public:
-    struct id_image_type
-    {
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct image_type
-    {
-      // cfg
-      //
-      long long cfg_value;
-      bool cfg_null;
-
-      // key
-      //
-      details::buffer key_value;
-      std::size_t key_size;
-      bool key_null;
-
-      // value
-      //
-      details::buffer value_value;
-      std::size_t value_size;
-      bool value_null;
-
-      // id_
-      //
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct extra_statement_cache_type;
-
-    struct cfg_tag;
-
-    using object_traits<object_type>::id;
-
-    static id_type
-    id (const id_image_type&);
-
-    static id_type
-    id (const image_type&);
-
-    static bool
-    grow (image_type&,
-          bool*);
-
-    static void
-    bind (sqlite::bind*,
-          image_type&,
-          sqlite::statement_kind);
-
-    static void
-    bind (sqlite::bind*, id_image_type&);
-
-    static bool
-    init (image_type&,
-          const object_type&,
-          sqlite::statement_kind);
-
-    static void
-    init (object_type&,
-          const image_type&,
-          database*);
-
-    static void
-    init (id_image_type&, const id_type&);
-
-    typedef sqlite::object_statements<object_type> statements_type;
-
-    typedef sqlite::query_base query_base_type;
-
-    static const std::size_t column_count = 4UL;
-    static const std::size_t id_column_count = 1UL;
-    static const std::size_t inverse_column_count = 0UL;
-    static const std::size_t readonly_column_count = 0UL;
-    static const std::size_t managed_optimistic_column_count = 0UL;
-
-    static const std::size_t separate_load_column_count = 0UL;
-    static const std::size_t separate_update_column_count = 0UL;
-
-    static const bool versioned = false;
-
-    static const char persist_statement[];
-    static const char find_statement[];
-    static const char update_statement[];
-    static const char erase_statement[];
-    static const char query_statement[];
-    static const char erase_query_statement[];
-
-    static const char table_name[];
-
-    static void
-    persist (database&, object_type&);
-
-    static pointer_type
-    find (database&, const id_type&);
-
-    static bool
-    find (database&, const id_type&, object_type&);
-
-    static bool
-    reload (database&, object_type&);
-
-    static void
-    update (database&, const object_type&);
-
-    static void
-    erase (database&, const id_type&);
-
-    static void
-    erase (database&, const object_type&);
-
-    static result<object_type>
-    query (database&, const query_base_type&);
-
-    static unsigned long long
-    erase_query (database&, const query_base_type&);
-
-    public:
-    static bool
-    find_ (statements_type&,
-           const id_type*);
-
-    static void
-    load_ (statements_type&,
-           object_type&,
-           bool reload);
-  };
-
-  template <>
-  class access::object_traits_impl< ::DBConfigKV, id_common >:
-    public access::object_traits_impl< ::DBConfigKV, id_sqlite >
-  {
-  };
-
-  // DBConfig
-  //
-  template <typename A>
-  struct query_columns< ::DBConfig, id_sqlite, A >
-  {
-    // name
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    name_type_;
-
-    static const name_type_ name;
-
-    // time_limit
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    time_limit_type_;
-
-    static const time_limit_type_ time_limit;
-
-    // id
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
-
-    static const id_type_ id;
-  };
-
-  template <typename A>
-  const typename query_columns< ::DBConfig, id_sqlite, A >::name_type_
-  query_columns< ::DBConfig, id_sqlite, A >::
-  name (A::table_name, "\"name\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::DBConfig, id_sqlite, A >::time_limit_type_
-  query_columns< ::DBConfig, id_sqlite, A >::
-  time_limit (A::table_name, "\"time_limit\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::DBConfig, id_sqlite, A >::id_type_
-  query_columns< ::DBConfig, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
-
-  template <typename A>
-  struct pointer_query_columns< ::DBConfig, id_sqlite, A >:
-    query_columns< ::DBConfig, id_sqlite, A >
-  {
-  };
-
-  template <>
-  class access::object_traits_impl< ::DBConfig, id_sqlite >:
-    public access::object_traits< ::DBConfig >
-  {
-    public:
-    struct id_image_type
-    {
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct image_type
-    {
-      // name
-      //
-      details::buffer name_value;
-      std::size_t name_size;
-      bool name_null;
-
-      // time_limit
-      //
-      long long time_limit_value;
-      bool time_limit_null;
-
-      // id_
-      //
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct extra_statement_cache_type;
-
-    // entries
-    //
-    struct entries_traits
-    {
-      static const std::size_t id_column_count = 1UL;
-      static const std::size_t data_column_count = 2UL;
-
-      static const bool versioned = false;
-
-      static const char insert_statement[];
-      static const char select_statement[];
-      static const char delete_statement[];
-
-      typedef ::std::vector< ::odb::lazy_weak_ptr< ::DBConfigKV > > container_type;
-      typedef
-      odb::access::container_traits<container_type>
-      container_traits_type;
-      typedef container_traits_type::index_type index_type;
-      typedef container_traits_type::value_type value_type;
-
-      typedef ordered_functions<index_type, value_type> functions_type;
-      typedef sqlite::container_statements< entries_traits > statements_type;
-
-      struct data_image_type
-      {
-        // value
-        //
-        long long value_value;
-        bool value_null;
-
-        std::size_t version;
-      };
-
-      static void
-      bind (sqlite::bind*,
-            const sqlite::bind* id,
-            std::size_t id_size,
-            data_image_type&);
-
-      static void
-      grow (data_image_type&,
-            bool*);
-
-      static void
-      init (value_type&,
-            const data_image_type&,
-            database*);
-
-      static void
-      insert (index_type, const value_type&, void*);
-
-      static bool
-      select (index_type&, value_type&, void*);
-
-      static void
-      delete_ (void*);
-
-      static void
-      load (container_type&,
-            statements_type&);
-    };
-
-    using object_traits<object_type>::id;
-
-    static id_type
-    id (const id_image_type&);
-
-    static id_type
-    id (const image_type&);
-
-    static bool
-    grow (image_type&,
-          bool*);
-
-    static void
-    bind (sqlite::bind*,
-          image_type&,
-          sqlite::statement_kind);
-
-    static void
-    bind (sqlite::bind*, id_image_type&);
-
-    static bool
-    init (image_type&,
-          const object_type&,
-          sqlite::statement_kind);
-
-    static void
-    init (object_type&,
-          const image_type&,
-          database*);
-
-    static void
-    init (id_image_type&, const id_type&);
-
-    typedef sqlite::object_statements<object_type> statements_type;
-
-    typedef sqlite::query_base query_base_type;
-
-    static const std::size_t column_count = 3UL;
-    static const std::size_t id_column_count = 1UL;
-    static const std::size_t inverse_column_count = 0UL;
-    static const std::size_t readonly_column_count = 0UL;
-    static const std::size_t managed_optimistic_column_count = 0UL;
-
-    static const std::size_t separate_load_column_count = 0UL;
-    static const std::size_t separate_update_column_count = 0UL;
-
-    static const bool versioned = false;
-
-    static const char persist_statement[];
-    static const char find_statement[];
-    static const char update_statement[];
-    static const char erase_statement[];
-    static const char query_statement[];
-    static const char erase_query_statement[];
-
-    static const char table_name[];
-
-    static void
-    persist (database&, object_type&);
-
-    static pointer_type
-    find (database&, const id_type&);
-
-    static bool
-    find (database&, const id_type&, object_type&);
-
-    static bool
-    reload (database&, object_type&);
-
-    static void
-    update (database&, const object_type&);
-
-    static void
-    erase (database&, const id_type&);
-
-    static void
-    erase (database&, const object_type&);
-
-    static result<object_type>
-    query (database&, const query_base_type&);
-
-    static unsigned long long
-    erase_query (database&, const query_base_type&);
-
-    public:
-    static bool
-    find_ (statements_type&,
-           const id_type*);
-
-    static void
-    load_ (statements_type&,
-           object_type&,
-           bool reload);
-  };
-
-  template <>
-  class access::object_traits_impl< ::DBConfig, id_common >:
-    public access::object_traits_impl< ::DBConfig, id_sqlite >
-  {
-  };
-
-  // DBResult
-  //
-  template <typename A>
-  struct pointer_query_columns< ::DBResult, id_sqlite, A >
-  {
-    // run
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    run_type_;
-
-    static const run_type_ run;
-
-    // instance
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    instance_type_;
-
-    static const instance_type_ instance;
-
-    // score
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    score_type_;
-
-    static const score_type_ score;
-
-    // algorithm
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    algorithm_type_;
-
-    static const algorithm_type_ algorithm;
-
-    // config
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    config_type_;
-
-    static const config_type_ config;
-
-    // seed
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    seed_type_;
-
-    static const seed_type_ seed;
-
-    // optimal
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        bool,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    optimal_type_;
-
-    static const optimal_type_ optimal;
-
-    // feasible
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        bool,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    feasible_type_;
-
-    static const feasible_type_ feasible;
-
-    // lower_bound
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    lower_bound_type_;
-
-    static const lower_bound_type_ lower_bound;
-
-    // elapsed
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    elapsed_type_;
-
-    static const elapsed_type_ elapsed;
-
-    // cfg
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    cfg_type_;
-
-    static const cfg_type_ cfg;
-
-    // id
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
-
-    static const id_type_ id;
-  };
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::run_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  run (A::table_name, "\"run\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::instance_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  instance (A::table_name, "\"instance\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::score_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  score (A::table_name, "\"score\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::algorithm_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  algorithm (A::table_name, "\"algorithm\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::config_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  config (A::table_name, "\"config\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::seed_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  seed (A::table_name, "\"seed\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::optimal_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  optimal (A::table_name, "\"optimal\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::feasible_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  feasible (A::table_name, "\"feasible\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::lower_bound_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  lower_bound (A::table_name, "\"lower_bound\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::elapsed_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  elapsed (A::table_name, "\"elapsed\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::cfg_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  cfg (A::table_name, "\"cfg\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBResult, id_sqlite, A >::id_type_
-  pointer_query_columns< ::DBResult, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
-
-  template <>
-  class access::object_traits_impl< ::DBResult, id_sqlite >:
-    public access::object_traits< ::DBResult >
-  {
-    public:
-    struct id_image_type
-    {
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct image_type
-    {
-      // run
-      //
-      details::buffer run_value;
-      std::size_t run_size;
-      bool run_null;
-
-      // instance
-      //
-      details::buffer instance_value;
-      std::size_t instance_size;
-      bool instance_null;
-
-      // score
-      //
-      double score_value;
-      bool score_null;
-
-      // algorithm
-      //
-      details::buffer algorithm_value;
-      std::size_t algorithm_size;
-      bool algorithm_null;
-
-      // config
-      //
-      details::buffer config_value;
-      std::size_t config_size;
-      bool config_null;
-
-      // seed
-      //
-      long long seed_value;
-      bool seed_null;
-
-      // optimal
-      //
-      long long optimal_value;
-      bool optimal_null;
-
-      // feasible
-      //
-      long long feasible_value;
-      bool feasible_null;
-
-      // lower_bound
-      //
-      double lower_bound_value;
-      bool lower_bound_null;
-
-      // elapsed
-      //
-      double elapsed_value;
-      bool elapsed_null;
-
-      // cfg
-      //
-      long long cfg_value;
-      bool cfg_null;
-
-      // id_
-      //
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct extra_statement_cache_type;
-
-    struct cfg_tag;
-
-    using object_traits<object_type>::id;
-
-    static id_type
-    id (const id_image_type&);
-
-    static id_type
-    id (const image_type&);
-
-    static bool
-    grow (image_type&,
-          bool*);
-
-    static void
-    bind (sqlite::bind*,
-          image_type&,
-          sqlite::statement_kind);
-
-    static void
-    bind (sqlite::bind*, id_image_type&);
-
-    static bool
-    init (image_type&,
-          const object_type&,
-          sqlite::statement_kind);
-
-    static void
-    init (object_type&,
-          const image_type&,
-          database*);
-
-    static void
-    init (id_image_type&, const id_type&);
-
-    typedef sqlite::object_statements<object_type> statements_type;
-
-    typedef sqlite::query_base query_base_type;
-
-    static const std::size_t column_count = 12UL;
-    static const std::size_t id_column_count = 1UL;
-    static const std::size_t inverse_column_count = 0UL;
-    static const std::size_t readonly_column_count = 0UL;
-    static const std::size_t managed_optimistic_column_count = 0UL;
-
-    static const std::size_t separate_load_column_count = 0UL;
-    static const std::size_t separate_update_column_count = 0UL;
-
-    static const bool versioned = false;
-
-    static const char persist_statement[];
-    static const char find_statement[];
-    static const char update_statement[];
-    static const char erase_statement[];
-    static const char query_statement[];
-    static const char erase_query_statement[];
-
-    static const char table_name[];
-
-    static void
-    persist (database&, object_type&);
-
-    static pointer_type
-    find (database&, const id_type&);
-
-    static bool
-    find (database&, const id_type&, object_type&);
-
-    static bool
-    reload (database&, object_type&);
-
-    static void
-    update (database&, const object_type&);
-
-    static void
-    erase (database&, const id_type&);
-
-    static void
-    erase (database&, const object_type&);
-
-    static result<object_type>
-    query (database&, const query_base_type&);
-
-    static unsigned long long
-    erase_query (database&, const query_base_type&);
-
-    public:
-    static bool
-    find_ (statements_type&,
-           const id_type*);
-
-    static void
-    load_ (statements_type&,
-           object_type&,
-           bool reload);
-  };
-
-  template <>
-  class access::object_traits_impl< ::DBResult, id_common >:
-    public access::object_traits_impl< ::DBResult, id_sqlite >
-  {
-  };
-
-  // DBSolution
-  //
-  template <typename A>
-  struct pointer_query_columns< ::DBSolution, id_sqlite, A >
-  {
-    // res
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    res_type_;
-
-    static const res_type_ res;
-
-    // id
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
-
-    static const id_type_ id;
-  };
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBSolution, id_sqlite, A >::res_type_
-  pointer_query_columns< ::DBSolution, id_sqlite, A >::
-  res (A::table_name, "\"res\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBSolution, id_sqlite, A >::id_type_
-  pointer_query_columns< ::DBSolution, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
-
-  template <>
-  class access::object_traits_impl< ::DBSolution, id_sqlite >:
-    public access::object_traits< ::DBSolution >
-  {
-    public:
-    struct id_image_type
-    {
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct image_type
-    {
-      // res
-      //
-      long long res_value;
-      bool res_null;
-
-      // id_
-      //
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct extra_statement_cache_type;
-
-    // jobs
-    //
-    struct jobs_traits
-    {
-      static const std::size_t id_column_count = 1UL;
-      static const std::size_t data_column_count = 2UL;
-
-      static const bool versioned = false;
-
-      static const char insert_statement[];
-      static const char select_statement[];
-      static const char delete_statement[];
-
-      typedef ::std::vector< ::std::shared_ptr< ::DBSolutionJob > > container_type;
-      typedef
-      odb::access::container_traits<container_type>
-      container_traits_type;
-      typedef container_traits_type::index_type index_type;
-      typedef container_traits_type::value_type value_type;
-
-      typedef ordered_functions<index_type, value_type> functions_type;
-      typedef sqlite::container_statements< jobs_traits > statements_type;
-
-      struct data_image_type
-      {
-        // value
-        //
-        long long value_value;
-        bool value_null;
-
-        std::size_t version;
-      };
-
-      static void
-      bind (sqlite::bind*,
-            const sqlite::bind* id,
-            std::size_t id_size,
-            data_image_type&);
-
-      static void
-      grow (data_image_type&,
-            bool*);
-
-      static void
-      init (value_type&,
-            const data_image_type&,
-            database*);
-
-      static void
-      insert (index_type, const value_type&, void*);
-
-      static bool
-      select (index_type&, value_type&, void*);
-
-      static void
-      delete_ (void*);
-
-      static void
-      load (container_type&,
-            statements_type&);
-    };
-
-    struct res_tag;
-
-    using object_traits<object_type>::id;
-
-    static id_type
-    id (const id_image_type&);
-
-    static id_type
-    id (const image_type&);
-
-    static bool
-    grow (image_type&,
-          bool*);
-
-    static void
-    bind (sqlite::bind*,
-          image_type&,
-          sqlite::statement_kind);
-
-    static void
-    bind (sqlite::bind*, id_image_type&);
-
-    static bool
-    init (image_type&,
-          const object_type&,
-          sqlite::statement_kind);
-
-    static void
-    init (object_type&,
-          const image_type&,
-          database*);
-
-    static void
-    init (id_image_type&, const id_type&);
-
-    typedef sqlite::object_statements<object_type> statements_type;
-
-    typedef sqlite::query_base query_base_type;
-
-    static const std::size_t column_count = 2UL;
-    static const std::size_t id_column_count = 1UL;
-    static const std::size_t inverse_column_count = 0UL;
-    static const std::size_t readonly_column_count = 0UL;
-    static const std::size_t managed_optimistic_column_count = 0UL;
-
-    static const std::size_t separate_load_column_count = 0UL;
-    static const std::size_t separate_update_column_count = 0UL;
-
-    static const bool versioned = false;
-
-    static const char persist_statement[];
-    static const char find_statement[];
-    static const char update_statement[];
-    static const char erase_statement[];
-    static const char query_statement[];
-    static const char erase_query_statement[];
-
-    static const char table_name[];
-
-    static void
-    persist (database&, object_type&);
-
-    static pointer_type
-    find (database&, const id_type&);
-
-    static bool
-    find (database&, const id_type&, object_type&);
-
-    static bool
-    reload (database&, object_type&);
-
-    static void
-    update (database&, const object_type&);
-
-    static void
-    erase (database&, const id_type&);
-
-    static void
-    erase (database&, const object_type&);
-
-    static result<object_type>
-    query (database&, const query_base_type&);
-
-    static unsigned long long
-    erase_query (database&, const query_base_type&);
-
-    public:
-    static bool
-    find_ (statements_type&,
-           const id_type*);
-
-    static void
-    load_ (statements_type&,
-           object_type&,
-           bool reload);
-  };
-
-  template <>
-  class access::object_traits_impl< ::DBSolution, id_common >:
-    public access::object_traits_impl< ::DBSolution, id_sqlite >
-  {
-  };
-
-  // DBSolutionJob
-  //
-  template <typename A>
-  struct pointer_query_columns< ::DBSolutionJob, id_sqlite, A >
-  {
-    // sol
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    sol_type_;
-
-    static const sol_type_ sol;
-
-    // job_id
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    job_id_type_;
-
-    static const job_id_type_ job_id;
-
-    // start_time
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    start_time_type_;
-
-    static const start_time_type_ start_time;
-
-    // id
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
-
-    static const id_type_ id;
-  };
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBSolutionJob, id_sqlite, A >::sol_type_
-  pointer_query_columns< ::DBSolutionJob, id_sqlite, A >::
-  sol (A::table_name, "\"sol\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBSolutionJob, id_sqlite, A >::job_id_type_
-  pointer_query_columns< ::DBSolutionJob, id_sqlite, A >::
-  job_id (A::table_name, "\"job_id\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBSolutionJob, id_sqlite, A >::start_time_type_
-  pointer_query_columns< ::DBSolutionJob, id_sqlite, A >::
-  start_time (A::table_name, "\"start_time\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBSolutionJob, id_sqlite, A >::id_type_
-  pointer_query_columns< ::DBSolutionJob, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
-
-  template <>
-  class access::object_traits_impl< ::DBSolutionJob, id_sqlite >:
-    public access::object_traits< ::DBSolutionJob >
-  {
-    public:
-    struct id_image_type
-    {
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct image_type
-    {
-      // sol
-      //
-      long long sol_value;
-      bool sol_null;
-
-      // job_id
-      //
-      long long job_id_value;
-      bool job_id_null;
-
-      // start_time
-      //
-      long long start_time_value;
-      bool start_time_null;
-
-      // id_
-      //
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct extra_statement_cache_type;
-
-    struct sol_tag;
-
-    using object_traits<object_type>::id;
-
-    static id_type
-    id (const id_image_type&);
-
-    static id_type
-    id (const image_type&);
-
-    static bool
-    grow (image_type&,
-          bool*);
-
-    static void
-    bind (sqlite::bind*,
-          image_type&,
-          sqlite::statement_kind);
-
-    static void
-    bind (sqlite::bind*, id_image_type&);
-
-    static bool
-    init (image_type&,
-          const object_type&,
-          sqlite::statement_kind);
-
-    static void
-    init (object_type&,
-          const image_type&,
-          database*);
-
-    static void
-    init (id_image_type&, const id_type&);
-
-    typedef sqlite::object_statements<object_type> statements_type;
-
-    typedef sqlite::query_base query_base_type;
-
-    static const std::size_t column_count = 4UL;
-    static const std::size_t id_column_count = 1UL;
-    static const std::size_t inverse_column_count = 0UL;
-    static const std::size_t readonly_column_count = 0UL;
-    static const std::size_t managed_optimistic_column_count = 0UL;
-
-    static const std::size_t separate_load_column_count = 0UL;
-    static const std::size_t separate_update_column_count = 0UL;
-
-    static const bool versioned = false;
-
-    static const char persist_statement[];
-    static const char find_statement[];
-    static const char update_statement[];
-    static const char erase_statement[];
-    static const char query_statement[];
-    static const char erase_query_statement[];
-
-    static const char table_name[];
-
-    static void
-    persist (database&, object_type&);
-
-    static pointer_type
-    find (database&, const id_type&);
-
-    static bool
-    find (database&, const id_type&, object_type&);
-
-    static bool
-    reload (database&, object_type&);
-
-    static void
-    update (database&, const object_type&);
-
-    static void
-    erase (database&, const id_type&);
-
-    static void
-    erase (database&, const object_type&);
-
-    static result<object_type>
-    query (database&, const query_base_type&);
-
-    static unsigned long long
-    erase_query (database&, const query_base_type&);
-
-    public:
-    static bool
-    find_ (statements_type&,
-           const id_type*);
-
-    static void
-    load_ (statements_type&,
-           object_type&,
-           bool reload);
-  };
-
-  template <>
-  class access::object_traits_impl< ::DBSolutionJob, id_common >:
-    public access::object_traits_impl< ::DBSolutionJob, id_sqlite >
-  {
-  };
-
-  // DBIntermediate
-  //
-  template <typename A>
-  struct pointer_query_columns< ::DBIntermediate, id_sqlite, A >
-  {
-    // res
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    res_type_;
-
-    static const res_type_ res;
-
-    // time
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    time_type_;
-
-    static const time_type_ time;
+    static key_type_ key;
 
     // iteration
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    iteration_type_;
+    typedef odb::query_column< unsigned int > iteration_type_;
 
-    static const iteration_type_ iteration;
-
-    // costs
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    costs_type_;
-
-    static const costs_type_ costs;
-
-    // bound
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    bound_type_;
-
-    static const bound_type_ bound;
-
-    // solution
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    solution_type_;
-
-    static const solution_type_ solution;
-
-    // id
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
-
-    static const id_type_ id;
-  };
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBIntermediate, id_sqlite, A >::res_type_
-  pointer_query_columns< ::DBIntermediate, id_sqlite, A >::
-  res (A::table_name, "\"res\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBIntermediate, id_sqlite, A >::time_type_
-  pointer_query_columns< ::DBIntermediate, id_sqlite, A >::
-  time (A::table_name, "\"time\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBIntermediate, id_sqlite, A >::iteration_type_
-  pointer_query_columns< ::DBIntermediate, id_sqlite, A >::
-  iteration (A::table_name, "\"iteration\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBIntermediate, id_sqlite, A >::costs_type_
-  pointer_query_columns< ::DBIntermediate, id_sqlite, A >::
-  costs (A::table_name, "\"costs\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBIntermediate, id_sqlite, A >::bound_type_
-  pointer_query_columns< ::DBIntermediate, id_sqlite, A >::
-  bound (A::table_name, "\"bound\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBIntermediate, id_sqlite, A >::solution_type_
-  pointer_query_columns< ::DBIntermediate, id_sqlite, A >::
-  solution (A::table_name, "\"solution\"", 0);
-
-  template <typename A>
-  const typename pointer_query_columns< ::DBIntermediate, id_sqlite, A >::id_type_
-  pointer_query_columns< ::DBIntermediate, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
-
-  template <>
-  class access::object_traits_impl< ::DBIntermediate, id_sqlite >:
-    public access::object_traits< ::DBIntermediate >
-  {
-    public:
-    struct id_image_type
-    {
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct image_type
-    {
-      // res
-      //
-      long long res_value;
-      bool res_null;
-
-      // time
-      //
-      double time_value;
-      bool time_null;
-
-      // iteration
-      //
-      long long iteration_value;
-      bool iteration_null;
-
-      // costs
-      //
-      double costs_value;
-      bool costs_null;
-
-      // bound
-      //
-      double bound_value;
-      bool bound_null;
-
-      // solution
-      //
-      long long solution_value;
-      bool solution_null;
-
-      // id_
-      //
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct extra_statement_cache_type;
-
-    struct res_tag;
-    struct solution_tag;
-
-    using object_traits<object_type>::id;
-
-    static id_type
-    id (const id_image_type&);
-
-    static id_type
-    id (const image_type&);
-
-    static bool
-    grow (image_type&,
-          bool*);
-
-    static void
-    bind (sqlite::bind*,
-          image_type&,
-          sqlite::statement_kind);
-
-    static void
-    bind (sqlite::bind*, id_image_type&);
-
-    static bool
-    init (image_type&,
-          const object_type&,
-          sqlite::statement_kind);
-
-    static void
-    init (object_type&,
-          const image_type&,
-          database*);
-
-    static void
-    init (id_image_type&, const id_type&);
-
-    typedef sqlite::object_statements<object_type> statements_type;
-
-    typedef sqlite::query_base query_base_type;
-
-    static const std::size_t column_count = 7UL;
-    static const std::size_t id_column_count = 1UL;
-    static const std::size_t inverse_column_count = 0UL;
-    static const std::size_t readonly_column_count = 0UL;
-    static const std::size_t managed_optimistic_column_count = 0UL;
-
-    static const std::size_t separate_load_column_count = 0UL;
-    static const std::size_t separate_update_column_count = 0UL;
-
-    static const bool versioned = false;
-
-    static const char persist_statement[];
-    static const char find_statement[];
-    static const char update_statement[];
-    static const char erase_statement[];
-    static const char query_statement[];
-    static const char erase_query_statement[];
-
-    static const char table_name[];
-
-    static void
-    persist (database&, object_type&);
-
-    static pointer_type
-    find (database&, const id_type&);
-
-    static bool
-    find (database&, const id_type&, object_type&);
-
-    static bool
-    reload (database&, object_type&);
-
-    static void
-    update (database&, const object_type&);
-
-    static void
-    erase (database&, const id_type&);
-
-    static void
-    erase (database&, const object_type&);
-
-    static result<object_type>
-    query (database&, const query_base_type&);
-
-    static unsigned long long
-    erase_query (database&, const query_base_type&);
-
-    public:
-    static bool
-    find_ (statements_type&,
-           const id_type*);
-
-    static void
-    load_ (statements_type&,
-           object_type&,
-           bool reload);
-  };
-
-  template <>
-  class access::object_traits_impl< ::DBIntermediate, id_common >:
-    public access::object_traits_impl< ::DBIntermediate, id_sqlite >
-  {
-  };
-
-  // DBError
-  //
-  template <typename A>
-  struct query_columns< ::DBError, id_sqlite, A >
-  {
-    // timestamp
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    timestamp_type_;
-
-    static const timestamp_type_ timestamp;
-
-    // run
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    run_type_;
-
-    static const run_type_ run;
-
-    // instance
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    instance_type_;
-
-    static const instance_type_ instance;
-
-    // algorithm
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    algorithm_type_;
-
-    static const algorithm_type_ algorithm;
-
-    // config
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    config_type_;
-
-    static const config_type_ config;
-
-    // seed
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    seed_type_;
-
-    static const seed_type_ seed;
-
-    // fault_code
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    fault_code_type_;
-
-    static const fault_code_type_ fault_code;
-
-    // error_id
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    error_id_type_;
-
-    static const error_id_type_ error_id;
-
-    // id
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
-
-    static const id_type_ id;
-  };
-
-  template <typename A>
-  const typename query_columns< ::DBError, id_sqlite, A >::timestamp_type_
-  query_columns< ::DBError, id_sqlite, A >::
-  timestamp (A::table_name, "\"timestamp\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::DBError, id_sqlite, A >::run_type_
-  query_columns< ::DBError, id_sqlite, A >::
-  run (A::table_name, "\"run\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::DBError, id_sqlite, A >::instance_type_
-  query_columns< ::DBError, id_sqlite, A >::
-  instance (A::table_name, "\"instance\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::DBError, id_sqlite, A >::algorithm_type_
-  query_columns< ::DBError, id_sqlite, A >::
-  algorithm (A::table_name, "\"algorithm\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::DBError, id_sqlite, A >::config_type_
-  query_columns< ::DBError, id_sqlite, A >::
-  config (A::table_name, "\"config\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::DBError, id_sqlite, A >::seed_type_
-  query_columns< ::DBError, id_sqlite, A >::
-  seed (A::table_name, "\"seed\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::DBError, id_sqlite, A >::fault_code_type_
-  query_columns< ::DBError, id_sqlite, A >::
-  fault_code (A::table_name, "\"fault_code\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::DBError, id_sqlite, A >::error_id_type_
-  query_columns< ::DBError, id_sqlite, A >::
-  error_id (A::table_name, "\"error_id\"", 0);
-
-  template <typename A>
-  const typename query_columns< ::DBError, id_sqlite, A >::id_type_
-  query_columns< ::DBError, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
-
-  template <typename A>
-  struct pointer_query_columns< ::DBError, id_sqlite, A >:
-    query_columns< ::DBError, id_sqlite, A >
-  {
-  };
-
-  template <>
-  class access::object_traits_impl< ::DBError, id_sqlite >:
-    public access::object_traits< ::DBError >
-  {
-    public:
-    struct id_image_type
-    {
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct image_type
-    {
-      // timestamp
-      //
-      long long timestamp_value;
-      bool timestamp_null;
-
-      // run
-      //
-      details::buffer run_value;
-      std::size_t run_size;
-      bool run_null;
-
-      // instance
-      //
-      details::buffer instance_value;
-      std::size_t instance_size;
-      bool instance_null;
-
-      // algorithm
-      //
-      details::buffer algorithm_value;
-      std::size_t algorithm_size;
-      bool algorithm_null;
-
-      // config
-      //
-      details::buffer config_value;
-      std::size_t config_size;
-      bool config_null;
-
-      // seed
-      //
-      long long seed_value;
-      bool seed_null;
-
-      // fault_code
-      //
-      long long fault_code_value;
-      bool fault_code_null;
-
-      // error_id
-      //
-      long long error_id_value;
-      bool error_id_null;
-
-      // id_
-      //
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct extra_statement_cache_type;
-
-    using object_traits<object_type>::id;
-
-    static id_type
-    id (const id_image_type&);
-
-    static id_type
-    id (const image_type&);
-
-    static bool
-    grow (image_type&,
-          bool*);
-
-    static void
-    bind (sqlite::bind*,
-          image_type&,
-          sqlite::statement_kind);
-
-    static void
-    bind (sqlite::bind*, id_image_type&);
-
-    static bool
-    init (image_type&,
-          const object_type&,
-          sqlite::statement_kind);
-
-    static void
-    init (object_type&,
-          const image_type&,
-          database*);
-
-    static void
-    init (id_image_type&, const id_type&);
-
-    typedef sqlite::object_statements<object_type> statements_type;
-
-    typedef sqlite::query_base query_base_type;
-
-    static const std::size_t column_count = 9UL;
-    static const std::size_t id_column_count = 1UL;
-    static const std::size_t inverse_column_count = 0UL;
-    static const std::size_t readonly_column_count = 0UL;
-    static const std::size_t managed_optimistic_column_count = 0UL;
-
-    static const std::size_t separate_load_column_count = 0UL;
-    static const std::size_t separate_update_column_count = 0UL;
-
-    static const bool versioned = false;
-
-    static const char persist_statement[];
-    static const char find_statement[];
-    static const char update_statement[];
-    static const char erase_statement[];
-    static const char query_statement[];
-    static const char erase_query_statement[];
-
-    static const char table_name[];
-
-    static void
-    persist (database&, object_type&);
-
-    static pointer_type
-    find (database&, const id_type&);
-
-    static bool
-    find (database&, const id_type&, object_type&);
-
-    static bool
-    reload (database&, object_type&);
-
-    static void
-    update (database&, const object_type&);
-
-    static void
-    erase (database&, const id_type&);
-
-    static void
-    erase (database&, const object_type&);
-
-    static result<object_type>
-    query (database&, const query_base_type&);
-
-    static unsigned long long
-    erase_query (database&, const query_base_type&);
-
-    public:
-    static bool
-    find_ (statements_type&,
-           const id_type*);
-
-    static void
-    load_ (statements_type&,
-           object_type&,
-           bool reload);
-  };
-
-  template <>
-  class access::object_traits_impl< ::DBError, id_common >:
-    public access::object_traits_impl< ::DBError, id_sqlite >
-  {
-  };
-
-  // DBExtendedMeasure
-  //
-  template <typename A>
-  struct pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >
-  {
-    // res
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    res_type_;
-
-    static const res_type_ res;
-
-    // key
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    key_type_;
-
-    static const key_type_ key;
-
-    // iteration
-    //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    iteration_type_;
-
-    static const iteration_type_ iteration;
+    static iteration_type_ iteration;
 
     // time
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    time_type_;
+    typedef odb::query_column< double > time_type_;
 
-    static const time_type_ time;
+    static time_type_ time;
 
     // v_int
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    v_int_type_;
+    typedef odb::query_column< int > v_int_type_;
 
-    static const v_int_type_ v_int;
+    static v_int_type_ v_int;
 
     // v_double
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    v_double_type_;
+    typedef odb::query_column< double > v_double_type_;
 
-    static const v_double_type_ v_double;
+    static v_double_type_ v_double;
 
     // id
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
+    typedef odb::query_column< long unsigned int > id_type_;
 
-    static const id_type_ id;
+    static id_type_ id;
   };
 
-  template <typename A>
-  const typename pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::res_type_
-  pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  res (A::table_name, "\"res\"", 0);
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
 
   template <typename A>
-  const typename pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::key_type_
-  pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  key (A::table_name, "\"key\"", 0);
+  typename pointer_query_columns< ::DBExtendedMeasure, id_common, A >::res_type_
+  pointer_query_columns< ::DBExtendedMeasure, id_common, A >::res;
 
   template <typename A>
-  const typename pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::iteration_type_
-  pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  iteration (A::table_name, "\"iteration\"", 0);
+  typename pointer_query_columns< ::DBExtendedMeasure, id_common, A >::key_type_
+  pointer_query_columns< ::DBExtendedMeasure, id_common, A >::key;
 
   template <typename A>
-  const typename pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::time_type_
-  pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  time (A::table_name, "\"time\"", 0);
+  typename pointer_query_columns< ::DBExtendedMeasure, id_common, A >::iteration_type_
+  pointer_query_columns< ::DBExtendedMeasure, id_common, A >::iteration;
 
   template <typename A>
-  const typename pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::v_int_type_
-  pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  v_int (A::table_name, "\"v_int\"", 0);
+  typename pointer_query_columns< ::DBExtendedMeasure, id_common, A >::time_type_
+  pointer_query_columns< ::DBExtendedMeasure, id_common, A >::time;
 
   template <typename A>
-  const typename pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::v_double_type_
-  pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  v_double (A::table_name, "\"v_double\"", 0);
+  typename pointer_query_columns< ::DBExtendedMeasure, id_common, A >::v_int_type_
+  pointer_query_columns< ::DBExtendedMeasure, id_common, A >::v_int;
 
   template <typename A>
-  const typename pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::id_type_
-  pointer_query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
+  typename pointer_query_columns< ::DBExtendedMeasure, id_common, A >::v_double_type_
+  pointer_query_columns< ::DBExtendedMeasure, id_common, A >::v_double;
+
+  template <typename A>
+  typename pointer_query_columns< ::DBExtendedMeasure, id_common, A >::id_type_
+  pointer_query_columns< ::DBExtendedMeasure, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
 
   template <>
-  class access::object_traits_impl< ::DBExtendedMeasure, id_sqlite >:
+  class access::object_traits_impl< ::DBExtendedMeasure, id_common >:
     public access::object_traits< ::DBExtendedMeasure >
   {
     public:
-    struct id_image_type
-    {
-      long long id_value;
-      bool id_null;
+    typedef odb::query_base query_base_type;
 
-      std::size_t version;
+    struct function_table_type
+    {
+      void (*persist) (database&, object_type&);
+      pointer_type (*find1) (database&, const id_type&);
+      bool (*find2) (database&, const id_type&, object_type&);
+      bool (*reload) (database&, object_type&);
+      void (*update) (database&, const object_type&);
+      void (*erase1) (database&, const id_type&);
+      void (*erase2) (database&, const object_type&);
+      result<object_type> (*query) (database&, const query_base_type&);
+      unsigned long long (*erase_query) (database&, const query_base_type&);
     };
 
-    struct image_type
-    {
-      // res
-      //
-      long long res_value;
-      bool res_null;
-
-      // key
-      //
-      details::buffer key_value;
-      std::size_t key_size;
-      bool key_null;
-
-      // iteration
-      //
-      long long iteration_value;
-      bool iteration_null;
-
-      // time
-      //
-      double time_value;
-      bool time_null;
-
-      // v_int
-      //
-      long long v_int_value;
-      bool v_int_null;
-
-      // v_double
-      //
-      double v_double_value;
-      bool v_double_null;
-
-      // id_
-      //
-      long long id_value;
-      bool id_null;
-
-      std::size_t version;
-    };
-
-    struct extra_statement_cache_type;
-
-    struct res_tag;
-
-    using object_traits<object_type>::id;
-
-    static id_type
-    id (const id_image_type&);
-
-    static id_type
-    id (const image_type&);
-
-    static bool
-    grow (image_type&,
-          bool*);
-
-    static void
-    bind (sqlite::bind*,
-          image_type&,
-          sqlite::statement_kind);
-
-    static void
-    bind (sqlite::bind*, id_image_type&);
-
-    static bool
-    init (image_type&,
-          const object_type&,
-          sqlite::statement_kind);
-
-    static void
-    init (object_type&,
-          const image_type&,
-          database*);
-
-    static void
-    init (id_image_type&, const id_type&);
-
-    typedef sqlite::object_statements<object_type> statements_type;
-
-    typedef sqlite::query_base query_base_type;
-
-    static const std::size_t column_count = 7UL;
-    static const std::size_t id_column_count = 1UL;
-    static const std::size_t inverse_column_count = 0UL;
-    static const std::size_t readonly_column_count = 0UL;
-    static const std::size_t managed_optimistic_column_count = 0UL;
-
-    static const std::size_t separate_load_column_count = 0UL;
-    static const std::size_t separate_update_column_count = 0UL;
-
-    static const bool versioned = false;
-
-    static const char persist_statement[];
-    static const char find_statement[];
-    static const char update_statement[];
-    static const char erase_statement[];
-    static const char query_statement[];
-    static const char erase_query_statement[];
-
-    static const char table_name[];
+    static const function_table_type* function_table[database_count];
 
     static void
     persist (database&, object_type&);
@@ -2596,22 +1926,46 @@ namespace odb
 
     static unsigned long long
     erase_query (database&, const query_base_type&);
+  };
 
-    public:
-    static bool
-    find_ (statements_type&,
-           const id_type*);
-
-    static void
-    load_ (statements_type&,
-           object_type&,
-           bool reload);
+  // ConfigGetterView
+  //
+  template <>
+  struct class_traits< ::ConfigGetterView >
+  {
+    static const class_kind kind = class_view;
   };
 
   template <>
-  class access::object_traits_impl< ::DBExtendedMeasure, id_common >:
-    public access::object_traits_impl< ::DBExtendedMeasure, id_sqlite >
+  class access::view_traits< ::ConfigGetterView >
   {
+    public:
+    typedef ::ConfigGetterView view_type;
+    typedef ::std::shared_ptr< ::ConfigGetterView > pointer_type;
+
+    static void
+    callback (database&, view_type&, callback_event);
+  };
+
+  template <>
+  class access::view_traits_impl< ::ConfigGetterView, id_common >:
+    public access::view_traits< ::ConfigGetterView >
+  {
+    public:
+    typedef odb::query_base query_base_type;
+    struct query_columns
+    {
+    };
+
+    struct function_table_type
+    {
+      result<view_type> (*query) (database&, const query_base_type&);
+    };
+
+    static const function_table_type* function_table[database_count];
+
+    static result<view_type>
+    query (database&, const query_base_type&);
   };
 
   // DBConfigKV
@@ -2619,587 +1973,706 @@ namespace odb
   template <>
   struct alias_traits<
     ::DBConfig,
-    id_sqlite,
-    access::object_traits_impl< ::DBConfigKV, id_sqlite >::cfg_tag>
+    id_common,
+    access::object_traits_impl< ::DBConfigKV, id_common >::cfg_tag>
   {
-    static const char table_name[];
   };
 
   template <>
-  struct query_columns_base< ::DBConfigKV, id_sqlite >
+  struct query_columns_base< ::DBConfigKV, id_common >
   {
     // cfg
     //
     typedef
     odb::alias_traits<
       ::DBConfig,
-      id_sqlite,
-      access::object_traits_impl< ::DBConfigKV, id_sqlite >::cfg_tag>
+      id_common,
+      access::object_traits_impl< ::DBConfigKV, id_common >::cfg_tag>
     cfg_alias_;
   };
 
   template <typename A>
-  struct query_columns< ::DBConfigKV, id_sqlite, A >:
-    query_columns_base< ::DBConfigKV, id_sqlite >
+  struct query_columns< ::DBConfigKV, id_common, A >:
+    query_columns_base< ::DBConfigKV, id_common >
   {
     // cfg
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    cfg_column_type_;
+    typedef odb::query_column< long unsigned int > cfg_column_type_;
 
     typedef
     odb::query_pointer<
       odb::pointer_query_columns<
         ::DBConfig,
-        id_sqlite,
+        id_common,
         cfg_alias_ > >
     cfg_pointer_type_;
 
     struct cfg_type_: cfg_pointer_type_, cfg_column_type_
     {
-      cfg_type_ (const char* t, const char* c, const char* conv)
-        : cfg_column_type_ (t, c, conv)
-      {
-      }
     };
 
-    static const cfg_type_ cfg;
+    static cfg_type_ cfg;
 
     // key
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    key_type_;
+    typedef odb::query_column< ::std::string > key_type_;
 
-    static const key_type_ key;
+    static key_type_ key;
 
     // value
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    value_type_;
+    typedef odb::query_column< ::std::string > value_type_;
 
-    static const value_type_ value;
+    static value_type_ value;
 
     // id
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
+    typedef odb::query_column< long unsigned int > id_type_;
 
-    static const id_type_ id;
+    static id_type_ id;
   };
 
-  template <typename A>
-  const typename query_columns< ::DBConfigKV, id_sqlite, A >::cfg_type_
-  query_columns< ::DBConfigKV, id_sqlite, A >::
-  cfg (A::table_name, "\"cfg\"", 0);
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
 
   template <typename A>
-  const typename query_columns< ::DBConfigKV, id_sqlite, A >::key_type_
-  query_columns< ::DBConfigKV, id_sqlite, A >::
-  key (A::table_name, "\"key\"", 0);
+  typename query_columns< ::DBConfigKV, id_common, A >::cfg_type_
+  query_columns< ::DBConfigKV, id_common, A >::cfg;
 
   template <typename A>
-  const typename query_columns< ::DBConfigKV, id_sqlite, A >::value_type_
-  query_columns< ::DBConfigKV, id_sqlite, A >::
-  value (A::table_name, "\"value\"", 0);
+  typename query_columns< ::DBConfigKV, id_common, A >::key_type_
+  query_columns< ::DBConfigKV, id_common, A >::key;
 
   template <typename A>
-  const typename query_columns< ::DBConfigKV, id_sqlite, A >::id_type_
-  query_columns< ::DBConfigKV, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
+  typename query_columns< ::DBConfigKV, id_common, A >::value_type_
+  query_columns< ::DBConfigKV, id_common, A >::value;
+
+  template <typename A>
+  typename query_columns< ::DBConfigKV, id_common, A >::id_type_
+  query_columns< ::DBConfigKV, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
 
   // DBConfig
+  //
+  // DBInvocation
   //
   // DBResult
   //
   template <>
   struct alias_traits<
-    ::DBConfig,
-    id_sqlite,
-    access::object_traits_impl< ::DBResult, id_sqlite >::cfg_tag>
+    ::DBInvocation,
+    id_common,
+    access::object_traits_impl< ::DBResult, id_common >::invocation_tag>
   {
-    static const char table_name[];
   };
 
   template <>
-  struct query_columns_base< ::DBResult, id_sqlite >
+  struct alias_traits<
+    ::DBConfig,
+    id_common,
+    access::object_traits_impl< ::DBResult, id_common >::cfg_tag>
   {
+  };
+
+  template <>
+  struct query_columns_base< ::DBResult, id_common >
+  {
+    // invocation
+    //
+    typedef
+    odb::alias_traits<
+      ::DBInvocation,
+      id_common,
+      access::object_traits_impl< ::DBResult, id_common >::invocation_tag>
+    invocation_alias_;
+
     // cfg
     //
     typedef
     odb::alias_traits<
       ::DBConfig,
-      id_sqlite,
-      access::object_traits_impl< ::DBResult, id_sqlite >::cfg_tag>
+      id_common,
+      access::object_traits_impl< ::DBResult, id_common >::cfg_tag>
     cfg_alias_;
   };
 
   template <typename A>
-  struct query_columns< ::DBResult, id_sqlite, A >:
-    query_columns_base< ::DBResult, id_sqlite >
+  struct query_columns< ::DBResult, id_common, A >:
+    query_columns_base< ::DBResult, id_common >
   {
     // run
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    run_type_;
+    typedef odb::query_column< ::std::string > run_type_;
 
-    static const run_type_ run;
+    static run_type_ run;
 
     // instance
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    instance_type_;
+    typedef odb::query_column< ::std::string > instance_type_;
 
-    static const instance_type_ instance;
+    static instance_type_ instance;
 
     // score
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    score_type_;
+    typedef odb::query_column< double > score_type_;
 
-    static const score_type_ score;
+    static score_type_ score;
 
     // algorithm
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    algorithm_type_;
+    typedef odb::query_column< ::std::string > algorithm_type_;
 
-    static const algorithm_type_ algorithm;
+    static algorithm_type_ algorithm;
 
     // config
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    config_type_;
+    typedef odb::query_column< ::std::string > config_type_;
 
-    static const config_type_ config;
+    static config_type_ config;
 
     // seed
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    seed_type_;
+    typedef odb::query_column< int > seed_type_;
 
-    static const seed_type_ seed;
+    static seed_type_ seed;
 
     // optimal
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        bool,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    optimal_type_;
+    typedef odb::query_column< bool > optimal_type_;
 
-    static const optimal_type_ optimal;
+    static optimal_type_ optimal;
 
     // feasible
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        bool,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    feasible_type_;
+    typedef odb::query_column< bool > feasible_type_;
 
-    static const feasible_type_ feasible;
+    static feasible_type_ feasible;
 
     // lower_bound
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    lower_bound_type_;
+    typedef odb::query_column< double > lower_bound_type_;
 
-    static const lower_bound_type_ lower_bound;
+    static lower_bound_type_ lower_bound;
 
     // elapsed
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    elapsed_type_;
+    typedef odb::query_column< double > elapsed_type_;
 
-    static const elapsed_type_ elapsed;
+    static elapsed_type_ elapsed;
+
+    // time
+    //
+    typedef odb::query_column< long unsigned int > time_type_;
+
+    static time_type_ time;
+
+    // invocation
+    //
+    typedef odb::query_column< long unsigned int > invocation_column_type_;
+
+    typedef
+    odb::query_pointer<
+      odb::pointer_query_columns<
+        ::DBInvocation,
+        id_common,
+        invocation_alias_ > >
+    invocation_pointer_type_;
+
+    struct invocation_type_: invocation_pointer_type_, invocation_column_type_
+    {
+    };
+
+    static invocation_type_ invocation;
 
     // cfg
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    cfg_column_type_;
+    typedef odb::query_column< long unsigned int > cfg_column_type_;
 
     typedef
     odb::query_pointer<
       odb::pointer_query_columns<
         ::DBConfig,
-        id_sqlite,
+        id_common,
         cfg_alias_ > >
     cfg_pointer_type_;
 
     struct cfg_type_: cfg_pointer_type_, cfg_column_type_
     {
-      cfg_type_ (const char* t, const char* c, const char* conv)
-        : cfg_column_type_ (t, c, conv)
-      {
-      }
     };
 
-    static const cfg_type_ cfg;
+    static cfg_type_ cfg;
 
     // id
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
+    typedef odb::query_column< long unsigned int > id_type_;
 
-    static const id_type_ id;
+    static id_type_ id;
   };
 
-  template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::run_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  run (A::table_name, "\"run\"", 0);
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::instance_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  instance (A::table_name, "\"instance\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::run_type_
+  query_columns< ::DBResult, id_common, A >::run;
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::score_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  score (A::table_name, "\"score\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::instance_type_
+  query_columns< ::DBResult, id_common, A >::instance;
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::algorithm_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  algorithm (A::table_name, "\"algorithm\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::score_type_
+  query_columns< ::DBResult, id_common, A >::score;
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::config_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  config (A::table_name, "\"config\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::algorithm_type_
+  query_columns< ::DBResult, id_common, A >::algorithm;
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::seed_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  seed (A::table_name, "\"seed\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::config_type_
+  query_columns< ::DBResult, id_common, A >::config;
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::optimal_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  optimal (A::table_name, "\"optimal\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::seed_type_
+  query_columns< ::DBResult, id_common, A >::seed;
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::feasible_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  feasible (A::table_name, "\"feasible\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::optimal_type_
+  query_columns< ::DBResult, id_common, A >::optimal;
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::lower_bound_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  lower_bound (A::table_name, "\"lower_bound\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::feasible_type_
+  query_columns< ::DBResult, id_common, A >::feasible;
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::elapsed_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  elapsed (A::table_name, "\"elapsed\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::lower_bound_type_
+  query_columns< ::DBResult, id_common, A >::lower_bound;
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::cfg_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  cfg (A::table_name, "\"cfg\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::elapsed_type_
+  query_columns< ::DBResult, id_common, A >::elapsed;
 
   template <typename A>
-  const typename query_columns< ::DBResult, id_sqlite, A >::id_type_
-  query_columns< ::DBResult, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
+  typename query_columns< ::DBResult, id_common, A >::time_type_
+  query_columns< ::DBResult, id_common, A >::time;
 
-  // DBSolution
+  template <typename A>
+  typename query_columns< ::DBResult, id_common, A >::invocation_type_
+  query_columns< ::DBResult, id_common, A >::invocation;
+
+  template <typename A>
+  typename query_columns< ::DBResult, id_common, A >::cfg_type_
+  query_columns< ::DBResult, id_common, A >::cfg;
+
+  template <typename A>
+  typename query_columns< ::DBResult, id_common, A >::id_type_
+  query_columns< ::DBResult, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  // DBResourcesInfo
   //
   template <>
   struct alias_traits<
     ::DBResult,
-    id_sqlite,
-    access::object_traits_impl< ::DBSolution, id_sqlite >::res_tag>
+    id_common,
+    access::object_traits_impl< ::DBResourcesInfo, id_common >::res_tag>
   {
-    static const char table_name[];
   };
 
   template <>
-  struct query_columns_base< ::DBSolution, id_sqlite >
+  struct query_columns_base< ::DBResourcesInfo, id_common >
   {
     // res
     //
     typedef
     odb::alias_traits<
       ::DBResult,
-      id_sqlite,
-      access::object_traits_impl< ::DBSolution, id_sqlite >::res_tag>
+      id_common,
+      access::object_traits_impl< ::DBResourcesInfo, id_common >::res_tag>
     res_alias_;
   };
 
   template <typename A>
-  struct query_columns< ::DBSolution, id_sqlite, A >:
-    query_columns_base< ::DBSolution, id_sqlite >
+  struct query_columns< ::DBResourcesInfo, id_common, A >:
+    query_columns_base< ::DBResourcesInfo, id_common >
   {
     // res
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    res_column_type_;
+    typedef odb::query_column< long unsigned int > res_column_type_;
 
     typedef
     odb::query_pointer<
       odb::pointer_query_columns<
         ::DBResult,
-        id_sqlite,
+        id_common,
         res_alias_ > >
     res_pointer_type_;
 
     struct res_type_: res_pointer_type_, res_column_type_
     {
-      res_type_ (const char* t, const char* c, const char* conv)
-        : res_column_type_ (t, c, conv)
-      {
-      }
     };
 
-    static const res_type_ res;
+    static res_type_ res;
+
+    // major_pagefaults
+    //
+    typedef odb::query_column< ::size_t > major_pagefaults_type_;
+
+    static major_pagefaults_type_ major_pagefaults;
+
+    // minor_pagefaults
+    //
+    typedef odb::query_column< ::size_t > minor_pagefaults_type_;
+
+    static minor_pagefaults_type_ minor_pagefaults;
+
+    // user_usecs
+    //
+    typedef odb::query_column< long unsigned int > user_usecs_type_;
+
+    static user_usecs_type_ user_usecs;
+
+    // system_usecs
+    //
+    typedef odb::query_column< long unsigned int > system_usecs_type_;
+
+    static system_usecs_type_ system_usecs;
+
+    // max_rss_size
+    //
+    typedef odb::query_column< long unsigned int > max_rss_size_type_;
+
+    static max_rss_size_type_ max_rss_size;
+
+    // max_data_size
+    //
+    typedef odb::query_column< long unsigned int > max_data_size_type_;
+
+    static max_data_size_type_ max_data_size;
+
+    // malloc_max_size
+    //
+    typedef odb::query_column< long unsigned int > malloc_max_size_type_;
+
+    static malloc_max_size_type_ malloc_max_size;
+
+    // malloc_count
+    //
+    typedef odb::query_column< long unsigned int > malloc_count_type_;
+
+    static malloc_count_type_ malloc_count;
 
     // id
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
+    typedef odb::query_column< long unsigned int > id_type_;
 
-    static const id_type_ id;
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename query_columns< ::DBResourcesInfo, id_common, A >::res_type_
+  query_columns< ::DBResourcesInfo, id_common, A >::res;
+
+  template <typename A>
+  typename query_columns< ::DBResourcesInfo, id_common, A >::major_pagefaults_type_
+  query_columns< ::DBResourcesInfo, id_common, A >::major_pagefaults;
+
+  template <typename A>
+  typename query_columns< ::DBResourcesInfo, id_common, A >::minor_pagefaults_type_
+  query_columns< ::DBResourcesInfo, id_common, A >::minor_pagefaults;
+
+  template <typename A>
+  typename query_columns< ::DBResourcesInfo, id_common, A >::user_usecs_type_
+  query_columns< ::DBResourcesInfo, id_common, A >::user_usecs;
+
+  template <typename A>
+  typename query_columns< ::DBResourcesInfo, id_common, A >::system_usecs_type_
+  query_columns< ::DBResourcesInfo, id_common, A >::system_usecs;
+
+  template <typename A>
+  typename query_columns< ::DBResourcesInfo, id_common, A >::max_rss_size_type_
+  query_columns< ::DBResourcesInfo, id_common, A >::max_rss_size;
+
+  template <typename A>
+  typename query_columns< ::DBResourcesInfo, id_common, A >::max_data_size_type_
+  query_columns< ::DBResourcesInfo, id_common, A >::max_data_size;
+
+  template <typename A>
+  typename query_columns< ::DBResourcesInfo, id_common, A >::malloc_max_size_type_
+  query_columns< ::DBResourcesInfo, id_common, A >::malloc_max_size;
+
+  template <typename A>
+  typename query_columns< ::DBResourcesInfo, id_common, A >::malloc_count_type_
+  query_columns< ::DBResourcesInfo, id_common, A >::malloc_count;
+
+  template <typename A>
+  typename query_columns< ::DBResourcesInfo, id_common, A >::id_type_
+  query_columns< ::DBResourcesInfo, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  // DBPapiMeasurement
+  //
+  template <>
+  struct alias_traits<
+    ::DBResult,
+    id_common,
+    access::object_traits_impl< ::DBPapiMeasurement, id_common >::res_tag>
+  {
+  };
+
+  template <>
+  struct query_columns_base< ::DBPapiMeasurement, id_common >
+  {
+    // res
+    //
+    typedef
+    odb::alias_traits<
+      ::DBResult,
+      id_common,
+      access::object_traits_impl< ::DBPapiMeasurement, id_common >::res_tag>
+    res_alias_;
   };
 
   template <typename A>
-  const typename query_columns< ::DBSolution, id_sqlite, A >::res_type_
-  query_columns< ::DBSolution, id_sqlite, A >::
-  res (A::table_name, "\"res\"", 0);
+  struct query_columns< ::DBPapiMeasurement, id_common, A >:
+    query_columns_base< ::DBPapiMeasurement, id_common >
+  {
+    // res
+    //
+    typedef odb::query_column< long unsigned int > res_column_type_;
+
+    typedef
+    odb::query_pointer<
+      odb::pointer_query_columns<
+        ::DBResult,
+        id_common,
+        res_alias_ > >
+    res_pointer_type_;
+
+    struct res_type_: res_pointer_type_, res_column_type_
+    {
+    };
+
+    static res_type_ res;
+
+    // event_type
+    //
+    typedef odb::query_column< ::std::string > event_type_type_;
+
+    static event_type_type_ event_type;
+
+    // event_count
+    //
+    typedef odb::query_column< long long int > event_count_type_;
+
+    static event_count_type_ event_count;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
 
   template <typename A>
-  const typename query_columns< ::DBSolution, id_sqlite, A >::id_type_
-  query_columns< ::DBSolution, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
+  typename query_columns< ::DBPapiMeasurement, id_common, A >::res_type_
+  query_columns< ::DBPapiMeasurement, id_common, A >::res;
+
+  template <typename A>
+  typename query_columns< ::DBPapiMeasurement, id_common, A >::event_type_type_
+  query_columns< ::DBPapiMeasurement, id_common, A >::event_type;
+
+  template <typename A>
+  typename query_columns< ::DBPapiMeasurement, id_common, A >::event_count_type_
+  query_columns< ::DBPapiMeasurement, id_common, A >::event_count;
+
+  template <typename A>
+  typename query_columns< ::DBPapiMeasurement, id_common, A >::id_type_
+  query_columns< ::DBPapiMeasurement, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
+
+  // DBSolution
+  //
+  template <>
+  struct alias_traits<
+    ::DBResult,
+    id_common,
+    access::object_traits_impl< ::DBSolution, id_common >::res_tag>
+  {
+  };
+
+  template <>
+  struct query_columns_base< ::DBSolution, id_common >
+  {
+    // res
+    //
+    typedef
+    odb::alias_traits<
+      ::DBResult,
+      id_common,
+      access::object_traits_impl< ::DBSolution, id_common >::res_tag>
+    res_alias_;
+  };
+
+  template <typename A>
+  struct query_columns< ::DBSolution, id_common, A >:
+    query_columns_base< ::DBSolution, id_common >
+  {
+    // res
+    //
+    typedef odb::query_column< long unsigned int > res_column_type_;
+
+    typedef
+    odb::query_pointer<
+      odb::pointer_query_columns<
+        ::DBResult,
+        id_common,
+        res_alias_ > >
+    res_pointer_type_;
+
+    struct res_type_: res_pointer_type_, res_column_type_
+    {
+    };
+
+    static res_type_ res;
+
+    // id
+    //
+    typedef odb::query_column< long unsigned int > id_type_;
+
+    static id_type_ id;
+  };
+
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
+
+  template <typename A>
+  typename query_columns< ::DBSolution, id_common, A >::res_type_
+  query_columns< ::DBSolution, id_common, A >::res;
+
+  template <typename A>
+  typename query_columns< ::DBSolution, id_common, A >::id_type_
+  query_columns< ::DBSolution, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
 
   // DBSolutionJob
   //
   template <>
   struct alias_traits<
     ::DBSolution,
-    id_sqlite,
-    access::object_traits_impl< ::DBSolutionJob, id_sqlite >::sol_tag>
+    id_common,
+    access::object_traits_impl< ::DBSolutionJob, id_common >::sol_tag>
   {
-    static const char table_name[];
   };
 
   template <>
-  struct query_columns_base< ::DBSolutionJob, id_sqlite >
+  struct query_columns_base< ::DBSolutionJob, id_common >
   {
     // sol
     //
     typedef
     odb::alias_traits<
       ::DBSolution,
-      id_sqlite,
-      access::object_traits_impl< ::DBSolutionJob, id_sqlite >::sol_tag>
+      id_common,
+      access::object_traits_impl< ::DBSolutionJob, id_common >::sol_tag>
     sol_alias_;
   };
 
   template <typename A>
-  struct query_columns< ::DBSolutionJob, id_sqlite, A >:
-    query_columns_base< ::DBSolutionJob, id_sqlite >
+  struct query_columns< ::DBSolutionJob, id_common, A >:
+    query_columns_base< ::DBSolutionJob, id_common >
   {
     // sol
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    sol_column_type_;
+    typedef odb::query_column< long unsigned int > sol_column_type_;
 
     typedef
     odb::query_pointer<
       odb::pointer_query_columns<
         ::DBSolution,
-        id_sqlite,
+        id_common,
         sol_alias_ > >
     sol_pointer_type_;
 
     struct sol_type_: sol_pointer_type_, sol_column_type_
     {
-      sol_type_ (const char* t, const char* c, const char* conv)
-        : sol_column_type_ (t, c, conv)
-      {
-      }
     };
 
-    static const sol_type_ sol;
+    static sol_type_ sol;
 
     // job_id
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    job_id_type_;
+    typedef odb::query_column< unsigned int > job_id_type_;
 
-    static const job_id_type_ job_id;
+    static job_id_type_ job_id;
 
     // start_time
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    start_time_type_;
+    typedef odb::query_column< unsigned int > start_time_type_;
 
-    static const start_time_type_ start_time;
+    static start_time_type_ start_time;
 
     // id
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
+    typedef odb::query_column< long unsigned int > id_type_;
 
-    static const id_type_ id;
+    static id_type_ id;
   };
 
-  template <typename A>
-  const typename query_columns< ::DBSolutionJob, id_sqlite, A >::sol_type_
-  query_columns< ::DBSolutionJob, id_sqlite, A >::
-  sol (A::table_name, "\"sol\"", 0);
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
 
   template <typename A>
-  const typename query_columns< ::DBSolutionJob, id_sqlite, A >::job_id_type_
-  query_columns< ::DBSolutionJob, id_sqlite, A >::
-  job_id (A::table_name, "\"job_id\"", 0);
+  typename query_columns< ::DBSolutionJob, id_common, A >::sol_type_
+  query_columns< ::DBSolutionJob, id_common, A >::sol;
 
   template <typename A>
-  const typename query_columns< ::DBSolutionJob, id_sqlite, A >::start_time_type_
-  query_columns< ::DBSolutionJob, id_sqlite, A >::
-  start_time (A::table_name, "\"start_time\"", 0);
+  typename query_columns< ::DBSolutionJob, id_common, A >::job_id_type_
+  query_columns< ::DBSolutionJob, id_common, A >::job_id;
 
   template <typename A>
-  const typename query_columns< ::DBSolutionJob, id_sqlite, A >::id_type_
-  query_columns< ::DBSolutionJob, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
+  typename query_columns< ::DBSolutionJob, id_common, A >::start_time_type_
+  query_columns< ::DBSolutionJob, id_common, A >::start_time;
+
+  template <typename A>
+  typename query_columns< ::DBSolutionJob, id_common, A >::id_type_
+  query_columns< ::DBSolutionJob, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
 
   // DBIntermediate
   //
   template <>
   struct alias_traits<
     ::DBResult,
-    id_sqlite,
-    access::object_traits_impl< ::DBIntermediate, id_sqlite >::res_tag>
+    id_common,
+    access::object_traits_impl< ::DBIntermediate, id_common >::res_tag>
   {
-    static const char table_name[];
   };
 
   template <>
   struct alias_traits<
     ::DBSolution,
-    id_sqlite,
-    access::object_traits_impl< ::DBIntermediate, id_sqlite >::solution_tag>
+    id_common,
+    access::object_traits_impl< ::DBIntermediate, id_common >::solution_tag>
   {
-    static const char table_name[];
   };
 
   template <>
-  struct query_columns_base< ::DBIntermediate, id_sqlite >
+  struct query_columns_base< ::DBIntermediate, id_common >
   {
     // res
     //
     typedef
     odb::alias_traits<
       ::DBResult,
-      id_sqlite,
-      access::object_traits_impl< ::DBIntermediate, id_sqlite >::res_tag>
+      id_common,
+      access::object_traits_impl< ::DBIntermediate, id_common >::res_tag>
     res_alias_;
 
     // solution
@@ -3207,166 +2680,113 @@ namespace odb
     typedef
     odb::alias_traits<
       ::DBSolution,
-      id_sqlite,
-      access::object_traits_impl< ::DBIntermediate, id_sqlite >::solution_tag>
+      id_common,
+      access::object_traits_impl< ::DBIntermediate, id_common >::solution_tag>
     solution_alias_;
   };
 
   template <typename A>
-  struct query_columns< ::DBIntermediate, id_sqlite, A >:
-    query_columns_base< ::DBIntermediate, id_sqlite >
+  struct query_columns< ::DBIntermediate, id_common, A >:
+    query_columns_base< ::DBIntermediate, id_common >
   {
     // res
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    res_column_type_;
+    typedef odb::query_column< long unsigned int > res_column_type_;
 
     typedef
     odb::query_pointer<
       odb::pointer_query_columns<
         ::DBResult,
-        id_sqlite,
+        id_common,
         res_alias_ > >
     res_pointer_type_;
 
     struct res_type_: res_pointer_type_, res_column_type_
     {
-      res_type_ (const char* t, const char* c, const char* conv)
-        : res_column_type_ (t, c, conv)
-      {
-      }
     };
 
-    static const res_type_ res;
+    static res_type_ res;
 
     // time
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    time_type_;
+    typedef odb::query_column< double > time_type_;
 
-    static const time_type_ time;
+    static time_type_ time;
 
     // iteration
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    iteration_type_;
+    typedef odb::query_column< unsigned int > iteration_type_;
 
-    static const iteration_type_ iteration;
+    static iteration_type_ iteration;
 
     // costs
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    costs_type_;
+    typedef odb::query_column< double > costs_type_;
 
-    static const costs_type_ costs;
+    static costs_type_ costs;
 
     // bound
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    bound_type_;
+    typedef odb::query_column< double > bound_type_;
 
-    static const bound_type_ bound;
+    static bound_type_ bound;
 
     // solution
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    solution_column_type_;
+    typedef odb::query_column< long unsigned int > solution_column_type_;
 
     typedef
     odb::query_pointer<
       odb::pointer_query_columns<
         ::DBSolution,
-        id_sqlite,
+        id_common,
         solution_alias_ > >
     solution_pointer_type_;
 
     struct solution_type_: solution_pointer_type_, solution_column_type_
     {
-      solution_type_ (const char* t, const char* c, const char* conv)
-        : solution_column_type_ (t, c, conv)
-      {
-      }
     };
 
-    static const solution_type_ solution;
+    static solution_type_ solution;
 
     // id
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
+    typedef odb::query_column< long unsigned int > id_type_;
 
-    static const id_type_ id;
+    static id_type_ id;
   };
 
-  template <typename A>
-  const typename query_columns< ::DBIntermediate, id_sqlite, A >::res_type_
-  query_columns< ::DBIntermediate, id_sqlite, A >::
-  res (A::table_name, "\"res\"", 0);
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
 
   template <typename A>
-  const typename query_columns< ::DBIntermediate, id_sqlite, A >::time_type_
-  query_columns< ::DBIntermediate, id_sqlite, A >::
-  time (A::table_name, "\"time\"", 0);
+  typename query_columns< ::DBIntermediate, id_common, A >::res_type_
+  query_columns< ::DBIntermediate, id_common, A >::res;
 
   template <typename A>
-  const typename query_columns< ::DBIntermediate, id_sqlite, A >::iteration_type_
-  query_columns< ::DBIntermediate, id_sqlite, A >::
-  iteration (A::table_name, "\"iteration\"", 0);
+  typename query_columns< ::DBIntermediate, id_common, A >::time_type_
+  query_columns< ::DBIntermediate, id_common, A >::time;
 
   template <typename A>
-  const typename query_columns< ::DBIntermediate, id_sqlite, A >::costs_type_
-  query_columns< ::DBIntermediate, id_sqlite, A >::
-  costs (A::table_name, "\"costs\"", 0);
+  typename query_columns< ::DBIntermediate, id_common, A >::iteration_type_
+  query_columns< ::DBIntermediate, id_common, A >::iteration;
 
   template <typename A>
-  const typename query_columns< ::DBIntermediate, id_sqlite, A >::bound_type_
-  query_columns< ::DBIntermediate, id_sqlite, A >::
-  bound (A::table_name, "\"bound\"", 0);
+  typename query_columns< ::DBIntermediate, id_common, A >::costs_type_
+  query_columns< ::DBIntermediate, id_common, A >::costs;
 
   template <typename A>
-  const typename query_columns< ::DBIntermediate, id_sqlite, A >::solution_type_
-  query_columns< ::DBIntermediate, id_sqlite, A >::
-  solution (A::table_name, "\"solution\"", 0);
+  typename query_columns< ::DBIntermediate, id_common, A >::bound_type_
+  query_columns< ::DBIntermediate, id_common, A >::bound;
 
   template <typename A>
-  const typename query_columns< ::DBIntermediate, id_sqlite, A >::id_type_
-  query_columns< ::DBIntermediate, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
+  typename query_columns< ::DBIntermediate, id_common, A >::solution_type_
+  query_columns< ::DBIntermediate, id_common, A >::solution;
+
+  template <typename A>
+  typename query_columns< ::DBIntermediate, id_common, A >::id_type_
+  query_columns< ::DBIntermediate, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
 
   // DBError
   //
@@ -3375,164 +2795,114 @@ namespace odb
   template <>
   struct alias_traits<
     ::DBResult,
-    id_sqlite,
-    access::object_traits_impl< ::DBExtendedMeasure, id_sqlite >::res_tag>
+    id_common,
+    access::object_traits_impl< ::DBExtendedMeasure, id_common >::res_tag>
   {
-    static const char table_name[];
   };
 
   template <>
-  struct query_columns_base< ::DBExtendedMeasure, id_sqlite >
+  struct query_columns_base< ::DBExtendedMeasure, id_common >
   {
     // res
     //
     typedef
     odb::alias_traits<
       ::DBResult,
-      id_sqlite,
-      access::object_traits_impl< ::DBExtendedMeasure, id_sqlite >::res_tag>
+      id_common,
+      access::object_traits_impl< ::DBExtendedMeasure, id_common >::res_tag>
     res_alias_;
   };
 
   template <typename A>
-  struct query_columns< ::DBExtendedMeasure, id_sqlite, A >:
-    query_columns_base< ::DBExtendedMeasure, id_sqlite >
+  struct query_columns< ::DBExtendedMeasure, id_common, A >:
+    query_columns_base< ::DBExtendedMeasure, id_common >
   {
     // res
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    res_column_type_;
+    typedef odb::query_column< long unsigned int > res_column_type_;
 
     typedef
     odb::query_pointer<
       odb::pointer_query_columns<
         ::DBResult,
-        id_sqlite,
+        id_common,
         res_alias_ > >
     res_pointer_type_;
 
     struct res_type_: res_pointer_type_, res_column_type_
     {
-      res_type_ (const char* t, const char* c, const char* conv)
-        : res_column_type_ (t, c, conv)
-      {
-      }
     };
 
-    static const res_type_ res;
+    static res_type_ res;
 
     // key
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        ::std::string,
-        sqlite::id_text >::query_type,
-      sqlite::id_text >
-    key_type_;
+    typedef odb::query_column< ::std::string > key_type_;
 
-    static const key_type_ key;
+    static key_type_ key;
 
     // iteration
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    iteration_type_;
+    typedef odb::query_column< unsigned int > iteration_type_;
 
-    static const iteration_type_ iteration;
+    static iteration_type_ iteration;
 
     // time
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    time_type_;
+    typedef odb::query_column< double > time_type_;
 
-    static const time_type_ time;
+    static time_type_ time;
 
     // v_int
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    v_int_type_;
+    typedef odb::query_column< int > v_int_type_;
 
-    static const v_int_type_ v_int;
+    static v_int_type_ v_int;
 
     // v_double
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        double,
-        sqlite::id_real >::query_type,
-      sqlite::id_real >
-    v_double_type_;
+    typedef odb::query_column< double > v_double_type_;
 
-    static const v_double_type_ v_double;
+    static v_double_type_ v_double;
 
     // id
     //
-    typedef
-    sqlite::query_column<
-      sqlite::value_traits<
-        long unsigned int,
-        sqlite::id_integer >::query_type,
-      sqlite::id_integer >
-    id_type_;
+    typedef odb::query_column< long unsigned int > id_type_;
 
-    static const id_type_ id;
+    static id_type_ id;
   };
 
-  template <typename A>
-  const typename query_columns< ::DBExtendedMeasure, id_sqlite, A >::res_type_
-  query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  res (A::table_name, "\"res\"", 0);
+#ifdef ODB_COMMON_QUERY_COLUMNS_DEF
 
   template <typename A>
-  const typename query_columns< ::DBExtendedMeasure, id_sqlite, A >::key_type_
-  query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  key (A::table_name, "\"key\"", 0);
+  typename query_columns< ::DBExtendedMeasure, id_common, A >::res_type_
+  query_columns< ::DBExtendedMeasure, id_common, A >::res;
 
   template <typename A>
-  const typename query_columns< ::DBExtendedMeasure, id_sqlite, A >::iteration_type_
-  query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  iteration (A::table_name, "\"iteration\"", 0);
+  typename query_columns< ::DBExtendedMeasure, id_common, A >::key_type_
+  query_columns< ::DBExtendedMeasure, id_common, A >::key;
 
   template <typename A>
-  const typename query_columns< ::DBExtendedMeasure, id_sqlite, A >::time_type_
-  query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  time (A::table_name, "\"time\"", 0);
+  typename query_columns< ::DBExtendedMeasure, id_common, A >::iteration_type_
+  query_columns< ::DBExtendedMeasure, id_common, A >::iteration;
 
   template <typename A>
-  const typename query_columns< ::DBExtendedMeasure, id_sqlite, A >::v_int_type_
-  query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  v_int (A::table_name, "\"v_int\"", 0);
+  typename query_columns< ::DBExtendedMeasure, id_common, A >::time_type_
+  query_columns< ::DBExtendedMeasure, id_common, A >::time;
 
   template <typename A>
-  const typename query_columns< ::DBExtendedMeasure, id_sqlite, A >::v_double_type_
-  query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  v_double (A::table_name, "\"v_double\"", 0);
+  typename query_columns< ::DBExtendedMeasure, id_common, A >::v_int_type_
+  query_columns< ::DBExtendedMeasure, id_common, A >::v_int;
 
   template <typename A>
-  const typename query_columns< ::DBExtendedMeasure, id_sqlite, A >::id_type_
-  query_columns< ::DBExtendedMeasure, id_sqlite, A >::
-  id (A::table_name, "\"id\"", 0);
+  typename query_columns< ::DBExtendedMeasure, id_common, A >::v_double_type_
+  query_columns< ::DBExtendedMeasure, id_common, A >::v_double;
+
+  template <typename A>
+  typename query_columns< ::DBExtendedMeasure, id_common, A >::id_type_
+  query_columns< ::DBExtendedMeasure, id_common, A >::id;
+
+#endif // ODB_COMMON_QUERY_COLUMNS_DEF
 }
 
 #include "db_objects-odb.ixx"

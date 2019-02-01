@@ -26,7 +26,7 @@ private:
   T get_json(const char * key) {
     try {
       return this->js[key];
-    } catch (std::domain_error e) {
+    } catch (const std::domain_error & e) {
       BOOST_LOG(l.e()) << "Got an error trying to access " << key ;
       throw e;
     }
@@ -36,7 +36,7 @@ private:
   T get_json(const char * key, json_T & js_in) {
     try {
       return js_in[key];
-    } catch (std::domain_error e) {
+    } catch (const std::domain_error & e) {
       BOOST_LOG(l.e()) << "Got an error trying to access " << key ;
       throw e;
     }

@@ -1,0 +1,31 @@
+**.pyc
+**/.ipynb_checkpoints/**
+
+# This file is auto-generated
+src/config.hpp
+
+# Documentation
+docs/html/**
+docs/latex/**
+
+# Auto-Generated Stuff
+*.gch
+*.o
+
+# JetBrains
+**/.idea
+
+# Weird ODB stuff
+src/db/-.s
+
+*~
+\#*
+**/.\#*
+
+# Stuff generated for emacs
+.cquery_cached_index/**
+compile_commands.json
+.dir-locals.el
+
+# Build directory
+build/**

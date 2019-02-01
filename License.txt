@@ -1,3 +1,30 @@
+Everything in this repository but the contents under contrib/ and partially
+the contents unter cmake/modules/ is released by the authors (found in the 
+CONTRIBUTORS.txt file) under the MIT license (see below).
+
+Code under contrib/ includes:
+
+* Tinydir by https://github.com/cxong, released under 2-Clause BSD license
+* A JSON library by Niels Lohmann, released under MIT license
+* malloc_counter by Timo Bingmann, released under 2-Clause BSD license
+
+More code will be pulled in by "git submodule", which brings its own license 
+descriptions.
+
+Additionally, CMake modules distributed with this software include:
+
+* Cotire by Sascha Kratky, released under MIT license
+* FindCairo by Balint Seeber, released under GPL v2
+* FindCPLEX by Bjoern Andres, Thorsten Beier and Joerg H. Kappes, released under MIT license
+* FindGurobi by John Schulman, released under BSD 2-clause license
+* FindIPOPT by iCub Facility, Istituto Italiano di Tecnologia, released under BSD 3-clause license
+* FindODB by Timo Rothenpieler and Per Edin, released under MIT license
+* FindPAPI by Gerard Gorman, released under 2-Clause BSD license
+* FindSqlite by Gilles Caulier, released under 3-Clause BSD license
+* GetGitRevisionDescription by Ryan Pavlik, released under Boost Software License 1.0
+
+=============================================================================
+
 MIT License
 
 Copyright (c) 2018 KIT ITI Algorithmics Group

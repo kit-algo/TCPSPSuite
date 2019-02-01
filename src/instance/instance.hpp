@@ -1,15 +1,16 @@
 #ifndef INSTANCE_HPP
 #define INSTANCE_HPP
 
-#include <cstddef>     // for ptrdiff_t, size_t
-#include <iterator>    // for input_iterator_tag
-#include <memory>      // for shared_ptr
-#include <string>      // for string
-#include <vector>      // for vector
-#include "job.hpp"     // for Job
-#include "traits.hpp"  // for Traits
+#include "job.hpp"    // for Job
+#include "traits.hpp" // for Traits
+#include <cstddef>    // for ptrdiff_t, size_t
+#include <iterator>   // for input_iterator_tag
+#include <memory>     // IWYU pragma: keep
+#include <string>     // for string
+#include <vector>     // for vector
 class LagGraph;
 class Resource;
+class ResVec;
 
 /**
  * @brief a TCPSP instance
@@ -27,26 +28,26 @@ public:
 
     class iterator {
     public:
-      typedef std::input_iterator_tag   iterator_category;
-      typedef Job                       value_type;
-      typedef Job                       *pointer;
-      typedef Job                       &reference;
-      typedef size_t                    size_type;
-      typedef std::ptrdiff_t            difference_type;
+      typedef std::input_iterator_tag iterator_category;
+      typedef Job value_type;
+      typedef Job * pointer;
+      typedef Job & reference;
+      typedef size_t size_type;
+      typedef std::ptrdiff_t difference_type;
 
       iterator(const JobContainer & c);
       iterator(const JobContainer & c, unsigned int pos);
 
-      const value_type &operator*();
-      const value_type *operator->();
+      const value_type & operator*();
+      const value_type * operator->();
 
       iterator operator++(int);
       iterator & operator++();
       iterator operator--(int);
       iterator & operator--();
 
-      bool operator==(const iterator &other) const;
-      bool operator!=(const iterator &other) const;
+      bool operator==(const iterator & other) const;
+      bool operator!=(const iterator & other) const;
 
     private:
       const JobContainer & c;
@@ -62,19 +63,19 @@ public:
     const Instance * instance;
   };
 
-  // copy & move assignment / construction need to *not* copy the cached container
+  // copy & move assignment / construction need to *not* copy the cached
+  // container
   void swap(Instance & other);
   Instance & operator=(Instance other);
   Instance(const Instance & other);
   Instance(Instance && other);
-
 
   /**
    * Default constructor
    * creates an empty instance without an id
    */
   Instance();
-  
+
   /**
    * Constructs a new instance with a name and sets
    * the instance should have
@@ -89,30 +90,28 @@ public:
    * Constructs a new instance based on another instance
    *
    * @param origin the instance this should be based on
-   * @param job_is_substituted a vector-of-bool stating 
+   * @param job_is_substituted a vector-of-bool stating
    *        for every job if it is substituted or not
    * @param substitutions the substitutions
    */
-  Instance(const Instance & origin, std::vector<bool> && job_is_substituted, std::vector<Job> && substitutions);
-
+  Instance(const Instance & origin, std::vector<bool> && job_is_substituted,
+           std::vector<Job> && substitutions);
 
   ~Instance();
 
+  /**
+   * Returns the lag graph
+   *
+   * @return the lag graph
+   */
+  LagGraph & get_laggraph();
 
   /**
    * Returns the lag graph
    *
    * @return the lag graph
    */
-  LagGraph &get_laggraph();
-  
-  /**
-   * Returns the lag graph
-   *
-   * @return the lag graph
-   */
-  const LagGraph &get_laggraph() const;
-
+  const LagGraph & get_laggraph() const;
 
   /**
    * adds a job to this instance
@@ -130,7 +129,6 @@ public:
    */
   unsigned int add_resource(Resource && resource);
 
-
   /**
    * Returns the number of jobs this instance has
    *
@@ -143,7 +141,7 @@ public:
    *
    * @return the job with the given index
    */
-  const Job &get_job(unsigned int i) const;
+  const Job & get_job(unsigned int i) const;
 
   /**
    * Returns a container with all jobs of this instance
@@ -151,7 +149,6 @@ public:
    * @return a container with all jobs of this instance
    */
   const JobContainer & get_jobs() const;
-
 
   /**
    * Returns the number of resourcec this instance has
@@ -167,13 +164,12 @@ public:
    */
   const Resource & get_resource(unsigned int i) const;
 
-
   /**
    * Returns all traits this instance fulfills (not only wanted ones)
    *
    * @return all traits this instance fulfills (not only wanted ones)
    */
-  const Traits &get_traits() const;
+  const Traits & get_traits() const;
 
   /**
    * computes the traits this instance actually fulfills
@@ -182,7 +178,6 @@ public:
    */
   void compute_traits();
 
-
   /**
    * Returns the id of this instance
    *
@@ -190,14 +185,12 @@ public:
    */
   const std::string & get_id() const;
 
-
   /**
    * Returns a deep copy of this instance
-   * 
+   *
    * @return a deep copy of this instance
    */
   Instance clone() const;
-
 
   /**
    * checks if the created instance is feasible
@@ -208,18 +201,19 @@ public:
    */
   bool check_feasibility() const;
 
-	/**
-	 * @brief Setter for the window extension parameters
-	 *
-	 * @param window_extension_limit		 The total number of time steps that windows may be extended
-	 * @param window_extension_job_limit The maximum number of jobs that may have their windows
-	 * extended
-	 */
-	void set_window_extension(unsigned int window_extension_limit,
-	                          unsigned int window_extension_job_limit);
+  /**
+   * @brief Setter for the window extension parameters
+   *
+   * @param window_extension_limit		 The total number of time steps
+   * that windows may be extended
+   * @param window_extension_job_limit The maximum number of jobs that may have
+   * their windows extended
+   */
+  void set_window_extension(unsigned int window_extension_limit,
+                            unsigned int window_extension_job_limit);
 
-	unsigned int get_window_extension_limit() const;
-	unsigned int get_window_extension_job_limit() const;
+  unsigned int get_window_extension_limit() const;
+  unsigned int get_window_extension_job_limit() const;
 
   /**
    * calculates the cost of a given solution in form of a vector of start times
@@ -231,39 +225,43 @@ public:
    * @param start_times the start times for each job
    * @return the total costs of this solution
    */
-  double calculate_max_costs(const std::vector<unsigned int>& start_times) const;
+  double
+  calculate_max_costs(const std::vector<unsigned int> & start_times) const;
 
   /**
    * calculates the cost of a given resource usage
-   * 
+   *
    * **Warning** This metho currently uses flat resources!!!
    * TODO change this!
    *
    * @param ressource_usage the base usage of all resources
    * @param additional_usage the additional usage of all resources
    *
+   * TODO what the hell? What is this function for?
+   *
    * @return the overall costs
    */
-  double calculate_costs(const std::vector<double>& ressource_usage, const std::vector<double>& additional_usage) const;
+  double calculate_costs(const ResVec & ressource_usage,
+                         const ResVec & additional_usage) const;
 
   /**
    * calculates the cost of a given resource usage
    *
    * **Warning** This metho currently uses flat resources!!!
-   * TODO change this! 
+   * TODO change this!
    *
    * @param ressource_usage the base usage of all resources
    *
    * @return the overall costs
    */
-  double calculate_costs(const std::vector<double>& ressource_usage) const;
+  double calculate_costs(const ResVec & ressource_usage) const;
 
-	/**
-	 * @brief Helper to return the latest deadline in the instance
-	 *
-	 * @return The latest deadline in the instance
-	 */
-	unsigned int get_latest_deadline() const;
+  /**
+   * @brief Helper to return the latest deadline in the instance
+   *
+   * @return The latest deadline in the instance
+   */
+  unsigned int get_latest_deadline() const;
 
 private:
   // These things are shared across substituted instances
@@ -276,10 +274,10 @@ private:
   std::vector<Job> substitutions;
   JobContainer cached_container;
 
-	unsigned int window_extension_limit;
-	unsigned int window_extension_job_limit;
+  unsigned int window_extension_limit;
+  unsigned int window_extension_job_limit;
 
-	Traits wanted_traits;
+  Traits wanted_traits;
   Traits computed_traits;
 };
 

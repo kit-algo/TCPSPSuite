@@ -1,9 +1,9 @@
 #ifndef TRANSFORM_H
 #define TRANSFORM_H
 
-#include <set>                               // for set
+#include <set>                                              // for set
 #include "instance.hpp"  // for Instance
-#include "traits.hpp"                        // for TraitsRouter, TraitsRout...
+#include "traits.hpp"                  // for TraitsRouter
 
 class Transformer {
 public:

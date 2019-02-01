@@ -1,50 +1,52 @@
 #ifndef AUTOTUNECONFIG_H
 #define AUTOTUNECONFIG_H
 
-#include <string>                       // for string, allocator
-#include <vector>                       // for vector
-#include <json.hpp>                     // for json
-#include "../datastructures/maybe.hpp"  // for Maybe
-#include "../util/log.hpp"              // for Log
-#include "solverconfig.hpp"             // for SolverConfig
-#include "parameter.hpp"                // for Parameters
+#include "../datastructures/maybe.hpp" // for Maybe
+#include "../util/log.hpp"             // for Log
+#include "parameter.hpp"               // for Parameters
+#include "solverconfig.hpp"            // for SolverConfig
+#include <json.hpp>                    // for json
+#include <string>                      // for string, allocator
+#include <vector>                      // for vector
 
 using json = nlohmann::json;
 
 class AutotuneConfig {
 public:
-  static AutotuneConfig * get() {
-      if (instance == nullptr) {
-          instance = new AutotuneConfig;
-      }
-    return instance;
-  }
+	static AutotuneConfig *
+	get()
+	{
+		if (instance == nullptr) {
+			instance = new AutotuneConfig;
+		}
+		return instance;
+	}
 
-    bool parse_cmdline(int argc, const char **argv);
+	bool parse_cmdline(int argc, const char ** argv);
 
-    /**
-     * sets the state of Configuration for the next run
-     */
-    bool nextConfig();
-    
-    /**
-     * @return the current configuration
-     */
-    SolverConfig generateConfig();    
+	/**
+	 * sets the state of Configuration for the next run
+	 */
+	bool nextConfig();
 
-    AutotuneConfig(const AutotuneConfig &) = delete;
+	/**
+	 * @return the current configuration
+	 */
+	SolverConfig generateConfig();
+
+	AutotuneConfig(const AutotuneConfig &) = delete;
 
 private:
-  AutotuneConfig();
-    int current_config;
-    
-    void read_auto_config(std::string file);
+	AutotuneConfig();
+	int current_config;
+	size_t current_parameter_group;
 
-    static AutotuneConfig * instance;
-    
-    std::vector<Parameter> parameters;
+	void read_auto_config(std::string file);
 
-    Log l;
+	static AutotuneConfig * instance;
+
+	std::vector<std::vector<Parameter>> parameters;
+	Log l;
 };
 
 #endif

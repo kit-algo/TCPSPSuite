@@ -5,7 +5,13 @@ cmake_minimum_required(VERSION 3.0)
 
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/cmake/modules/")
 
-include(cotire)
+if (${CMAKE_EXPORT_COMPILE_COMMANDS})
+   message(WARNING "Disabling COTIRE to generate a compilation database.")
+else()
+   message(STATUS "Enabling cotire")
+   include(cotire)
+endif()
+
 include(FeatureSummary)
 
 project(TCPSPSUITE)
@@ -42,13 +48,39 @@ find_package(Sqlite REQUIRED)
 include_directories(${SQLITE_INCLUDE_DIRS})
 set(LIBS ${LIBS} ${SQLITE_LIBRARIES})
 
+# Find libnuma, if we're optimizing for NUMA
+if (${NUMA_OPTIMIZE})
+   find_package(NUMA REQUIRED)
+   set(LIBS ${LIBS} ${NUMA_LIBRARY})
+   include_directories(SYSTEM ${NUMA_INCLUDE_DIR})
+endif()
+
+# Point to Dyno headers
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/contrib/dyno/include)
+
+# Here's where the json header is
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/contrib/json)
+
 # Find ODB
-find_package(ODB REQUIRED
-        COMPONENTS sqlite)
+find_package(ODB
+        COMPONENTS sqlite mysql)
 include(${ODB_USE_FILE})
 #include_directories(SYSTEM ${ODB_INCLUDE_DIRS})
 #include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/contrib/odb/include)
 set(LIBS ${LIBS} ${ODB_LIBRARIES})
+
+if (NOT (${ODB_SQLITE_FOUND} OR ${ODB_MYSQL_FOUND}))
+   MESSAGE(FATAL_ERROR "At least one database backend must be present.")
+endif()
+
+message(STATUS "================ ODB: Enabled DB backends  =================")
+if (${ODB_SQLITE_FOUND})
+   message(STATUS "  - SQLite")
+endif()
+
+if (${ODB_MYSQL_FOUND})
+   message(STATUS "  - MySQL / MariaDB")
+endif()
 
 #
 # ODB is major PITA. Since they use throw(…) (which is deprecated for ages and thrown out of
@@ -91,6 +123,13 @@ if (CPLEX_FOUND)
   set(LIBS ${LIBS} ${CPLEX_LIBRARIES})
 endif(CPLEX_FOUND)
 
+# Find PAPI
+find_package(PAPI)
+if (PAPI_FOUND)
+	include_directories(SYSTEM ${PAPI_INCLUDE_DIRS})
+	set(LIBS ${LIBS} ${PAPI_LIBRARIES})
+endif(PAPI_FOUND)
+
 # One might one day turn on -Waggregate-return…
 
 # Set a default build type if none was specified
@@ -107,8 +146,7 @@ endif()
 #==== Build type: default
 #===============================================
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -isystem ${CMAKE_CURRENT_SOURCE_DIR}/src/db/db_objects \
- -isystem ${CMAKE_CURRENT_SOURCE_DIR}/src/contrib/json")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -isystem ${CMAKE_CURRENT_SOURCE_DIR}/src/db/db_objects")
 set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_C_FLAGS}")
 
 #===============================================
@@ -143,7 +181,7 @@ set(CMAKE_CXX_FLAGS_THREADINSTRUMENT "${CMAKE_C_FLAGS_INSTRUMENT}")
 #===============================================
 
 # TODO fast math? Hum…
-set(CMAKE_C_FLAGS_RELEASE "-O3 -march=native -ffast-math -flto")
+set(CMAKE_C_FLAGS_RELEASE "-O3 -march=native -ffast-math -flto -DNDEBUG")
 set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE}")
 set(CMAKE_EXE_LINKER_FLAGS_RELEASE "-flto")
 
@@ -193,6 +231,7 @@ MARK_AS_ADVANCED(
 # User Configuration
 #
 
+SET(INSTRUMENT_MALLOC "FALSE" CACHE BOOL "Instrument malloc() and related calls to profile memory usage.")
 SET(SOFT_FAIL "FALSE" CACHE BOOL "Try to fail softly whenever possible")
 SET(ENABLE_CONSISTENCY_CHECKS "TRUE" CACHE BOOL "Enable consistency checks")
 SET(ENABLE_ASSERTIONS "TRUE" CACHE BOOL "Enable assertions")
@@ -202,8 +241,20 @@ SET(CRASH_ON_CHECK "TRUE" CACHE BOOL "Crash the program when verification fails.
 SET(CATCH_EXCEPTIONS "TRUE" CACHE BOOL "Try to catch everything and provide own crash handler")
 SET(EXIT_ON_SIGINT "FALSE" CACHE BOOL "Exit cleanly when interrupted via CTRL-C.")
 SET(NUMA_OPTIMIZE "FALSE" CACHE BOOL "Optimize for performance on NUMA enabled systems")
+SET(TIME_COMPILATION "FALSE" CACHE BOOL "Time individual compilation commands")
+SET(ALLOW_INCREMENTAL_LINKING  "FALSE" CACHE BOOL "Allow incremental linking if possible. May have a slight performance impact.")
+SET(USE_DEFAULT_LINKER  "FALSE" CACHE BOOL "Force the default linker to be used.")
 
 SET(MAX_DBG_LEVEL 5 CACHE INT "Maximum debug level")
+SET(OPTIMAL_RESOURCE_COUNT 1 CACHE INT "Optimize for this resource count")
+
+#
+# Compilation Tools
+#
+if (${TIME_COMPILATION})
+   set_property(GLOBAL PROPERTY RULE_LAUNCH_COMPILE "time --verbose")
+   set_property(GLOBAL PROPERTY RULE_LAUNCH_LINK "time --verbose")
+endif()
 
 #
 # Configure config.in
@@ -231,6 +282,7 @@ set_package_properties(CPLEX PROPERTIES TYPE OPTIONAL PURPOSE "Required for the 
 algorithm (using the CPLEX solver)")
 set_package_properties(Cairo PROPERTIES TYPE OPTIONAL PURPOSE "Required to draw a visualization of the result")
 set_package_properties(GTest PROPERTIES TYPE OPTIONAL PURPOSE "Required to build unit tests")
+set_package_properties(PAPI PROPERTIES TYPE OPTIONAL PURPOSE "Required for various performance metrics")
 
 message(STATUS "=====================================================")
 message(STATUS "========           Optional Packages         ========")
@@ -241,3 +293,19 @@ message(STATUS "=====================================================")
 message(STATUS "The following optional packages were NOT found:")
 FEATURE_SUMMARY(WHAT OPTIONAL_PACKAGES_NOT_FOUND)
 message(STATUS "=====================================================")
+
+
+#
+# Final warnings
+#
+if(INSTRUMENT_MALLOC)
+	message(STATUS "")
+	message(STATUS "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	message(STATUS "!!!   You have malloc() instrumentation turned on.  !!!")
+	message(STATUS "!!! ----------------------------------------------- !!!")
+	message(STATUS "!!! This impacts performance. Unless you want to do !!!")
+	message(STATUS "!!! heavy profiling, this is probably not what you  !!!")
+	message(STATUS "!!! want.                                           !!!")
+	message(STATUS "!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+	message(STATUS "")
+endif()

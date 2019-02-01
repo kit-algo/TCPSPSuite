@@ -1,6 +1,10 @@
 #ifndef FAST_RESET_VECTOR_H
 #define FAST_RESET_VECTOR_H
 
+#include <stddef.h>
+#include <utility>
+#include <vector>
+
 template<class T>
 class FastResetVector {
 public:

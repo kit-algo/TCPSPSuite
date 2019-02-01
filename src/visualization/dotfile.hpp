@@ -2,8 +2,9 @@
 #define DOTFILE_H
 
 #include <iostream>  // for ostringstream
-#include <sstream>
 #include <string>    // for string
+#include <sstream>
+
 class Instance;
 
 class DotfileExporter {

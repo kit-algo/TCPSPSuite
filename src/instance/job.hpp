@@ -1,7 +1,7 @@
 #ifndef JOB_HPP
 #define JOB_HPP
 
-#include <vector>
+#include "resource.hpp"
 
 /**
  * @brief A job of an TCPSP instance.
@@ -29,7 +29,7 @@ public:
    * @param usages    A vector of usage specifications. usages[i] specifies how much of resource with ID i this job requires.
    * @param id        The ID of the job to be created.
    */
-  Job(unsigned int release, unsigned int deadline, unsigned int duration, std::vector<double> usages, unsigned int id);
+  Job(unsigned int release, unsigned int deadline, unsigned int duration, ResVec usages, unsigned int id);
 
   // Modified copy constructor that allows to change release and deadline during copying
   /**
@@ -78,7 +78,7 @@ public:
    *
    * @return the amount of resource used for each resource
    */
-  const std::vector<double>& get_resource_usage() const;
+  const ResVec & get_resource_usage() const;
 
   /**
    * Returns the ID of the job.
@@ -113,7 +113,7 @@ public:
 private:
   unsigned int jid;
 
-  std::vector<double> resource_usage; // TODO only flat?
+  ResVec resource_usage; // TODO only flat?
   unsigned int duration;
   unsigned int release;
   unsigned int deadline;

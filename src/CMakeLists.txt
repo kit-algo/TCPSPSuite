@@ -5,14 +5,65 @@ set(SOLVER_HEADERS "")
 set(SOURCES instance/instance.cpp instance/job.cpp instance/resource.cpp
         instance/laggraph.cpp instance/solution.cpp instance/transform.cpp io/jsonreader.cpp
         baselines/earlyscheduler.cpp manager/timer.cpp util/randomizer.cpp
-        util/git.cpp instance/traits.cpp manager/errors.cpp visualization/dotfile.cpp
+        instance/traits.cpp manager/errors.cpp visualization/dotfile.cpp
         algorithms/graphalgos.cpp util/solverconfig.cpp io/solutionwriter.cpp datastructures/jobset.cpp
-        util/configuration.cpp
+        util/configuration.cpp db/db_factory.cpp 
         datastructures/skyline.cpp datastructures/leveltree.cpp
-		manager/parallelizer.cpp util/log.cpp
-		util/autotuneconfig.cpp util/parameter.cpp
+				manager/parallelizer.cpp util/log.cpp
+				util/autotuneconfig.cpp util/parameter.cpp
         db/storage.cpp db/db_objects.cpp db/db_objects-odb.cxx
-        db/db_objects-schema-proxy.cpp)
+        manager/memoryinfo.cpp util/thread_checker.cpp)
+
+if (${ODB_SQLITE_FOUND})
+   set(SOURCES ${SOURCES} db/db_objects-odb-sqlite.cxx db/db_objects-schema-sqlite.cxx)
+endif()
+if (${ODB_MYSQL_FOUND})
+   set(SOURCES ${SOURCES} db/db_objects-odb-mysql.cxx db/db_objects-schema-mysql.cxx)
+endif()
+
+if (INSTRUMENT_MALLOC)
+	set(SOURCES ${SOURCES} contrib/tbingmann/malloc_tracker.cpp)
+	set(LIBS ${LIBS} dl)
+endif()
+
+##########################################################################################
+#
+# Use the gold linker if available
+#
+##########################################################################################
+set(OLD_FLAGS ${CMAKE_REQUIRED_FLAGS})
+set(CMAKE_REQUIRED_FLAGS "${CMAKE_REQUIRED_FLAGS} -Werror -fuse-ld=gold")
+INCLUDE(CheckCXXSourceCompiles) 
+CHECK_CXX_SOURCE_COMPILES(
+	"int main() { return 0; } "
+	HAS_GOLD_LINKER
+	)
+if ((HAS_GOLD_LINKER) AND (ALLOW_INCREMENTAL_LINKING))
+	set(LINK_FLAGS "${LINK_FLAGS} --incremental")
+endif()
+
+set(CMAKE_REQUIRED_FLAGS "${OLD_FLAGS} -Werror -fuse-ld=lld")
+INCLUDE(CheckCXXSourceCompiles) 
+CHECK_CXX_SOURCE_COMPILES(
+	"int main() { return 0; } "
+	HAS_LLD_LINKER
+)
+if ((HAS_LLD_LINKER) AND (ALLOW_INCREMENTAL_LINKING))
+	set(LINK_FLAGS "${LINK_FLAGS} --incremental")
+endif()
+
+set(CMAKE_REQUIRED_FLAGS "${OLD_FLAGS}")
+
+#if (HAS_LLD_LINKER)
+#	message(STATUS " +++ Detected linker: lld")
+#	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=lld")
+#elseif (HAS_GOLD_LINKER)
+if ((HAS_GOLD_LINKER) AND (NOT (USE_DEFAULT_LINKER)))
+	message(STATUS " +++ Detected linker: gold")
+	set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fuse-ld=gold")
+else()
+	message(STATUS " +++ Detected linker: default")
+endif()
 
 ##########################################################################################
 #
@@ -54,6 +105,10 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/ilp/")
     add_subdirectory(ilp)
 endif()
 
+if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/swag/")
+    add_subdirectory(swag)
+endif()
+
 message(STATUS "=====================================================")
 
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/solver_headers.hpp.in"
@@ -76,17 +131,44 @@ list(APPEND SOURCES "${CMAKE_CURRENT_BINARY_DIR}/util/git.cpp")
 #
 add_library(commonlib OBJECT ${SOURCES})
 set_target_properties(commonlib PROPERTIES COMPILE_FLAGS -std=c++17)
-cotire(commonlib)
+set_target_properties(commonlib PROPERTIES
+    COTIRE_PREFIX_HEADER_IGNORE_PATH "${CMAKE_SOURCE_DIR}/src/db")
+set_target_properties(commonlib PROPERTIES COTIRE_ENABLE_PRECOMPILED_HEADER FALSE)
+
+if (NOT ${CMAKE_EXPORT_COMPILE_COMMANDS})
+   cotire(commonlib)
+else()   
+endif()
 
 # main
 add_executable(tcpspsuite $<TARGET_OBJECTS:commonlib> main.cpp)
 set_target_properties(tcpspsuite PROPERTIES COMPILE_FLAGS -std=c++17)
+set_target_properties(tcpspsuite PROPERTIES COTIRE_ENABLE_PRECOMPILED_HEADER FALSE)
 target_link_libraries(tcpspsuite ${LIBS})
-cotire(tcpspsuite)
+if (NOT ${CMAKE_EXPORT_COMPILE_COMMANDS})
+   cotire(tcpspsuite)
+endif()
 
 # autotune
 add_executable(autotune $<TARGET_OBJECTS:commonlib> autotune.cpp)
 target_link_libraries(autotune ${LIBS})
-cotire(autotune)
+set_target_properties(autotune PROPERTIES COTIRE_ENABLE_PRECOMPILED_HEADER FALSE)
+if (NOT ${CMAKE_EXPORT_COMPILE_COMMANDS})
+   cotire(autotune)
+endif()
 
+# DB Merger
+add_executable(db_merger $<TARGET_OBJECTS:commonlib> tools/dbmerger.cpp)
+target_link_libraries(db_merger ${LIBS})
+set_target_properties(db_merger PROPERTIES COTIRE_ENABLE_PRECOMPILED_HEADER FALSE)
+if (NOT ${CMAKE_EXPORT_COMPILE_COMMANDS})
+   cotire(db_merger)
+endif()
 
+# Completeness Checker
+add_executable(completeness_checker $<TARGET_OBJECTS:commonlib> tools/completeness_checker.cpp)
+target_link_libraries(completeness_checker ${LIBS})
+set_target_properties(completeness_checker PROPERTIES COTIRE_ENABLE_PRECOMPILED_HEADER FALSE)
+if (NOT ${CMAKE_EXPORT_COMPILE_COMMANDS})
+   cotire(completeness_checker)
+endif()
