@@ -329,7 +329,7 @@ AutotuneConfig::generateConfig()
 	}
 	general["config"] = config;
 	json configs;
-	configs["solvers"] = std::vector<json>{general};
+	configs["solvers"] = std::vector<json>(1, general);
 
 	return SolverConfig::read_configs(configs)[0];
 }
