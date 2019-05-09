@@ -88,9 +88,24 @@ $(function() {
 </ul>
 </li>
 </ul>
+<h3>SWAG</h3>
+<ul>
+<li><b>ID</b>: <code>SWAG v.1.0</code></li>
+<li><b>Software Requirements</b>: None</li>
+<li><b><a class="el" href="classInstance.html" title="a TCPSP instance ">Instance</a> Requirements</b>: Only finish-start dependencies, no drain, no window extension, no availability, no overshoot costs</li>
+</ul>
+<p>This is the Scheduling with Augmented Graphs (SWAG) algorithm presented in [3]. It is an iterative heuristic that reduces peak demand by repeatedly inserting new dependencies between jobs executing concurrently during peak demand.</p>
+<h4>Possible Configuration</h4>
+<p>Refer to [3] for the meaning of the parameters <b>deletions_before_reset</b>, <b>deletion_trials</b>, <b>complete_propagation_after</b>, <b>deletion_max_depth</b>, <b>edge_candidate_batchsize</b> and <b>deletion_undermove_penalty</b>.</p>
+<p>Other parameters not mentioned in that paper are:</p>
+<ul>
+<li><b>disaggregate_time</b>: Boolean option. Controls whether to write detailed statistics to the database, incurs a small performance penalty.</li>
+</ul>
+<p>TODO document scorers</p>
 <h2>References </h2>
 <p>[1] Lukas Barth, Nicole Ludwig, Esther Mengelkamp, and Philipp Staudt. 2017. A comprehensive modelling framework for demand side flexibility in smart grids. Computer Science - Research and Development (30 Aug 2017). <a href="https://doi.org/10.1007/s00450-017-0343-x">https://doi.org/10.1007/s00450-017-0343-x</a></p>
-<p>[2] Lukas Barth, Veit Hagenmeyer, Nicole Ludwig, and Dorothea Wagner. 2018. How much demand side flexibility do we need? Analyzing where to exploit flexibility in industrial processes. In Proceedings of ACM eEnergy Conference (eEnergy’18). ACM, New York, NY, USA, 22 pages. </p>
+<p>[2] Lukas Barth, Veit Hagenmeyer, Nicole Ludwig, and Dorothea Wagner. 2018. How much demand side flexibility do we need? Analyzing where to exploit flexibility in industrial processes. In Proceedings of ACM eEnergy Conference (eEnergy’18). ACM, New York, NY, USA, 22 pages.</p>
+<p>[3] Lukas Barth and Dorothea Wagner. 2019. Shaving Peaks by Augmenting the Dependency Graph. In Proceedings of the Tenth ACM International Conference on Future Energy Systems (e-Energy ’19), June 25–28, 2019, Phoenix, AZ, USA. ACM, New York, NY, USA, Article 4, 11 pages. <a href="https://doi.org/10.1145/3307772.3328298">https://doi.org/10.1145/3307772.3328298</a> </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>

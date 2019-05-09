@@ -97,6 +97,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:a5d3c1427e13746b0c603c10caea26369"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a841680ef61f9566b785509386f5d8c81"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSolution.html#a841680ef61f9566b785509386f5d8c81">print_jobs</a> () const</td></tr>
 <tr class="separator:a841680ef61f9566b785509386f5d8c81"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afed760151fb04a1d52170549ff2ad0de"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSolution.html#afed760151fb04a1d52170549ff2ad0de">print_profile</a> () const</td></tr>
+<tr class="separator:afed760151fb04a1d52170549ff2ad0de"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a76450c72738a6bcbf383fc8a6e840489"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSolution.html#a76450c72738a6bcbf383fc8a6e840489">get_costs</a> () const</td></tr>
 <tr class="separator:a76450c72738a6bcbf383fc8a6e840489"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac3dfcd86587d94b73b154c6ed4d4c458"><td class="memItemLeft" align="right" valign="top"><a id="ac3dfcd86587d94b73b154c6ed4d4c458"></a>
@@ -121,8 +123,8 @@ double&#160;</td><td class="memItemRight" valign="bottom"><b>get_investment_cost
 <tr class="separator:a0c13d95195e6c865c7b4dccbe1ce5826"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad17f5d4cf3c82715de8856a4c08f7657"><td class="memItemLeft" align="right" valign="top">Maybe&lt; double &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSolution.html#ad17f5d4cf3c82715de8856a4c08f7657">get_lower_bound</a> () const</td></tr>
 <tr class="separator:ad17f5d4cf3c82715de8856a4c08f7657"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a90e9bd09f9d8c234a8de639b229dfbb5"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSolution.html#a90e9bd09f9d8c234a8de639b229dfbb5">verify</a> (int seed) const</td></tr>
-<tr class="separator:a90e9bd09f9d8c234a8de639b229dfbb5"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab06e98c6bb0eef85c154e0a5cfea3c97"><td class="memItemLeft" align="right" valign="top">bool&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classSolution.html#ab06e98c6bb0eef85c154e0a5cfea3c97">verify</a> (int seed, InconsistentResultError *error_out=nullptr) const</td></tr>
+<tr class="separator:ab06e98c6bb0eef85c154e0a5cfea3c97"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>a soultion for a TCPSP instance </p>
@@ -321,7 +323,7 @@ double&#160;</td><td class="memItemRight" valign="bottom"><b>get_investment_cost
         </tr>
       </table>
 </div><div class="memdoc">
-<p>logs the profile get the costs for this solution</p>
+<p>get the costs for this solution</p>
 <dl class="section return"><dt>Returns</dt><dd>the actual cost or INF if the solution is not feasible </dd></dl>
 
 </div>
@@ -532,33 +534,55 @@ double&#160;</td><td class="memItemRight" valign="bottom"><b>get_investment_cost
 
 </div>
 </div>
-<a id="a90e9bd09f9d8c234a8de639b229dfbb5"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a90e9bd09f9d8c234a8de639b229dfbb5">&#9670;&nbsp;</a></span>verify()</h2>
+<a id="afed760151fb04a1d52170549ff2ad0de"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afed760151fb04a1d52170549ff2ad0de">&#9670;&nbsp;</a></span>print_profile()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">void Solution::verify </td>
+          <td class="memname">void Solution::print_profile </td>
           <td>(</td>
-          <td class="paramtype">int&#160;</td>
-          <td class="paramname"><em>seed</em></td><td>)</td>
+          <td class="paramname"></td><td>)</td>
           <td> const</td>
         </tr>
       </table>
 </div><div class="memdoc">
-<p>verifies that this solution is correct all constraints are met</p>
-<dl class="exception"><dt>Exceptions</dt><dd>
-  <table class="exception">
-    <tr><td class="paramname">InconsistentResultError</td><td>if any constraint is not met </td></tr>
-  </table>
-  </dd>
-</dl>
+<p>logs the profile </p>
+
+</div>
+</div>
+<a id="ab06e98c6bb0eef85c154e0a5cfea3c97"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab06e98c6bb0eef85c154e0a5cfea3c97">&#9670;&nbsp;</a></span>verify()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">bool Solution::verify </td>
+          <td>(</td>
+          <td class="paramtype">int&#160;</td>
+          <td class="paramname"><em>seed</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">InconsistentResultError *&#160;</td>
+          <td class="paramname"><em>error_out</em> = <code>nullptr</code>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td> const</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<p>verifies that this solution is correct all constraints are met </p>
 
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/lukas/src/tcpsp/github/src/instance/<a class="el" href="solution_8hpp_source.html">solution.hpp</a></li>
+<li>/home/lukas/src/tcpsp/TCPSPsuite/TCPSPSuite/src/instance/<a class="el" href="solution_8hpp_source.html">solution.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

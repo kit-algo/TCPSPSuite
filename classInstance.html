@@ -130,10 +130,10 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>get_window_ex
 <tr class="separator:a1918dfda583ea28914acfb9bce0c188c"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a09b35e3ef85877c631a6f1e2d42c0e72"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classInstance.html#a09b35e3ef85877c631a6f1e2d42c0e72">calculate_max_costs</a> (const std::vector&lt; unsigned int &gt; &amp;start_times) const</td></tr>
 <tr class="separator:a09b35e3ef85877c631a6f1e2d42c0e72"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a4f267947da921199d494185afbca49bb"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classInstance.html#a4f267947da921199d494185afbca49bb">calculate_costs</a> (const std::vector&lt; double &gt; &amp;ressource_usage, const std::vector&lt; double &gt; &amp;additional_usage) const</td></tr>
-<tr class="separator:a4f267947da921199d494185afbca49bb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a3d3d771a3213224936f398b1661878f1"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classInstance.html#a3d3d771a3213224936f398b1661878f1">calculate_costs</a> (const std::vector&lt; double &gt; &amp;ressource_usage) const</td></tr>
-<tr class="separator:a3d3d771a3213224936f398b1661878f1"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a806f489ddc9545e2486c2e2ed85719f2"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classInstance.html#a806f489ddc9545e2486c2e2ed85719f2">calculate_costs</a> (const ResVec &amp;ressource_usage, const ResVec &amp;additional_usage) const</td></tr>
+<tr class="separator:a806f489ddc9545e2486c2e2ed85719f2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:adbb701eb543109b79fcb784d3ff72f92"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classInstance.html#adbb701eb543109b79fcb784d3ff72f92">calculate_costs</a> (const ResVec &amp;ressource_usage) const</td></tr>
+<tr class="separator:adbb701eb543109b79fcb784d3ff72f92"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af0655a103688d01a23210e283edadd6a"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classInstance.html#af0655a103688d01a23210e283edadd6a">get_latest_deadline</a> () const</td></tr>
 <tr class="memdesc:af0655a103688d01a23210e283edadd6a"><td class="mdescLeft">&#160;</td><td class="mdescRight">Helper to return the latest deadline in the instance.  <a href="#af0655a103688d01a23210e283edadd6a">More...</a><br /></td></tr>
 <tr class="separator:af0655a103688d01a23210e283edadd6a"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -294,8 +294,8 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>get_window_ex
 
 </div>
 </div>
-<a id="a4f267947da921199d494185afbca49bb"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a4f267947da921199d494185afbca49bb">&#9670;&nbsp;</a></span>calculate_costs() <span class="overload">[1/2]</span></h2>
+<a id="a806f489ddc9545e2486c2e2ed85719f2"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a806f489ddc9545e2486c2e2ed85719f2">&#9670;&nbsp;</a></span>calculate_costs() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -303,13 +303,13 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>get_window_ex
         <tr>
           <td class="memname">double Instance::calculate_costs </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramtype">const ResVec &amp;&#160;</td>
           <td class="paramname"><em>ressource_usage</em>, </td>
         </tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">const std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramtype">const ResVec &amp;&#160;</td>
           <td class="paramname"><em>additional_usage</em>&#160;</td>
         </tr>
         <tr>
@@ -328,12 +328,13 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>get_window_ex
   </table>
   </dd>
 </dl>
+<p>TODO what the hell? What is this function for?</p>
 <dl class="section return"><dt>Returns</dt><dd>the overall costs </dd></dl>
 
 </div>
 </div>
-<a id="a3d3d771a3213224936f398b1661878f1"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a3d3d771a3213224936f398b1661878f1">&#9670;&nbsp;</a></span>calculate_costs() <span class="overload">[2/2]</span></h2>
+<a id="adbb701eb543109b79fcb784d3ff72f92"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#adbb701eb543109b79fcb784d3ff72f92">&#9670;&nbsp;</a></span>calculate_costs() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -341,7 +342,7 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>get_window_ex
         <tr>
           <td class="memname">double Instance::calculate_costs </td>
           <td>(</td>
-          <td class="paramtype">const std::vector&lt; double &gt; &amp;&#160;</td>
+          <td class="paramtype">const ResVec &amp;&#160;</td>
           <td class="paramname"><em>ressource_usage</em></td><td>)</td>
           <td> const</td>
         </tr>
@@ -673,7 +674,7 @@ unsigned int&#160;</td><td class="memItemRight" valign="bottom"><b>get_window_ex
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/lukas/src/tcpsp/github/src/instance/<a class="el" href="instance_8hpp_source.html">instance.hpp</a></li>
+<li>/home/lukas/src/tcpsp/TCPSPsuite/TCPSPSuite/src/instance/<a class="el" href="instance_8hpp_source.html">instance.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->

@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['solution',['Solution',['../classSolution.html',1,'']]]
+  ['pdmcw',['PDMCW',['../classPDMCW.html',1,'']]],
+  ['pdmheuristic',['PDMHeuristic',['../classPDMHeuristic.html',1,'']]]
 ];

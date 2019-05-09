@@ -80,8 +80,8 @@ using&#160;</td><td class="memItemRight" valign="bottom"><b>JobId</b> = unsigned
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:a62467af36fdd35f1f3bc57560c2c9a40"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classJob.html#a62467af36fdd35f1f3bc57560c2c9a40">Job</a> (unsigned int release, unsigned int deadline, unsigned int duration, std::vector&lt; double &gt; usages, unsigned int id)</td></tr>
-<tr class="separator:a62467af36fdd35f1f3bc57560c2c9a40"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9aa3788c3474ab698d34dfe4fd999f6"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classJob.html#ac9aa3788c3474ab698d34dfe4fd999f6">Job</a> (unsigned int release, unsigned int deadline, unsigned int duration, ResVec usages, unsigned int id)</td></tr>
+<tr class="separator:ac9aa3788c3474ab698d34dfe4fd999f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a4070da7a51555988980b1a5aa5c6d664"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classJob.html#a4070da7a51555988980b1a5aa5c6d664">Job</a> (unsigned int release, unsigned int deadline, const <a class="el" href="classJob.html">Job</a> &amp;other)</td></tr>
 <tr class="separator:a4070da7a51555988980b1a5aa5c6d664"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a37b9a52fa548335de65ca0e6b1712c50"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classJob.html#a37b9a52fa548335de65ca0e6b1712c50">get_duration</a> () const</td></tr>
@@ -92,8 +92,8 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:af17f530686e04ccf12c3b561f7cb97a3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad703175012d1765706ef684d323aa928"><td class="memItemLeft" align="right" valign="top">double&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classJob.html#ad703175012d1765706ef684d323aa928">get_resource_usage</a> (unsigned int rid) const</td></tr>
 <tr class="separator:ad703175012d1765706ef684d323aa928"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ab5cda16d5b02bfea873a7ca305a0bbd2"><td class="memItemLeft" align="right" valign="top">const std::vector&lt; double &gt; &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classJob.html#ab5cda16d5b02bfea873a7ca305a0bbd2">get_resource_usage</a> () const</td></tr>
-<tr class="separator:ab5cda16d5b02bfea873a7ca305a0bbd2"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2fe5e6b20b0583fb9c0336b88b682d40"><td class="memItemLeft" align="right" valign="top">const ResVec &amp;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classJob.html#a2fe5e6b20b0583fb9c0336b88b682d40">get_resource_usage</a> () const</td></tr>
+<tr class="separator:a2fe5e6b20b0583fb9c0336b88b682d40"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa36af16c27eaff620417634bc4d11542"><td class="memItemLeft" align="right" valign="top">unsigned int&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classJob.html#aa36af16c27eaff620417634bc4d11542">get_jid</a> () const</td></tr>
 <tr class="separator:aa36af16c27eaff620417634bc4d11542"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae2c17254738dbcdf38e283a790c45f84"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classJob.html#ae2c17254738dbcdf38e283a790c45f84">set_id</a> (unsigned int id)</td></tr>
@@ -114,8 +114,8 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const
 <li>One usage specification per resource: Specifies how much this job uses of a given resource during its execution. </li>
 </ul>
 </div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
-<a id="a62467af36fdd35f1f3bc57560c2c9a40"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a62467af36fdd35f1f3bc57560c2c9a40">&#9670;&nbsp;</a></span>Job() <span class="overload">[1/2]</span></h2>
+<a id="ac9aa3788c3474ab698d34dfe4fd999f6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9aa3788c3474ab698d34dfe4fd999f6">&#9670;&nbsp;</a></span>Job() <span class="overload">[1/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -141,7 +141,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">std::vector&lt; double &gt;&#160;</td>
+          <td class="paramtype">ResVec&#160;</td>
           <td class="paramname"><em>usages</em>, </td>
         </tr>
         <tr>
@@ -337,14 +337,14 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const
 
 </div>
 </div>
-<a id="ab5cda16d5b02bfea873a7ca305a0bbd2"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#ab5cda16d5b02bfea873a7ca305a0bbd2">&#9670;&nbsp;</a></span>get_resource_usage() <span class="overload">[2/2]</span></h2>
+<a id="a2fe5e6b20b0583fb9c0336b88b682d40"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a2fe5e6b20b0583fb9c0336b88b682d40">&#9670;&nbsp;</a></span>get_resource_usage() <span class="overload">[2/2]</span></h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">const std::vector&lt;double&gt;&amp; Job::get_resource_usage </td>
+          <td class="memname">const ResVec&amp; Job::get_resource_usage </td>
           <td>(</td>
           <td class="paramname"></td><td>)</td>
           <td> const</td>
@@ -383,7 +383,7 @@ bool&#160;</td><td class="memItemRight" valign="bottom"><b>operator==</b> (const
 </div>
 </div>
 <hr/>The documentation for this class was generated from the following file:<ul>
-<li>/home/lukas/src/tcpsp/github/src/instance/<a class="el" href="job_8hpp_source.html">job.hpp</a></li>
+<li>/home/lukas/src/tcpsp/TCPSPsuite/TCPSPSuite/src/instance/<a class="el" href="job_8hpp_source.html">job.hpp</a></li>
 </ul>
 </div><!-- contents -->
 <!-- start footer part -->
