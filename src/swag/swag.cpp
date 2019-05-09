@@ -1,7 +1,3 @@
-//
-// Created by lukas on 03.07.18.
-//
-
 #include "swag.hpp"
 
 #include "../datastructures/maybe.hpp"
@@ -142,9 +138,6 @@ template <bool use_mes, bool use_eps>
 void
 SWAGSolver<use_mes, use_eps>::bulk_delete()
 {
-	// std::cout << "Before Bulk Delete:\n";
-	// this->dbg_print_adjacencies();
-	// TODO fast reset
 	for (Job::JobId jid = 0; jid < this->job_count; ++jid) {
 		this->forward_pointers_changed[jid].clear();
 		this->reverse_pointers_changed[jid].clear();
@@ -184,8 +177,6 @@ SWAGSolver<use_mes, use_eps>::bulk_delete()
 			}
 			last_index = delete_index;
 
-			//			std::cout << "<<< (P1) Deleting: " << s << " -> "
-			//          << this->adjacency_list[s][delete_index].t << "\n";
 			if (delete_index != end_index - 1) {
 				this->adjacency_list[s][delete_index] =
 				    this->adjacency_list[s][end_index - 1];
@@ -198,8 +189,6 @@ SWAGSolver<use_mes, use_eps>::bulk_delete()
 
 		this->adjacency_list[s].resize(end_index);
 	}
-	// std::cout << "After Pass 1:\n";
-	// this->dbg_print_adjacencies();
 
 	// Pass 2
 	for (Job::JobId t = 0; t < this->job_count; ++t) {
@@ -225,10 +214,6 @@ SWAGSolver<use_mes, use_eps>::bulk_delete()
 		size_t end_index = this->rev_adjacency_list[t].size();
 
 		for (size_t delete_index : this->reverse_deletion_buckets[t]) {
-			//			std::cout << "<<< (P2) Deleting: "
-			//        << this->rev_adjacency_list[t][delete_index].s << " -> " << t
-			//        << "\n";
-
 			if (delete_index == last_index) {
 				continue;
 			}
@@ -242,10 +227,6 @@ SWAGSolver<use_mes, use_eps>::bulk_delete()
 				                                   .s]
 				    .push_back({this->rev_adjacency_list[t][delete_index].forward_index,
 				                delete_index});
-				/*				std::cout << " -> Pushed into FPC["
-				          << this->rev_adjacency_list[t][delete_index].s << "]: "
-				          << this->rev_adjacency_list[t][delete_index].forward_index
-				          << "," << delete_index << "\n";*/
 			}
 			end_index--;
 		}
@@ -253,9 +234,6 @@ SWAGSolver<use_mes, use_eps>::bulk_delete()
 		this->rev_adjacency_list[t].resize(end_index);
 	}
 
-	// std::cout << "After Pass 2:\n";
-	// this->dbg_print_adjacencies();
-	// Pass 3
 	for (Job::JobId s = 0; s < this->job_count; ++s) {
 		if (!this->forward_pointers_changed[s].empty()) {
 			for (auto [index, new_rev_index] : this->forward_pointers_changed[s]) {
@@ -263,18 +241,12 @@ SWAGSolver<use_mes, use_eps>::bulk_delete()
 			}
 		}
 	}
-
-	// std::cout << "After Pass 3:\n";
-	// this->dbg_print_adjacencies();
-
-	this->dbg_verify_graph();
 }
 
 template <bool use_mes, bool use_eps>
 void
 SWAGSolver<use_mes, use_eps>::create_new_candidate_edges() noexcept
 {
-	this->dbg_verify();
 	/*
 	std::cout << "=======================================================\n";
 	std::cout << "=======================================================\n";
@@ -289,7 +261,6 @@ SWAGSolver<use_mes, use_eps>::create_new_candidate_edges() noexcept
 	}
 	*/
 
-	// TODO just use the candidate buf as one?
 	this->edgedel_sorted_by_start_buf = this->candidates_buf;
 	this->edgedel_sorted_by_end_buf = this->candidates_buf;
 
@@ -407,8 +378,6 @@ SWAGSolver<use_mes, use_eps>::create_new_candidate_edges() noexcept
 			this->reverse_deletion_buckets[e->t].push_back(e->rev_index);
 		}
 
-		this->dbg_verify_graph();
-
 		for (Edge * e : this->delete_backwards_edges_buf) {
 			Job::JobId s = this->rev_adjacency_list[e->t][e->rev_index].s;
 			size_t forward_index =
@@ -424,70 +393,12 @@ SWAGSolver<use_mes, use_eps>::create_new_candidate_edges() noexcept
 			this->reverse_deletion_buckets[e->t].push_back(e->rev_index);
 		}
 
-		//		std::cout << "Bulk deletion forwards buffer: \n";
-		/*		for (Job::JobId jid = 0; jid < this->job_count; ++jid) {
-		  if (this->forward_deletion_buckets[jid].empty()) {
-		    continue;
-		  }
-
-		  std::cout << "   [" << jid << "]: ";
-		  for (auto index : this->forward_deletion_buckets[jid]) {
-		    std::cout << " " << index;
-		  }
-		  std::cout << "\n";
-		}*/
-
-		//		std::cout << "Bulk deletion reverse buffer: \n";
-		/*		for (Job::JobId jid = 0; jid < this->job_count; ++jid) {
-		  if (this->reverse_deletion_buckets[jid].empty()) {
-		    continue;
-		  }
-
-		  std::cout << "   [" << jid << "]: ";
-		  for (auto index : this->reverse_deletion_buckets[jid]) {
-		    std::cout << " " << index;
-		  }
-		  std::cout << "\n";
-		  }*/
-
 		this->bulk_delete();
 
-		//		this->dbg_print_graph();
-		/*
-		std::cout << "Wanted S: " << std::to_string(wanted_s) << "\n";
-		std::cout << "Wanted T: " << std::to_string(wanted_t) << "\n";
-		std::cout << "Promised backwards amount: " << backwards_amount << "\n";
-		std::cout << "Promised forwards amount: " << forwards_amount << "\n";
-
-		std::cout << "S ES before: "
-		          << std::to_string(this->earliest_starts[wanted_s]) << "\n";
-		std::cout << "T LF before: "
-		          << std::to_string(this->latest_finishs[wanted_t]) << "\n";
-
-		std::cout << "--- Rebuilding.\n";
-		std::cout << " ES queue: ";
-		for (auto jid : this->rebuild_es_forward_queue) {
-		  std::cout << jid << " ";
-		}
-		std::cout << "\n";
-		std::cout << " LF queue: ";
-		for (auto jid : this->rebuild_lf_backward_queue) {
-		  std::cout << jid << " ";
-		}
-		std::cout << "\n";
-		*/
 		this->changed_nodes_buf.clear();
 		this->rebuild_es_forward();
 		this->rebuild_lf_backward();
 
-		this->dbg_verify_correctly_partially_propagated();
-
-		/*
-		std::cout << "S ES after: "
-		          << std::to_string(this->earliest_starts[wanted_s]) << "\n";
-		std::cout << "T LF after: "
-		          << std::to_string(this->latest_finishs[wanted_t]) << "\n";
-		*/
 		this->node_moved_buf.reset();
 		Timer skyline_timer;
 		if (this->disaggregate_time) {
@@ -503,13 +414,6 @@ SWAGSolver<use_mes, use_eps>::create_new_candidate_edges() noexcept
 			this->skyline_update_time += skyline_timer.get();
 		}
 
-		this->dbg_verify();
-
-		// this->dbg_print_graph();
-		assert(this->earliest_starts[wanted_s] + this->durations[wanted_s] +
-		           this->durations[wanted_t] <=
-		       this->latest_finishs[wanted_t]);
-
 		/*
 		 *Step 4: Insert the new candidate into the candidate edge set.
 		 */
@@ -520,8 +424,6 @@ SWAGSolver<use_mes, use_eps>::create_new_candidate_edges() noexcept
 			this->candidate_edge_buf.emplace_back(wanted_s, wanted_t);
 			break; // We succeeded
 		}
-
-		//		std::cout << "------------- Done ----------------\n";
 	}
 }
 
@@ -557,7 +459,7 @@ SWAGSolver<use_mes, use_eps>::edgedel_update_current_values_backwards(
 			for (const auto & next_edge : this->adjacency_list[t]) {
 				Job::JobId next_t = next_edge.t;
 				if (this->edgedel_vertex_seen[next_t]) {
-					// TODO this makes this a heuristic. We might not see some paths!
+					// this makes this a heuristic. We might not see some paths!
 					this->rebuild_queue.push_back(next_t);
 				}
 			}
@@ -571,33 +473,12 @@ SWAGSolver<use_mes, use_eps>::edgedel_update_current_values_forwards(
     Job::JobId initial_s)
 {
 	// TODO evaluate whether a queue might actually help here!
-
-	//	this->dbg_print_graph();
-
-	// TODO FIXME REMOVE THIS
-	// std::unordered_map<Job::JobId, size_t> seen_counter;
-	// size_t seen_threshold = 1000000;
-
 	this->rebuild_queue.clear();
 	this->rebuild_queue.push_back(initial_s);
 
 	while (!this->rebuild_queue.empty()) {
 		Job::JobId s = this->rebuild_queue[0];
 		this->rebuild_queue.pop_front();
-
-		// TODO FIXME REMOVE
-		/*
-		if (seen_counter.find(s) == seen_counter.end()) {
-		  seen_counter[s] = 1;
-		} else {
-		  seen_counter[s] += 1;
-		}
-		if (seen_counter[s] >= seen_threshold) {
-		  this->dbg_verify_cycle_free();
-		  BOOST_LOG(l.e()) << "Detected a cycle!";
-		  cycle_detected = true;
-		}
-	*/
 
 		unsigned min_lf = this->base_latest_finishs[s];
 
@@ -704,25 +585,14 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_backwards(
 	 * (this->deletion_undermove_penalty)
 	 */
 	double best_deletion_score =
-	    edges_removed + std::max(((int)moved_time_steps - (int)amount), 0) *
-	                        (this->deletion_undermove_penalty);
+	    (double)edges_removed +
+	    (double)std::max(((int)moved_time_steps - (int)amount), 0) *
+	        (this->deletion_undermove_penalty);
 	size_t best_moved_time_steps = moved_time_steps;
-
-	this->dbg_verify_values_during_backwards_bfs();
-
-	//	std::cout << "DB >>> Initial edge count: " << best_edges_removed << "\n";
-
-	// TODO special handling for depth == 0
-
-	// TODO traverse in some pre-computed topological order to minimize
-	// number of errors
 
 	while (!this->bfs_buf.empty()) {
 		const auto candidate = this->bfs_buf[0];
 		this->bfs_buf.pop_front();
-		// const auto candidate = this->bfs_buf.back();
-		// this->bfs_buf.pop_back();
-
 		if ((candidate.depth >= depth) || (candidate.e->is_seen())) {
 			// Prune the BFS here, which means that we permanently decide to
 			// delete this edge, if it is not permanent
@@ -739,7 +609,6 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_backwards(
 			// This edge is no longer to be deleted.
 			edges_removed--;
 			candidate.e->set_marked(false);
-			// TODO replace this by pushing both into the queue
 			this->edgedel_update_current_values_backwards(candidate.e->t);
 		}
 
@@ -786,7 +655,6 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_backwards(
 
 		// Something might have changed!
 		this->edgedel_update_current_values_backwards(sub_t);
-		this->dbg_verify_values_during_backwards_bfs();
 
 		/* After every BFS step: evaluate the quality of what we currently have.
 		 * Quality is measured in two criteria:
@@ -799,9 +667,9 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_backwards(
 		moved_time_steps =
 		    this->earliest_starts[t] - this->edgedel_current_value[t];
 
-		double score =
-		    edges_removed + std::max(((int)moved_time_steps - (int)amount), 0) *
-		                        (this->deletion_undermove_penalty);
+		double score = (double)edges_removed +
+		               (double)std::max(((int)moved_time_steps - (int)amount), 0) *
+		                   (this->deletion_undermove_penalty);
 
 		if (score < best_deletion_score) {
 			// New best solution
@@ -848,8 +716,6 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_backwards(
 	this->edgedel_vertex_seen[t] = true;
 	this->edgedel_current_value[t] =
 	    this->earliest_starts[t] - best_moved_time_steps;
-
-	this->dbg_verify_values_during_backwards_bfs();
 
 	for (Edge * e : this->delete_backwards_edges_buf) {
 		e->set_marked(false);
@@ -898,8 +764,6 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_forwards(Job::JobId s,
 	    this->base_latest_finishs[s] - this->latest_finishs[s];
 	// First step in the BFS
 	for (auto & e : this->adjacency_list[s]) {
-		//		Edge * e = &(this->adjacency_list[rev_e.s][rev_e.forward_index]);
-
 		this->edgedel_current_value[e.t] = this->latest_finishs[e.t];
 		this->edgedel_vertex_seen[e.t] = true;
 		e.set_seen(true);
@@ -923,11 +787,8 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_forwards(Job::JobId s,
 		}
 	}
 
-	// TODO only do this if there are permament edges
 	// Now, s has moved
 	this->edgedel_update_current_values_forwards(s);
-
-	this->dbg_verify_values_during_forwards_bfs();
 
 	/* Here, a scoring is not necessary - anything that moves less
 	 * than <amount> time steps is unacceptable!
@@ -935,14 +796,9 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_forwards(Job::JobId s,
 	size_t best_edges_removed = edges_removed;
 	size_t best_moved_time_steps = moved_time_steps;
 
-	// TODO traverse in some pre-computed topological order to minimize
-	// number of errors
-
 	while (!this->bfs_buf.empty()) {
 		const auto candidate = this->bfs_buf[0];
 		this->bfs_buf.pop_front();
-		//		const auto candidate = this->bfs_buf.back();
-		// this->bfs_buf.pop_back();
 
 		if ((candidate.depth >= depth) || (candidate.e->is_seen())) {
 			// Prune the BFS here, which means that we permanently decide to
@@ -957,7 +813,6 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_forwards(Job::JobId s,
 			// This edge is no longer to be deleted.
 			edges_removed--;
 			candidate.e->set_marked(false);
-			// TODO replace this by pushing both into the queue
 			auto & rev_edge =
 			    this->rev_adjacency_list[candidate.e->t][candidate.e->rev_index];
 			this->edgedel_update_current_values_forwards(rev_edge.s);
@@ -1007,8 +862,6 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_forwards(Job::JobId s,
 
 		// Something might have changed!
 		this->edgedel_update_current_values_forwards(sub_s);
-
-		this->dbg_verify_values_during_forwards_bfs();
 
 		/* After every BFS step: evaluate the quality of what we currently have.
 		 * Quality is measured in two criteria:
@@ -1066,8 +919,6 @@ SWAGSolver<use_mes, use_eps>::find_edges_to_delete_forwards(Job::JobId s,
 	this->edgedel_current_value[s] =
 	    this->latest_finishs[s] + best_moved_time_steps;
 
-	this->dbg_verify_values_during_forwards_bfs();
-
 	for (Edge * e : this->delete_forwards_edges_buf) {
 		e->set_marked(false);
 	}
@@ -1091,8 +942,6 @@ void
 SWAGSolver<use_mes, use_eps>::graph_delete_edge(
     Job::JobId s, size_t s_adj_list_index) noexcept
 {
-	this->dbg_verify();
-
 	auto & edge = this->adjacency_list[s][s_adj_list_index];
 	Job::JobId t = edge.t;
 	auto rev_edge_index = edge.rev_index;
@@ -1105,8 +954,6 @@ SWAGSolver<use_mes, use_eps>::graph_delete_edge(
 
 	this->adjacency_list[s].pop_back();
 	this->rev_adjacency_list[t].pop_back();
-
-	this->dbg_verify_graph();
 }
 
 template <bool use_mes, bool use_eps>
@@ -1116,9 +963,6 @@ SWAGSolver<use_mes, use_eps>::graph_delete_edge(Edge * e) noexcept
 	Job::JobId t = e->t;
 	auto rev_edge_index = e->rev_index;
 	Job::JobId s = this->rev_adjacency_list[t][rev_edge_index].s;
-
-	//	std::cout << " ### Deleting " << std::to_string(s) << " -> "
-	//          << std::to_string(t) << "\n";
 
 	auto adj_edge_index =
 	    this->rev_adjacency_list[t][rev_edge_index].forward_index;
@@ -1131,8 +975,6 @@ SWAGSolver<use_mes, use_eps>::graph_delete_edge(Edge * e) noexcept
 
 	this->adjacency_list[s].pop_back();
 	this->rev_adjacency_list[t].pop_back();
-
-	this->dbg_verify_graph();
 }
 
 template <bool use_mes, bool use_eps>
@@ -1152,8 +994,6 @@ SWAGSolver<use_mes, use_eps>::initialize_graph() noexcept
 		this->base_adjacency_list[s] = this->adjacency_list[s];
 		this->base_rev_adjacency_list[s] = this->rev_adjacency_list[s];
 	}
-
-	this->dbg_verify_cycle_free();
 }
 
 template <bool use_mes, bool use_eps>
@@ -1195,7 +1035,6 @@ SWAGSolver<use_mes, use_eps>::push_es_forward(bool force_complete,
 	}
 
 	if (force_complete) {
-		//		std::cout << "--> Complete push\n";
 		this->push_es_forward_queue.insert(
 		    this->push_es_forward_queue.end(),
 		    this->push_es_forward_out_of_range.begin(),
@@ -1206,12 +1045,9 @@ SWAGSolver<use_mes, use_eps>::push_es_forward(bool force_complete,
 		// propagated
 
 		size_t i = 0;
-		//		std::cout << "Continuing propagation. Held " <<
-		//this->push_es_forward_out_of_range.size() << " elements: ";
 		while (i < this->push_es_forward_out_of_range.size()) {
 			Job::JobId jid = this->push_es_forward_out_of_range[i];
 			if (this->earliest_starts[jid] <= this->active_range.second) {
-				//				std::cout << jid << " ";
 				this->push_es_forward_queue.push_back(jid);
 				std::swap(this->push_es_forward_out_of_range[i],
 				          this->push_es_forward_out_of_range.back());
@@ -1220,8 +1056,6 @@ SWAGSolver<use_mes, use_eps>::push_es_forward(bool force_complete,
 				i++;
 			}
 		}
-		//		std::cout << " # " << this->push_es_forward_out_of_range.size() << "
-		//elements remain.\n";
 	}
 
 	while (!this->push_es_forward_queue.empty()) {
@@ -1247,7 +1081,7 @@ SWAGSolver<use_mes, use_eps>::push_es_forward(bool force_complete,
 				} else {
 					this->push_es_forward_out_of_range.emplace_back(edge.t);
 					//					std::cout << "Deferring " << edge.t << " (now " <<
-					//this->push_es_forward_out_of_range.size() << " elements)\n";
+					// this->push_es_forward_out_of_range.size() << " elements)\n";
 				}
 				this->changed_nodes_buf.push_back(edge.t);
 			}
@@ -1268,9 +1102,8 @@ SWAGSolver<use_mes, use_eps>::build_candidate_jobs() noexcept
 		timer.start();
 	}
 
-	// std::cout << "Candidate jobs…\n";
 	this->candidates_buf.clear();
-	// TODO FIXME this is way too slow
+	// TODO this is way too slow
 	for (unsigned int jid = 0; jid < this->job_count; ++jid) {
 		if ((this->earliest_starts[jid] <= this->active_range.second) &&
 		    (this->earliest_starts[jid] + this->durations[jid] >=
@@ -1478,13 +1311,6 @@ SWAGSolver<use_mes, use_eps>::reset() noexcept
 	this->earliest_starts = this->base_earliest_starts;
 	this->latest_finishs = this->base_latest_finishs;
 
-	/*
-	edgecount = 0;
-	for (auto & adj : this->adjacency_list) {
-	  edgecount += adj.size();
-	}
-	std::cout << "}}} --- After Reset: " << edgecount << " edges.\n";*/
-
 	// TODO speed this up once Ygg knows how to clone trees
 	for (unsigned int jid = 0; jid < this->job_count; ++jid) {
 		this->rsl.set_pos(jid, (int)this->earliest_starts[jid]);
@@ -1495,54 +1321,23 @@ SWAGSolver<use_mes, use_eps>::reset() noexcept
 	}
 
 	this->active_range = this->rsl.get_maximum_range();
-	//	std::cout << "AR changed: " << this->active_range << "\n";
 	// Propagate for the new active range
-	this->iteration_propagate(true, true); // TODO DEBUG
-	// this->iteration_propagate(true); // TODO DEBUG
-	this->dbg_verify_correctly_partially_propagated();
+	this->iteration_propagate(true, true); // TODO is this necessary?
 }
 
 template <bool use_mes, bool use_eps>
 void
 SWAGSolver<use_mes, use_eps>::iteration_regenerate_candidates() noexcept
 {
-	/*
-	std::cout << "\n==============================================\n\n";
-	std::cout << "Active Range: " << this->active_range << "\n";
-	std::cout << "Active Jobs: ";
-	for (unsigned int jid = 0; jid < this->job_count; ++jid) {
-	  if ((this->earliest_starts[jid] + this->durations[jid] >=
-	       this->active_range.first) &&
-	      (this->earliest_starts[jid] <= this->active_range.second)) {
-	    std::cout << jid << ", ";
-	  }
-	}
-	std::cout << "\n";
-	std::cout << "Earliest Starts: " << this->earliest_starts << "\n";
-	std::cout << "Latest Finishs: " << this->latest_finishs << "\n";
-	std::cout << "Durations: " << this->durations << "\n";
-	std::cout << "BLFs: " << this->base_latest_finishs << "\n";
-	std::cout << "ECands: " << this->candidate_edge_buf << "\n";
-	std::cout << "\n";
-	*/
-	// TODO time this!
-
-	// std::cout << "((( " << this->candidates_buf.size() << " candidate jobs.\n";
-
 	this->build_candidate_jobs();
-	this->dbg_verify_active_range();
 
 	this->candidate_edge_buf.clear();
-
-	this->dbg_verify_active_range();
 
 	if (this->edge_candidate_batchsize == 0) {
 		this->build_candidate_edges();
 	} else {
 		this->build_candidate_edges_batched();
 	}
-
-	this->dbg_verify_active_range();
 }
 
 template <bool use_mes, bool use_eps>
@@ -1587,16 +1382,12 @@ SWAGSolver<use_mes, use_eps>::iteration_unstick() noexcept
 
 	if (this->rsl.get_maximum_range() != this->active_range) {
 		this->active_range = this->rsl.get_maximum_range();
-		//	std::cout << "AR changed: " << this->active_range << "\n";
 		// We just propagated everything, so we don't need to do it again here.
-		// Propagate for the new active range
-		// this->iteration_propagate(false, true);
-		this->dbg_verify_correctly_partially_propagated();
+		// this->dbg_verify_correctly_partially_propagated();
 
 		// We got a different peak! Maybe we can do something there…
 		this->iteration_regenerate_candidates();
 		if (!this->candidate_edge_buf.empty()) {
-			// std::cout << "Different range worked!\n";
 			// Ha, that worked!
 			if (disaggregate_time) {
 				this->unstick_time += timer.get();
@@ -1616,9 +1407,7 @@ SWAGSolver<use_mes, use_eps>::iteration_unstick() noexcept
 
 	// Okay, now for actual unsticking. If we can still delete…
 	if (this->deletions_remaining > 0) {
-		// std::cout << "-- Trying to delete ... ";
 		// Then delete!
-		//		BOOST_LOG(l.d(3)) << ">> Trying to delete…";
 		this->deletions_remaining--;
 
 		Timer deletion_timer;
@@ -1629,29 +1418,23 @@ SWAGSolver<use_mes, use_eps>::iteration_unstick() noexcept
 		this->create_new_candidate_edges();
 
 		if (this->candidate_edge_buf.empty()) {
-			// std::cout << "No success. :-(\n";
 			//			BOOST_LOG(l.d(3)) << ">>> No success, resetting.";
 			this->reset();
 			this->iteration_regenerate_candidates();
-			this->dbg_verify_correctly_partially_propagated();
 			this->deletions_remaining = this->deletions_before_reset;
 			if (disaggregate_time) {
 				this->unstick_time += timer.get();
 			}
 			return;
 		} else {
-			// std::cout << "SUCCESS. :)\n";
 			//			BOOST_LOG(l.d(3)) << ">>> Success!";
 		}
 	} else {
-		// std::cout << "-- Resetting\n";
-
 		// No possibility found
 		//	BOOST_LOG(l.d(5)) << ">> Resetting!";
 
 		this->reset();
 		this->iteration_regenerate_candidates();
-		this->dbg_verify_correctly_partially_propagated();
 		this->deletions_remaining = this->deletions_before_reset;
 		if (disaggregate_time) {
 			this->unstick_time += timer.get();
@@ -1669,7 +1452,7 @@ void
 SWAGSolver<use_mes, use_eps>::iteration() noexcept
 {
 	this->dbg_verify();
-	this->dbg_verify_cycle_free();
+
 	this->iteration_count++;
 
 	bool active_range_changed = false;
@@ -1690,8 +1473,6 @@ SWAGSolver<use_mes, use_eps>::iteration() noexcept
 		this->last_log_iteration = this->iteration_count;
 		this->log_timer.start();
 	}
-
-	this->dbg_verify();
 
 	/* Write intermediate scores if requested */
 	if (__builtin_expect(this->intermediate_score_interval > 0, 0)) {
@@ -1720,13 +1501,15 @@ SWAGSolver<use_mes, use_eps>::iteration() noexcept
 	// Periodically push everything through
 	if ((this->iteration_count - this->last_complete_push) >=
 	    this->force_complete_push_after) {
+		this->push_es_forward(true, true);
+		this->push_lf_backward(true, true);
 	}
 
 	// Periodically check if our active range is still okay
 	if ((this->iteration_count - this->last_range_check) >=
 	    this->force_range_check_after) {
 		this->last_range_check = this->iteration_count;
-		// std::cout << "Range-checking.\n" << std::flush;
+
 		auto max_range = this->rsl.get_maximum_range();
 		if (max_range != this->active_range) {
 			// Active range has changed
@@ -1736,41 +1519,29 @@ SWAGSolver<use_mes, use_eps>::iteration() noexcept
 			this->candidates_buf.clear();
 			this->candidate_edge_buf.clear();
 			this->active_range = max_range;
-			//			std::cout << "AR changed: " << this->active_range << "\n";
 
 			// Propagate for the new active range
-			this->iteration_propagate(true, true); // TODO DEBUG
-			// this->iteration_propagate(true); // TODO DEBUG
-			this->dbg_verify_correctly_partially_propagated();
+			this->iteration_propagate(true, true); // TODO is complete necessary?
 		}
 	}
 
 	// No more candidates. We need new ones.
 	if (this->candidate_edge_buf.empty()) {
-		if ((active_range_changed) ||
-		    (this->iteration_count == 1)) { // TODO why does the range not change?
-			// std::cout << "Generating new after changed range\n" << std::flush;
+		if ((active_range_changed) || (this->iteration_count == 1)) {
 			// It's fine - just generate new candidates.
 			this->iteration_regenerate_candidates();
 			if (this->candidate_edge_buf.empty()) {
 				// Uh-oh. We're really stuck. Try to unstick by deleting or resetting.
 				this->iteration_unstick();
 			}
-			// std::cout << "-> Now we have " << this->candidate_edge_buf.size()
-			//			          << " candidates.\n";
 		} else {
 			// We're still in the same place. In the case of batched generation,
 			// that could mean we just need to generate the next batch. Otherwise,
 			// we need to unstick.
 			if (this->edge_candidate_batchsize > 0) {
-				// std::cout << "Re-generating in batch.\n";
 				this->build_candidate_edges_batched();
-				// std::cout << "-> Now we have " << this->candidate_edge_buf.size()
-				//				          << " candidates (2).\n"
-				//				          << std::flush;
 				if (this->candidate_edge_buf.empty()) {
 					// Still no luck - now we need to unstick.
-					// std::cout << "!! Unstick!\n";
 					this->iteration_unstick();
 				}
 			} else {
@@ -1781,8 +1552,6 @@ SWAGSolver<use_mes, use_eps>::iteration() noexcept
 
 	// At this point, we should have a candidate for insertion.
 	assert(!this->candidate_edge_buf.empty());
-
-	this->dbg_verify_correctly_partially_propagated();
 
 	bool inserted = false;
 	// Thus, insert one edge.
@@ -1800,7 +1569,6 @@ SWAGSolver<use_mes, use_eps>::iteration() noexcept
 			inserted = this->iteration_insert_edge(false);
 		}
 	}
-	this->dbg_verify_limits_during_partial_propagation();
 }
 
 template <bool use_mes, bool use_eps>
@@ -1827,11 +1595,8 @@ SWAGSolver<use_mes, use_eps>::push_lf_backward(bool force_complete,
 
 		while (i < this->push_lf_backward_out_of_range.size()) {
 			Job::JobId jid = this->push_lf_backward_out_of_range[i];
-			if (this->latest_finishs[jid] >=
-			    this->active_range.first) { // TODO is this correct? If not, also
-				                              // change in the check!
-				this->push_lf_backward_queue.push_back(
-				    jid); // TODO make sure this is only done once.
+			if (this->latest_finishs[jid] >= this->active_range.first) {
+				this->push_lf_backward_queue.push_back(jid);
 				std::swap(this->push_lf_backward_out_of_range[i],
 				          this->push_lf_backward_out_of_range.back());
 				this->push_lf_backward_out_of_range.pop_back();
@@ -1875,12 +1640,10 @@ SWAGSolver<use_mes, use_eps>::rebuild_lf_backward() noexcept
 {
 	while (!this->rebuild_lf_backward_queue.empty()) {
 		auto v = this->rebuild_lf_backward_queue.back();
-		//		std::cout << "### Rebuilding at " << v << ": ";
 
 		this->rebuild_lf_backward_queue.pop_back();
 
 		unsigned int min_seen = this->deadlines[v];
-		//		std::cout << " D: " << min_seen << " ";
 
 		for (const auto & edge : this->adjacency_list[v]) {
 			min_seen = std::min(min_seen, this->latest_finishs[edge.t] -
@@ -1924,14 +1687,8 @@ void
 SWAGSolver<use_mes, use_eps>::insert_edge(Job::JobId s, Job::JobId t,
                                           bool force_complete) noexcept
 {
-	this->dbg_verify_correctly_partially_propagated();
-
 	this->insertion_count++;
 
-	//	std::cout << "Inserting " << s << "->" << t << "\n" << std::flush;
-	assert(this->earliest_starts[s] + this->durations[s] >=
-	       this->active_range.first);
-	assert(this->earliest_starts[t] <= this->active_range.second);
 	this->graph_insert_edge(s, t);
 
 	this->changed_nodes_buf.clear();
@@ -1941,8 +1698,6 @@ SWAGSolver<use_mes, use_eps>::insert_edge(Job::JobId s, Job::JobId t,
 	this->push_lf_backward_queue.clear(); // TODO should be unnecessary
 	this->push_lf_backward_queue.emplace_back(t);
 	this->push_lf_backward(force_complete, false);
-
-	this->dbg_verify_limits_during_partial_propagation();
 
 	this->node_moved_buf.reset();
 	Timer skyline_timer;
@@ -1958,11 +1713,6 @@ SWAGSolver<use_mes, use_eps>::insert_edge(Job::JobId s, Job::JobId t,
 	if (this->disaggregate_time) {
 		this->skyline_update_time += skyline_timer.get();
 	}
-
-	// std::cout << "After inserting the edge: \n\n";
-	//	this->dbg_print_graph();
-
-	this->dbg_verify();
 }
 
 template <bool use_mes, bool use_eps>
@@ -1972,18 +1722,15 @@ SWAGSolver<use_mes, use_eps>::delete_edge(Job::JobId s,
 {
 	Job::JobId t = this->adjacency_list[s][s_adj_list_index];
 	this->graph_delete_edge(s, s_adj_list_index);
-	this->dbg_verify_graph();
 	Timer update_timer;
 	if (this->disaggregate_time) {
 		update_timer.start();
 	}
 
-	// TODO if we're deleting multiple edges, we don't need to do the
-	// actual propagation here!
 	this->changed_nodes_buf.clear();
 	this->rebuild_es_forward_buf.push_back(t);
 	this->rebuild_es_forward();
-	this->rebuild_lf_backward_buf.push_back(s); // TODO or t?
+	this->rebuild_lf_backward_buf.push_back(s);
 	this->rebuild_lf_backward();
 
 	if (this->disaggregate_time) {
@@ -2004,8 +1751,6 @@ SWAGSolver<use_mes, use_eps>::delete_edge(Job::JobId s,
 	if (this->disaggregate_time) {
 		this->skyline_update_time += skyline_timer.get();
 	}
-
-	this->dbg_verify();
 }
 
 template <bool use_mes, bool use_eps>
@@ -2036,7 +1781,6 @@ SWAGSolver<use_mes, use_eps>::run()
 	this->active_range = this->rsl.get_maximum_range();
 
 	BOOST_LOG(l.d(2)) << "Initialization done.";
-	this->dbg_verify();
 
 	while (this->run_timer.get() < this->timelimit) {
 		this->iteration();
@@ -2130,28 +1874,6 @@ bool
 SWAGSolver<use_mes, use_eps>::iteration_insert_edge(
     bool force_complete) noexcept
 {
-	/*
-	std::cout << "\n==============================================\n\n";
-	std::cout << "Active Range: " << this->active_range << "\n";
-	std::cout << "Active Jobs: ";
-	for (unsigned int jid = 0; jid < this->job_count; ++jid) {
-	  if ((this->earliest_starts[jid] + this->durations[jid] >=
-	       this->active_range.first) &&
-	      (this->earliest_starts[jid] <= this->active_range.second)) {
-	    std::cout << jid << ", ";
-	  }
-	}
-	std::cout << "\n";
-	std::cout << "Earliest Starts: " << this->earliest_starts << "\n";
-	std::cout << "Latest Finishs: " << this->latest_finishs << "\n";
-	std::cout << "Durations: " << this->durations << "\n";
-	std::cout << "BLFs: " << this->base_latest_finishs << "\n";
-	std::cout << "ECands: " << this->candidate_edge_buf << "\n";
-	std::cout << "\n";
-	// this->dbg_print_graph();
-	*/
-	this->dbg_verify_correctly_partially_propagated();
-
 	size_t i = 0;
 
 	if constexpr (use_mes || use_eps) {
@@ -2180,8 +1902,6 @@ SWAGSolver<use_mes, use_eps>::iteration_insert_edge(
 		t = this->candidate_edge_buf.at(i).second;
 	}
 
-	// std::cout << "<< Trying " << s << " -> " << t << ": ";
-
 	bool inserted = false;
 	// Make sure they still overlap
 	if ((this->earliest_starts[s] <
@@ -2190,7 +1910,6 @@ SWAGSolver<use_mes, use_eps>::iteration_insert_edge(
 	     this->earliest_starts[s] + this->durations[s])) {
 
 		// Make sure both jobs are still within the active range
-		// TODO should have some redundancy with the checks above?
 		if ((this->earliest_starts[s] + this->durations[s] >=
 		     this->active_range.first) &&
 		    (this->earliest_starts[s] <= this->active_range.second) &&
@@ -2200,25 +1919,14 @@ SWAGSolver<use_mes, use_eps>::iteration_insert_edge(
 			// Make sure windows still fit
 			// At this point it is *very* important that everything is propagated
 			// properly!
-			this->dbg_verify_correctly_partially_propagated();
 			if (this->earliest_starts[s] + this->durations[s] + this->durations[t] <=
 			    this->latest_finishs[t]) {
-				// std::cout << "Yes!\n";
-
 				this->insert_edge(s, t, force_complete);
 				inserted = true;
 
-				this->dbg_verify_correctly_partially_propagated();
-				this->dbg_verify_limits_during_partial_propagation();
-			} else {
-				// std::cout << "Nope b/c too tight.\n";
-			}
-		} else {
-			// std::cout << "Nope b/c not in active range.\n";
-		}
-	} else {
-		// std::cout << "Nope b/c not overlapping anymore.\n";
-	}
+			} // else: too tight
+		}   // else: not in active range
+	}     // else: not overlapping anymore
 
 	// Remove edge from candidates
 	if constexpr (use_mes || use_eps) {
@@ -2235,30 +1943,28 @@ template <bool use_mes, bool use_eps>
 void
 SWAGSolver<use_mes, use_eps>::dbg_print_adjacencies()
 {
-	// std::cout << "////// Adjacencies ///////\n";
-	// std::cout << "Forward:\n";
+	std::cout << "////// Adjacencies ///////\n";
+	std::cout << "Forward:\n";
 	for (Job::JobId jid = 0; jid < this->job_count; ++jid) {
 		if (!this->adjacency_list[jid].empty()) {
-			// std::cout << "  " << jid << ": ";
+			std::cout << "  " << jid << ": ";
 			for (const auto & edge : this->adjacency_list[jid]) {
-				// std::cout << "(" << edge.t << "/" << edge.rev_index << ") ";
+				std::cout << "(" << edge.t << "/" << edge.rev_index << ") ";
 			}
-			// std::cout << "\n";
+			std::cout << "\n";
 		}
 	}
-	// std::cout << "Reverse:\n";
+	std::cout << "Reverse:\n";
 	for (Job::JobId jid = 0; jid < this->job_count; ++jid) {
 		if (!this->rev_adjacency_list[jid].empty()) {
-			// std::cout << "  " << jid << ": ";
+			std::cout << "  " << jid << ": ";
 			for (const auto & rev_edge : this->rev_adjacency_list[jid]) {
-				// std::cout << "(" << rev_edge.s << "/" << rev_edge.forward_index <<
-				// ")
-				// ";
+				std::cout << "(" << rev_edge.s << "/" << rev_edge.forward_index << ")";
 			}
-			// std::cout << "\n";
+			std::cout << "\n";
 		}
 	}
-	// std::cout << "//////////////////////////\n";
+	std::cout << "//////////////////////////\n";
 }
 
 template <bool use_mes, bool use_eps>
@@ -2319,9 +2025,9 @@ SWAGSolver<use_mes, use_eps>::dbg_verify()
 {
 #ifdef OMG_VERIFY
 	this->dbg_verify_graph();
-	// 	this->dbg_verify_solution()t;
+	this->dbg_verify_solution() t;
 	this->dbg_verify_times();
-	//	this->dbg_verify_cycle_free();
+	this->dbg_verify_cycle_free();
 #endif
 }
 
@@ -2763,6 +2469,8 @@ SWAGSolver::get_solution()
 		return std::get<3>(this->impl).get_solution();
 	default:
 		assert(false);
+		// Just here to remove the warning
+		return std::get<0>(this->impl).get_solution();
 	}
 }
 

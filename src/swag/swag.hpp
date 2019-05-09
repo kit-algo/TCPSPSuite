@@ -1,7 +1,3 @@
-//
-// Created by lukas on 28.06.18.
-//
-
 #ifndef TCPSPSUITE_SWAG_HPP
 #define TCPSPSUITE_SWAG_HPP
 

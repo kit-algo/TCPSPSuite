@@ -18,6 +18,7 @@ void apply_permutation(std::vector<T> & container, const IC & indices)
 	// TODO can we somehow get rid of this this bool vector?
 	std::vector<bool> done(container.size(), false);
 
+	// TODO use moves everywhere!
 	for (unsigned int i = 0 ; i < container.size() ; ++i) {
 		if (done[i]) {
 			continue;

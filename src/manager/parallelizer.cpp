@@ -23,7 +23,6 @@
 #include <numa.h>
 #endif
 
-
 Parallelizer::Parallelizer(Storage & storage_in, std::string run_id_in,
                            Randomizer & randomizer_in)
     : storage(storage_in), run_id(run_id_in), randomizer(randomizer_in),
@@ -52,21 +51,6 @@ Parallelizer::run_in_parallel(const std::vector<std::string> & filenames,
 		                 << cfg->get_partition_number() << " of "
 		                 << cfg->get_partition_count();
 
-		size_t partition_size =
-		    this->remaining_tasks.size() / cfg->get_partition_count();
-		// Correct for integer division error
-		if ((this->remaining_tasks.size() % cfg->get_partition_count()) > 0) {
-			partition_size += 1;
-		}
-
-		auto low_it = this->remaining_tasks.begin() +
-		              (partition_size * cfg->get_partition_number());
-		auto high_it =
-		    this->remaining_tasks.begin() +
-		    std::min<size_t>(
-		        this->remaining_tasks.size(),
-		        (size_t)(partition_size * (cfg->get_partition_number() + 1)));
-
 		auto cmp = [](const auto & lhs, const auto & rhs) {
 			return (std::hash<std::string>{}(lhs.first) ^
 			        std::hash<SolverConfig>{}(lhs.second)) <
@@ -74,9 +58,30 @@ Parallelizer::run_in_parallel(const std::vector<std::string> & filenames,
 			        std::hash<SolverConfig>{}(rhs.second));
 		};
 
+		double partition_size = (double)this->remaining_tasks.size() /
+			(double)cfg->get_partition_count();
+
+		size_t partition_border_low = 
+			(size_t)(std::floor(partition_size * cfg->get_partition_number()));
+		size_t partition_border_high =
+			std::min(
+			         this->remaining_tasks.size(),
+			         (size_t)(std::floor(partition_size * (cfg->get_partition_number() + 1))));
+
+		
+		auto low_it = this->remaining_tasks.begin() + (long)partition_border_low;
 		std::nth_element(this->remaining_tasks.begin(), low_it,
 		                 this->remaining_tasks.end(), cmp);
-		std::nth_element(low_it, high_it, this->remaining_tasks.end(), cmp);
+
+		auto high_it = this->remaining_tasks.begin();
+		if (cfg->get_partition_number().value() ==
+		    cfg->get_partition_count().value() - 1) {
+			// We are the last partition
+			high_it = this->remaining_tasks.end();
+		} else {
+			high_it += (long)partition_border_high;
+			std::nth_element(low_it, high_it, this->remaining_tasks.end(), cmp);
+		}
 
 		std::vector<std::pair<std::string, SolverConfig>> my_partition(low_it,
 		                                                               high_it);

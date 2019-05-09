@@ -24,13 +24,36 @@ The Mixed-Integer Programming solver uses the MIP presented in [1] and [2] to op
   * **2**: Focus on finding and proving better lower bounds.
   * **3**: Focus on showing optimality of the found solutions.
 
+### SWAG
+
 
 
 References
 ----------
+* **ID**: `SWAG v.1.0`
+* **Software Requirements**: None
+* **Instance Requirements**: Only finish-start dependencies, no drain, no window extension, no availability, no overshoot costs
+
+This is the Scheduling with Augmented Graphs (SWAG) algorithm presented in [3]. It is an iterative heuristic
+that reduces peak demand by repeatedly inserting new dependencies between jobs executing concurrently during peak demand.
+
+#### Possible Configuration
+Refer to [3] for the meaning of the parameters **deletions_before_reset**, **deletion_trials**, **complete_propagation_after**, **deletion_max_depth**, **edge_candidate_batchsize** and **deletion_undermove_penalty**.
+
+Other parameters not mentioned in that paper are:
+
+* **disaggregate_time**: Boolean option. Controls whether to write detailed statistics to the database, incurs a small performance penalty.
+
+TODO document scorers
+
 
 [1] Lukas Barth, Nicole Ludwig, Esther Mengelkamp, and Philipp Staudt. 2017. A comprehensive modelling framework for demand side flexibility in smart grids. Computer Science - Research and Development (30 Aug 2017). https://doi.org/10.1007/s00450-017-0343-x
 
 [2] Lukas Barth, Veit Hagenmeyer, Nicole Ludwig, and Dorothea Wagner. 2018.
 How much demand side flexibility do we need? Analyzing where to exploit
 flexibility in industrial processes. In Proceedings of ACM eEnergy Conference (eEnergy’18). ACM, New York, NY, USA, 22 pages.
+
+[3] Lukas Barth and Dorothea Wagner. 2019. Shaving Peaks by Augmenting the
+Dependency Graph. In Proceedings of the Tenth ACM International Conference
+on Future Energy Systems (e-Energy ’19), June 25–28, 2019, Phoenix, AZ,
+USA. ACM, New York, NY, USA, Article 4, 11 pages. https://doi.org/10.1145/3307772.3328298

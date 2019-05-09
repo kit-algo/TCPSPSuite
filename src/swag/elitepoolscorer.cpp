@@ -49,8 +49,8 @@ ElitePoolScorer::ElitePoolScorer(const Instance & instance_in,
 double
 ElitePoolScorer::get_score_for(size_t s, size_t t) const noexcept
 {
-	if (this->solutions_seen <
-	    this->start_factor * this->pool_size) { // TODO set a bool flag
+	if ((double)this->solutions_seen <
+	    this->start_factor * (double)this->pool_size) {
 		return 1.0;
 	}
 
@@ -87,7 +87,7 @@ ElitePoolScorer::iteration(size_t iteration) noexcept
 	/* TODO remove this? */
 	if (iteration % 5000 == 0) {
 		BOOST_LOG(l.d(1)) << "Eviction percentage: "
-		                  << (double)this->num_replaced / this->solutions_seen;
+		                  << (double)this->num_replaced / (double)this->solutions_seen;
 	}
 }
 

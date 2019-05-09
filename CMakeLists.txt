@@ -155,7 +155,7 @@ set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_C_FLAGS}")
 
 set(CMAKE_C_FLAGS_DEBUG "-g -O0 -fno-omit-frame-pointer -Wall -Wextra -pedantic -Wfloat-equal \
 -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings -Wcast-qual \
--Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal -Wswitch-default")
+-Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal")
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG}")
 
 #===============================================

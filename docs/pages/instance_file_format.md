@@ -4,6 +4,8 @@ A TCPSPSuite instance is described by a JSON file. The two most important aspect
 
 In a TCPSP instance, each job is associated with a certain quantity of one or more resources. The job requires these quantities while it is being executed. The **resource** specification in an instance file allows to specify costs for the consumption of resources.
 
+Additionally, an instance has an **id** field uniquely identifying this instance, and may have an **additional** field containing arbitrary key-value mappings. These mappings are not used by TCPSPSuite but may be used to tag instances, for example supply information on how the instance was generated.
+
 Full example
 ------------
 Before listing the possible objects and their attributes, we provide a full (although somewhat minimal) example. This instance consists of three jobs and one resource. Job `0` must be run for 15 time steps between time step 0 and 41 and takes 2.5 units of resource `0` during that time. Job `1` must be run for 2 time steps between time steps 0 and 48, consuming 5 units of resource `0`, and job `2` must be run for 5 time steps between time steps 0 and 56, requiring 10 units of resource `0`. Additionally, job `2` can only be started as soon as job `1` was started, no earlier.
@@ -37,6 +39,9 @@ This is the corresponding instance file:
           "lag": 0
         }
       },
+	  "additional": {
+	    "comment": "This is job nr. 1"
+	  },
       "deadline": 48,
       "release": 0,
       "duration": 2
@@ -53,6 +58,9 @@ This is the corresponding instance file:
     }
   ],
   "id": "minimal test instance",
+  "additional": {
+    "instance_comment": "This is an example instance"
+  },
   "resources": [
     {
       "id": 0,
@@ -115,7 +123,7 @@ Each job has these attributes:
 ```
   Now, the duration extension of job `23` would be computed as above and amount to 25 time steps. However, the `max_recharge` attribute limits the duration extension to 10 time steps, and therefore job `23`'s duration is only extended by 10 time steps.
 
-* **usages**: A map from resource IDs to a number. Every resource defined in the instance must be present. The mapped-to number indicates how much of the resprective resource this job requires during execution. Example:
+* **usages** (Required): A map from resource IDs to a number. Every resource defined in the instance must be present. The mapped-to number indicates how much of the resprective resource this job requires during execution. Example:
 ```json
 {
   "resources": [
@@ -136,10 +144,10 @@ Each job has these attributes:
 ```
   This defines two resources with IDs `0` and `1` (see below for details on resources) and states that job `42` requires one unit of resource `0` and 3.1415 units of resource `1` while executing.
 
-* **release**: The time step that the job can be started at the earliest (if no window extensions are used, see below).
-* **deadline**: The time step at which the job must be finished at the latest (if no window extensions are used, see below).
-* **duration**: The number of time steps that the job must execute consecutively. This time can be extended, e.g. by `drain_factor`s.
-
+* **release** (Required): The time step that the job can be started at the earliest (if no window extensions are used, see below).
+* **deadline** (Required): The time step at which the job must be finished at the latest (if no window extensions are used, see below).
+* **duration** (Required): The number of time steps that the job must execute consecutively. This time can be extended, e.g. by `drain_factor`s.
+* **additional** (Optional): A dictionary with arbitrary key-value mappings. May be used to tag jobs, etc. Solvers ignore the values set here.
 
 Resources
 ---------
