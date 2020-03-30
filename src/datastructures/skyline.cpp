@@ -646,6 +646,7 @@ TreeSkyLineBase<ranged, single_resource>::TreeSkyLineBase(
     const Instance * instance_in)
     : instance(instance_in), nodes(this->instance->job_count())
 {
+	std::cout << "Constructed TSL with " << this->instance->job_count() << " nodes This is at "<< std::hex << reinterpret_cast<size_t>(this) << std::dec << " \n";
   for (size_t jid = 0; jid < this->instance->job_count(); ++jid) {
     if constexpr (!single_resource) {
       nodes[jid].usage = Resources{
@@ -699,6 +700,7 @@ void
 TreeSkyLineBase<ranged, single_resource>::insert_job(Job::JobId jid,
                                                      unsigned int pos) noexcept
 {
+	std::cout << "I have " << this->nodes.size() << " nodes. This is at " << std::hex << reinterpret_cast<size_t>(this) << std::dec << " \n";
   Node & n = this->nodes[jid];
   n.start = pos;
   this->t.insert(n);

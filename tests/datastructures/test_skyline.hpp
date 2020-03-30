@@ -1,7 +1,3 @@
-//
-// Created by lukas on 06.12.17.
-//
-
 #ifndef TCPSPSUITE_TEST_SKYLINE_HPP
 #define TCPSPSUITE_TEST_SKYLINE_HPP
 

@@ -39,9 +39,9 @@ SWAGSolver<use_mes, use_eps>::SWAGSolver(
       deletion_undermove_penalty(3), last_complete_push(0), last_range_check(0),
       adjacency_list(instance_in.job_count()),
       rev_adjacency_list(instance_in.job_count()),
-      rsl((instance.resource_count() > 1)
-              ? ds::SkyLine{ds::RangedTreeSkyLine{&instance}}
-              : ds::SkyLine{ds::SingleRangedTreeSkyLine{&instance}}),
+      rsl((instance_in.resource_count() > 1)
+              ? ds::SkyLine{ds::RangedTreeSkyLine{&instance_in}}
+              : ds::SkyLine{ds::SingleRangedTreeSkyLine{&instance_in}}),
       earliest_starts(instance_in.job_count()),
       latest_finishs(instance_in.job_count()),
       best_score(std::numeric_limits<double>::max()),
@@ -1499,11 +1499,15 @@ SWAGSolver<use_mes, use_eps>::iteration() noexcept
 
 	/* End of bookkeeping */
 	// Periodically push everything through
+	/*
+	 * NOTE: This is not necessary anymore - this is performed by the code at {1}
+	 *
 	if ((this->iteration_count - this->last_complete_push) >=
 	    this->force_complete_push_after) {
-		this->push_es_forward(true, true);
-		this->push_lf_backward(true, true);
+	  this->push_es_forward(true, true);
+	  this->push_lf_backward(true, true);
 	}
+	*/
 
 	// Periodically check if our active range is still okay
 	if ((this->iteration_count - this->last_range_check) >=
@@ -1557,6 +1561,11 @@ SWAGSolver<use_mes, use_eps>::iteration() noexcept
 	// Thus, insert one edge.
 	if ((this->iteration_count - this->last_complete_push) >=
 	    this->force_complete_push_after) {
+		/*
+		 * {1} At this point, we perform the complete push instead of the
+		 * start of the iteration.
+		 */
+
 		// Loop until we could actually insert an edge
 		while (!inserted && (!this->candidate_edge_buf.empty())) {
 			inserted = this->iteration_insert_edge(true);

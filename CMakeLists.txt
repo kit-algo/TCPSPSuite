@@ -61,6 +61,11 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/contrib/dyno/include)
 # Here's where the json header is
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/contrib/json)
 
+# If we're using Ygg's export-sequence feature, we need std::filesystem!
+if (YGG_STORE_SEQUENCE OR YGG_STORE_SEQUENCE_DST)
+	set(LIBS ${LIBS} stdc++fs)
+endif()
+
 # Find ODB
 find_package(ODB
         COMPONENTS sqlite mysql)
@@ -120,7 +125,7 @@ endif(GUROBI_FOUND)
 find_package(CPLEX)
 if (CPLEX_FOUND)
   include_directories(SYSTEM ${CPLEX_INCLUDE_DIRS})
-  set(LIBS ${LIBS} ${CPLEX_LIBRARIES})
+  set(LIBS ${LIBS} ${CPLEX_LIBRARIES} dl)
 endif(CPLEX_FOUND)
 
 # Find PAPI
@@ -166,7 +171,7 @@ set(CMAKE_C_FLAGS_INSTRUMENT "-g -O0 -fno-omit-frame-pointer -Wall -Wextra -peda
 -Wfloat-equal -Wundef -Wshadow -Wpointer-arith -Wcast-align -Wstrict-overflow=5 -Wwrite-strings \
 -Wcast-qual -Wswitch-default -Wswitch-enum -Wconversion -Wunreachable-code -Wfloat-equal \
 -Wswitch-default -fstack-protector -fsanitize=undefined -ftrapv -fno-sanitize-recover \
--fsanitize=address -fsanitize-undefined-trap-on-error")
+-fsanitize=address -fsanitize-undefined-trap-on-error -D_GLIBCXX_ASSERTIONS -D_GLIBCXX_DEBUG_PEDANTIC -D_GLIBCXX_SANITIZE_VECTOR")
 set(CMAKE_CXX_FLAGS_INSTRUMENT "${CMAKE_C_FLAGS_INSTRUMENT}")
 
 #===============================================
@@ -233,6 +238,7 @@ MARK_AS_ADVANCED(
 
 SET(INSTRUMENT_MALLOC "FALSE" CACHE BOOL "Instrument malloc() and related calls to profile memory usage.")
 SET(SOFT_FAIL "FALSE" CACHE BOOL "Try to fail softly whenever possible")
+SET(IGNORE_INCONSISTENT_OBJECTIVE "FALSE" CACHE BOOL "Ignore inconsistent reported objective values.")
 SET(ENABLE_CONSISTENCY_CHECKS "TRUE" CACHE BOOL "Enable consistency checks")
 SET(ENABLE_ASSERTIONS "TRUE" CACHE BOOL "Enable assertions")
 SET(OMG_VERIFY "FALSE" CACHE BOOL "Verify over 9000")
@@ -244,6 +250,10 @@ SET(NUMA_OPTIMIZE "FALSE" CACHE BOOL "Optimize for performance on NUMA enabled s
 SET(TIME_COMPILATION "FALSE" CACHE BOOL "Time individual compilation commands")
 SET(ALLOW_INCREMENTAL_LINKING  "FALSE" CACHE BOOL "Allow incremental linking if possible. May have a slight performance impact.")
 SET(USE_DEFAULT_LINKER  "FALSE" CACHE BOOL "Force the default linker to be used.")
+SET(YGG_STORE_SEQUENCE  "FALSE" CACHE BOOL "ONLY FOR INTERNAL USE.")
+mark_as_advanced(YGG_STORE_SEQUENCE)
+SET(YGG_STORE_SEQUENCE_DST  "FALSE" CACHE BOOL "ONLY FOR INTERNAL USE.")
+mark_as_advanced(YGG_STORE_SEQUENCE_DST)
 
 SET(MAX_DBG_LEVEL 5 CACHE INT "Maximum debug level")
 SET(OPTIMAL_RESOURCE_COUNT 1 CACHE INT "Optimize for this resource count")
@@ -271,7 +281,7 @@ add_subdirectory(src)
 # Optional: Testing
 #
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/tests/")
-    add_subdirectory(tests)
+#    add_subdirectory(tests)
 endif()
 
 set_package_properties(IPOPT PROPERTIES TYPE OPTIONAL PURPOSE "Required for the 'closed form' optimization algorithm")

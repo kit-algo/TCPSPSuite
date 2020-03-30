@@ -78,7 +78,11 @@ message(STATUS "========           Enabled Solvers          ========")
 message(STATUS "=====================================================")
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/state_propagation/")
+	if (${YGG_STORE_SEQUENCE} OR ${YGG_STORE_SEQUENCE_DST})
+		message(WARNING "Not enabling state propagation solver b/c of compatibility problems with YGG_STORE_SEQUENCE!")
+	else()
     add_subdirectory(state_propagation)
+	endif()
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/grasp/")
@@ -90,7 +94,11 @@ if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/peak_meta/")
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/bnb/")
+	if (${YGG_STORE_SEQUENCE} OR ${YGG_STORE_SEQUENCE_DST})
+		message(WARNING "Not enabling BNB solver b/c of compatibility problems with YGG_STORE_SEQUENCE!")
+	else()
     add_subdirectory(bnb)
+	endif()
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/moveheuristic/")

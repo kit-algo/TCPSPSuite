@@ -7,6 +7,7 @@
 #cmakedefine VERIFY_NUMERICS
 #cmakedefine CRASH_ON_CHECK
 #cmakedefine SOFT_FAIL
+#cmakedefine IGNORE_INCONSISTENT_OBJECTIVE
 #cmakedefine CATCH_EXCEPTIONS
 #cmakedefine EXIT_ON_SIGINT
 #cmakedefine INSTRUMENT_MALLOC
@@ -23,6 +24,11 @@
 // DB Backends
 #cmakedefine ODB_SQLITE_FOUND
 #cmakedefine ODB_MYSQL_FOUND
+
+// Way to export BST modification sequences
+#cmakedefine YGG_STORE_SEQUENCE
+// Way to export DST modification sequences
+#cmakedefine YGG_STORE_SEQUENCE_DST
 
 #define Boost_MAJOR_VERSION @Boost_MAJOR_VERSION@
 #define Boost_MINOR_VERSION @Boost_MINOR_VERSION@

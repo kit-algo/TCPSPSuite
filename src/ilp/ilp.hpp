@@ -1,6 +1,7 @@
 #ifndef ILP_HPP
 #define ILP_HPP
 
+#include <chrono>
 #include <iomanip>                                            // for operator<<
 #include <string>                                             // for string
 #include <vector>                                             // for vector
@@ -132,6 +133,9 @@ protected:
 	bool initialize_with_early;
 	bool collect_kappa_stats;
 
+	decltype(std::chrono::high_resolution_clock::now()) prepare_started;
+	decltype(std::chrono::high_resolution_clock::now()) prepare_finished;
+	
   static const Traits required_traits;
 
   AdditionalResultStorage & additional_storage;

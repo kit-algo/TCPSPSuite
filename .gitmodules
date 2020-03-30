@@ -3,7 +3,7 @@
 	url = https://github.com/tinloaf/ygg.git
 [submodule "src/contrib/ilpabstraction"]
 	path = src/contrib/ilpabstraction
-	url = git@i11git.iti.kit.edu:/Mitarbeiter/Lukas-Barth/ilp-abstraction.git
+	url = https://github.com/kit-algo/ilp-abstraction.git
 [submodule "fixed_sparsehash"]
 	path = src/contrib/sparsehash
 	url = https://github.com/tinloaf/sparsehash-c11.git

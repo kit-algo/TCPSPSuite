@@ -9,8 +9,9 @@
 #include "../util/log.hpp"        // for Log
 #include "generated_config.hpp"   // for GUROBI_FOUND
 #include "ilp.hpp"                // for ILPBase
-#include <string>                 // for string
-#include <vector>                 // for vector
+
+#include <string> // for string
+#include <vector> // for vector
 class AdditionalResultStorage;
 class Instance;
 class SolverConfig;
@@ -30,101 +31,119 @@ struct registry_hook;
 template <class SolverT>
 class EBILP : public ILPBase<SolverT> {
 public:
-  EBILP(const Instance & instance, AdditionalResultStorage & additional,
-        const SolverConfig & sconf);
+	EBILP(const Instance & instance, AdditionalResultStorage & additional,
+	      const SolverConfig & sconf);
 
-  void run();
-  static std::string get_id();
+	void run();
+	static std::string get_id();
 
 private:
-  Log l;
+	Log l;
 
-  using Base = ILPBase<SolverT>;
-  using MIPSolver = typename Base::MIPSolver;
-  using Model = typename Base::Model;
-  using Variable = typename Base::Variable;
-  using Expression = typename Base::Expression;
-  using VarType = typename Base::VarType;
-  using ParamType = typename Base::ParamType;
-  using ModelStatus = typename Base::ModelStatus;
-  using Constraint = typename Base::Constraint;
+	using Base = ILPBase<SolverT>;
+	using MIPSolver = typename Base::MIPSolver;
+	using Model = typename Base::Model;
+	using Variable = typename Base::Variable;
+	using Expression = typename Base::Expression;
+	using VarType = typename Base::VarType;
+	using ParamType = typename Base::ParamType;
+	using ModelStatus = typename Base::ModelStatus;
+	using Constraint = typename Base::Constraint;
 
-  /*
-   * Job-Start <=> Event Mapping
-   *
-   * job_start_events[j][a] becomes 1 if and only if job j starts at event a.
-   */
-  std::vector<std::vector<Variable>> job_start_events;
+	/*
+	 * Job-Start <=> Event Mapping
+	 *
+	 * job_start_events[j][a] becomes 1 if and only if job j starts at event
+	 * skip_numbers[j].first + a.
+	 */
+	std::vector<std::vector<Variable>> job_start_events;
 
-  /*
-   * Job-End <=> Event Mapping
-   *
-   * job_end_events[j][a] becomes 1 if and only if job j ends at event a.
-   */
-  std::vector<std::vector<Variable>> job_end_events;
+	/*
+	 * Job-End <=> Event Mapping
+	 *
+	 * job_end_events[j][a] becomes 1 if and only if job j ends at event
+	 * skip_numbers[j].first + a.
+	 */
+	std::vector<std::vector<Variable>> job_end_events;
 
-  /*
-   * event_times[a] is the point in time at which event a happens
-   */
-  std::vector<Variable> event_times;
+	/*
+	 * event_times[a] is the point in time at which event a happens
+	 */
+	std::vector<Variable> event_times;
 
-  /*
-   * end_points[jid] is the time when job jid finishes
-   * TODO a variable should not be necessary here
-   */
-  // std::vector<Variable> end_points;
+	/*
+	 * end_points[jid] is the time when job jid finishes
+	 * TODO a variable should not be necessary here
+	 */
+	// std::vector<Variable> end_points;
 
-  /*
-   * usages_after_event[rid][a] contains the amount of resource <rid> used after
-   * event <a>
-   */
-  // std::vector<std::vector<Variable>> usages_after_event;
+	/*
+	 * usages_after_event[rid][a] contains the amount of resource <rid> used after
+	 * event <a>
+	 */
+	// std::vector<std::vector<Variable>> usages_after_event;
 
-  /*
-   * event_usages[rid][a] holds the amount of resource <rid> used after event
-   * <a>
-   */
-  std::vector<std::vector<Expression>> event_usages;
+	/*
+	 * event_usages[rid][a] holds the amount of resource <rid> used after event
+	 * <a>
+	 */
+	std::vector<std::vector<Expression>> event_usages;
 
-  /* True if we use (and set) the start points in the base ILP
-   */
-  bool start_point_mode;
+	/*
+	 * Skip numbers specify how many of the first and last events
+	 * can be skipped for each job, saving us job_start_events and job_end_events
+	 * variables (and constraints).
+	 *
+	 * The number of jobs that *must* be finished before j (times 2) is the
+	 * number of events to skip in the beginning, the number of jobs that must
+	 * start after j finishes is the number of events to skip in the end.
+	 */
+	std::vector<std::pair<size_t, size_t>> skip_numbers;
+	std::vector<size_t> event_counts;
 
-  /* Set to true if we use a sum trick to enforce "end after start"
-   * for every job. */
-  bool enforce_end_after_start_via_sum;
+	unsigned int max_deadline;
 
-  void prepare_variables();
+	/* True if we use (and set) the start points in the base ILP
+	 */
+	bool start_point_mode;
 
-  /* For now: every job's duration variable is set fixed to its duration */
-  void prepare_duration_constraint();
+	/* Set to true if we use a sum trick to enforce "end after start"
+	 * for every job. */
+	bool enforce_end_after_start_via_sum;
 
-  /* Enforce event ordering. TODO is this necessary? */
-  void prepare_event_constraints();
+	void compute_skip_numbers() noexcept;
 
-  /* Make sure every event is used once, and every job has exactly one start and
-   * end */
-  void prepare_job_event_constraints();
+	void prepare_variables();
 
-  /* Links events and job durations */
-  void prepare_time_constraints();
+	/* For now: every job's duration variable is set fixed to its duration */
+	void prepare_duration_constraint();
 
-  /* Set start_points variables in base ILP */
-  void prepare_start_points_constraints();
+	/* Enforce event ordering. TODO is this necessary? */
+	void prepare_event_constraints();
 
-  /* Prepare realease / deadline constraints (if start points are not used) */
-  void prepare_release_deadline_constraints();
+	/* Make sure every event is used once, and every job has exactly one start and
+	 * end */
+	void prepare_job_event_constraints();
 
-  /* Prepare dependency constraints (if start points are not used) */
-  void prepare_dependency_constraints();
+	/* Links events and job durations */
+	void prepare_time_constraints();
 
-  /* Create event_usages expressions */
-  void prepare_usage_expressions();
+	/* Set start_points variables in base ILP */
+	void prepare_start_points_constraints();
 
-  void prepare();
+	/* Prepare realease / deadline constraints (if start points are not used) */
+	void prepare_release_deadline_constraints();
 
-  /* Only necessary if start points are not used */
-  void create_solution();
+	/* Prepare dependency constraints (if start points are not used) */
+	void prepare_dependency_constraints();
+
+	/* Create event_usages expressions */
+	void prepare_usage_expressions();
+
+	void prepare();
+
+	/* Only necessary if start points are not used */
+	void create_solution();
 };
 
 // Register the solver
@@ -134,15 +153,15 @@ template <>
 struct registry_hook<
     solvers::get_free_N<EBILP<ilpabstraction::GurobiInterface>>()>
 {
-  constexpr static unsigned int my_N =
-      solvers::get_free_N<EBILP<ilpabstraction::GurobiInterface>>();
+	constexpr static unsigned int my_N =
+	    solvers::get_free_N<EBILP<ilpabstraction::GurobiInterface>>();
 
-  auto
-  operator()()
-  {
-    return solvers::register_class<EBILP<ilpabstraction::GurobiInterface>,
-                                   my_N>{}();
-  }
+	auto
+	operator()()
+	{
+		return solvers::register_class<EBILP<ilpabstraction::GurobiInterface>,
+		                               my_N>{}();
+	}
 };
 #endif
 
@@ -151,15 +170,15 @@ template <>
 struct registry_hook<
     solvers::get_free_N<EBILP<ilpabstraction::CPLEXInterface>>()>
 {
-  constexpr static unsigned int my_N =
-      solvers::get_free_N<EBILP<ilpabstraction::CPLEXInterface>>();
+	constexpr static unsigned int my_N =
+	    solvers::get_free_N<EBILP<ilpabstraction::CPLEXInterface>>();
 
-  auto
-  operator()()
-  {
-    return solvers::register_class<EBILP<ilpabstraction::CPLEXInterface>,
-                                   my_N>{}();
-  }
+	auto
+	operator()()
+	{
+		return solvers::register_class<EBILP<ilpabstraction::CPLEXInterface>,
+		                               my_N>{}();
+	}
 };
 #endif
 } // namespace solvers

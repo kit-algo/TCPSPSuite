@@ -26,10 +26,6 @@ The Mixed-Integer Programming solver uses the MIP presented in [1] and [2] to op
 
 ### SWAG
 
-
-
-References
-----------
 * **ID**: `SWAG v.1.0`
 * **Software Requirements**: None
 * **Instance Requirements**: Only finish-start dependencies, no drain, no window extension, no availability, no overshoot costs
@@ -47,6 +43,30 @@ Other parameters not mentioned in that paper are:
 TODO document scorers
 
 
+### GRASP
+
+* **ID**: `GRASP<A,B>`
+  * `A` indicates which method is being used to determine the demand during the algorithm, with the possible values being `array` for a simple time-indexed array implementation and `skyline` for tha dynamic segment tree - based implementation. We recommend `skyline`.
+  * `B` indicates whether the `random` or `sorted` variant of the algorithm is used (cf. [4])
+* **Software Requirements**: None
+* **Instance Requirements**: Only positive lags, no drain, no window extension, no availability, no overshoot costs
+
+This is the Greedy Randomized Adaptive Search Procedure introduced by Petersen et al. [4], a metaheuristic approach.
+
+#### Possible Configuration
+
+* **weightedIterationss**: How many times should the local search (Algorithm 1 in [4]) be executed using the *weighted* selection strategy?
+* **uniformIterations**: How many times should the local search (Algorithm 1 in [4]) be executed using the *uniform* selection strategy?
+* **uniformSelections**: The n in line 1 of Algorithm 2 of [4]. Note that in [4], the authors always use the number of jobs for this value.
+* **weightedSelections**: The n in line 1 of Algorithm 3 of [4]. Note that in [4], the authors always use the number of jobs for this value.
+* **graspSelection**: The m in line 3 of Algorithm 4 resp. line Algorithm 5 in [4].
+* **graspSamples**: The l in Algorithm 4 resp. Algorithm 5 in [4].
+* **resetCount**: Allows to start the algorithm with a clean slate after a certain number of iterations. The global best solution is always preserved.
+
+References
+----------
+
+
 [1] Lukas Barth, Nicole Ludwig, Esther Mengelkamp, and Philipp Staudt. 2017. A comprehensive modelling framework for demand side flexibility in smart grids. Computer Science - Research and Development (30 Aug 2017). https://doi.org/10.1007/s00450-017-0343-x
 
 [2] Lukas Barth, Veit Hagenmeyer, Nicole Ludwig, and Dorothea Wagner. 2018.
@@ -57,3 +77,7 @@ flexibility in industrial processes. In Proceedings of ACM eEnergy Conference (e
 Dependency Graph. In Proceedings of the Tenth ACM International Conference
 on Future Energy Systems (e-Energy ’19), June 25–28, 2019, Phoenix, AZ,
 USA. ACM, New York, NY, USA, Article 4, 11 pages. https://doi.org/10.1145/3307772.3328298
+
+[4] M. K. Petersen, L. H. Hansen, J. Bendtsen, K. Edlund, and J. Stoustrup, 
+“Heuristic Optimization for the Discrete Virtual Power Plant Dispatch Problem,” 
+IEEE Transactions on Smart Grid, vol. 5, no. 6, pp. 2910–2918, Nov. 2014.
