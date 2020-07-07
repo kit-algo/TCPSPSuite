@@ -102,10 +102,32 @@ $(function() {
 <li><b>disaggregate_time</b>: Boolean option. Controls whether to write detailed statistics to the database, incurs a small performance penalty.</li>
 </ul>
 <p>TODO document scorers</p>
+<h3>GRASP</h3>
+<ul>
+<li><b>ID</b>: <code>GRASP&lt;A,B&gt;</code><ul>
+<li><code>A</code> indicates which method is being used to determine the demand during the algorithm, with the possible values being <code>array</code> for a simple time-indexed array implementation and <code>skyline</code> for tha dynamic segment tree - based implementation. We recommend <code>skyline</code>.</li>
+<li><code>B</code> indicates whether the <code>random</code> or <code>sorted</code> variant of the algorithm is used (cf. [4])</li>
+</ul>
+</li>
+<li><b>Software Requirements</b>: None</li>
+<li><b><a class="el" href="classInstance.html" title="a TCPSP instance ">Instance</a> Requirements</b>: Only positive lags, no drain, no window extension, no availability, no overshoot costs</li>
+</ul>
+<p>This is the Greedy Randomized Adaptive Search Procedure introduced by Petersen et al. [4], a metaheuristic approach.</p>
+<h4>Possible Configuration</h4>
+<ul>
+<li><b>weightedIterationss</b>: How many times should the local search (Algorithm 1 in [4]) be executed using the <em>weighted</em> selection strategy?</li>
+<li><b>uniformIterations</b>: How many times should the local search (Algorithm 1 in [4]) be executed using the <em>uniform</em> selection strategy?</li>
+<li><b>uniformSelections</b>: The n in line 1 of Algorithm 2 of [4]. Note that in [4], the authors always use the number of jobs for this value.</li>
+<li><b>weightedSelections</b>: The n in line 1 of Algorithm 3 of [4]. Note that in [4], the authors always use the number of jobs for this value.</li>
+<li><b>graspSelection</b>: The m in line 3 of Algorithm 4 resp. line Algorithm 5 in [4].</li>
+<li><b>graspSamples</b>: The l in Algorithm 4 resp. Algorithm 5 in [4].</li>
+<li><b>resetCount</b>: Allows to start the algorithm with a clean slate after a certain number of iterations. The global best solution is always preserved.</li>
+</ul>
 <h2>References </h2>
 <p>[1] Lukas Barth, Nicole Ludwig, Esther Mengelkamp, and Philipp Staudt. 2017. A comprehensive modelling framework for demand side flexibility in smart grids. Computer Science - Research and Development (30 Aug 2017). <a href="https://doi.org/10.1007/s00450-017-0343-x">https://doi.org/10.1007/s00450-017-0343-x</a></p>
 <p>[2] Lukas Barth, Veit Hagenmeyer, Nicole Ludwig, and Dorothea Wagner. 2018. How much demand side flexibility do we need? Analyzing where to exploit flexibility in industrial processes. In Proceedings of ACM eEnergy Conference (eEnergy’18). ACM, New York, NY, USA, 22 pages.</p>
-<p>[3] Lukas Barth and Dorothea Wagner. 2019. Shaving Peaks by Augmenting the Dependency Graph. In Proceedings of the Tenth ACM International Conference on Future Energy Systems (e-Energy ’19), June 25–28, 2019, Phoenix, AZ, USA. ACM, New York, NY, USA, Article 4, 11 pages. <a href="https://doi.org/10.1145/3307772.3328298">https://doi.org/10.1145/3307772.3328298</a> </p>
+<p>[3] Lukas Barth and Dorothea Wagner. 2019. Shaving Peaks by Augmenting the Dependency Graph. In Proceedings of the Tenth ACM International Conference on Future Energy Systems (e-Energy ’19), June 25–28, 2019, Phoenix, AZ, USA. ACM, New York, NY, USA, Article 4, 11 pages. <a href="https://doi.org/10.1145/3307772.3328298">https://doi.org/10.1145/3307772.3328298</a></p>
+<p>[4] M. K. Petersen, L. H. Hansen, J. Bendtsen, K. Edlund, and J. Stoustrup, “Heuristic Optimization for the Discrete Virtual Power Plant Dispatch Problem,” IEEE Transactions on Smart Grid, vol. 5, no. 6, pp. 2910–2918, Nov. 2014. </p>
 </div></div><!-- contents -->
 <!-- start footer part -->
 <hr class="footer"/><address class="footer"><small>
