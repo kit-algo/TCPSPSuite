@@ -1,4 +1,3 @@
-
 #include "main.hpp"
 
 #include "contrib/tinydir.h"        // for tinydir_next
@@ -32,7 +31,6 @@
 #include <ilconcert/ilosys.h>
 #endif
 
-
 #define BACKTRACE_SIZE 20
 void * backtrace_buffer[BACKTRACE_SIZE];
 
@@ -62,116 +60,6 @@ has_cmd_option(char ** begin, char ** end, const std::string & option)
 }
 
 void
-print_help()
-{
-	std::cout << "Usage: tcpsp -s <storage> [ -f <instance file> | -d <instance "
-	             "directory> ] OPTIONS \n";
-	std::cout << "\n";
-	std::cout << "At least three options are mandatory:\n\n";
-	std::cout << "  -s <storage>: Specifies the path to a sqlite3 database which "
-	             "will store\n";
-	std::cout << "                the results of the computations. The database "
-	             "will be created\n";
-	std::cout << "                if it does not exist.\n";
-	std::cout << "\n";
-	std::cout << "  -d <instance directory>\n";
-	std::cout
-	    << "              : Specifies the path to a directory containing JSON\n";
-	std::cout
-	    << "                instance files. The directory will be recursively\n";
-	std::cout << "                scanned for JSON files. All instances found "
-	             "will be\n";
-	std::cout << "                computed on one after the other. May not be "
-	             "specified\n";
-	std::cout << "                if the -f option (see below) is used.\n";
-	std::cout << "\n";
-	std::cout << "  -f <instance file>\n";
-	std::cout << "              : Specifies the path to a single JSON instance "
-	             "file. Only this\n";
-	std::cout << "                instance will be solved. May not be used if -d "
-	             "is used.\n";
-	std::cout << "\n";
-	std::cout << "  -c <algorithm config file>\n";
-	std::cout << "              : Specifies the path to a single JSON algorithm "
-	             "configuration\n";
-	std::cout << "                file. This may not be used in conjunction with "
-	             "-a. All algorithms\n";
-	std::cout << "                specified in the config file will be executed "
-	             "on all instances with the\n";
-	std::cout << "                specified configurations.\n";
-	std::cout << "\n";
-	std::cout << "  -a <algorithm regexp>\n";
-	std::cout << "              : Specifies a regular expression to match "
-	             "against the algorithm IDs. All\n";
-	std::cout << "                matching algorithms will be executed on all "
-	             "instances. The algorithms\n";
-	std::cout << "                must be configured with the optional "
-	             "parameters below. This may not be used\n";
-	std::cout << "                in conjunction with -c.\n";
-	std::cout << "\n\n";
-	std::cout << "Additionally, there are optional parameters: \n\n";
-	std::cout << "  -l <seconds>: Limits the maximum computation time to "
-	             "<seconds> seconds. After \n";
-	std::cout << "                that time, all solvers will be asked to quit. "
-	             "If -c is used, the per-algorithm\n";
-	std::cout << "                time limit supersedes this option.\n";
-	std::cout << "\n";
-	std::cout << "  -t <count>  : Sets the number of threads that solvers should "
-	             "use, if they can use multithreading. \n";
-	std::cout << "                Defaults to 1.\n";
-	std::cout << "\n";
-	std::cout << "  -r <run ID> : Sets the run ID, which may be any string. This "
-	             "string can then later \n";
-	std::cout << "                be used to associate the results with a "
-	             "specific run.\n";
-	std::cout << "\n";
-	std::cout << "  -u          : Asks the software to compute only results "
-	             "which are not yet in the database. \n";
-	std::cout << "                An instance / solver combination is skipped if "
-	             "this combination was already\n";
-	std::cout << "                computed for the specified run (see -r).\n";
-	std::cout << "\n";
-	std::cout << "  -i <seed>   : Forces the 'instance seed' to be <seed>. Note "
-	             "that if you use this in combination\n";
-	std::cout << "                with -d (see above), all found instances will "
-	             "be computed with the exact same seed!\n";
-	std::cout << "                This is useful for reproducing specific "
-	             "results. If -c is used, the per-algorithm\n";
-	std::cout << "                instance seed may supersede this option.\n";
-	std::cout << "\n";
-	std::cout << "  -g <seed>   : Forces the 'global seed' to be <seed>. All "
-	             "instance seeds are generated from this global\n";
-	std::cout << "                seed. This is useful to deterministically "
-	             "reproduce a whole run of the suite.\n";
-	std::cout << "\n";
-	std::cout << "  -o <logdir> : Sets <logdir> as path to the log directory. If "
-	             "this is given, the suite will write a \n";
-	std::cout << "                separate log for every solver run into this "
-	             "directory.\n";
-	std::cout << "\n";
-	std::cout << "  -x <resdir> : Sets <resdir> as path to the result dump "
-	             "directory. If this is given, the suite will write a \n";
-	std::cout << "                separate JSON file for every algorithm run on "
-	             "every instance, dumping the result in JSON format.\n";
-	std::cout << "\n\nExamples:\n\n";
-	std::cout << " Read all instances from /tmp/instances, write results to "
-	             "/tmp/db.sqlite:\n";
-	std::cout << "   > tcpspsuite -d /tmp/instances -s /tmp/db.sdlite\n";
-	std::cout << "\n";
-	std::cout << " Read a single instance from /tmp/instance.json, write results "
-	             "to /tmp/db.sqlite, name the run 'testrun':\n";
-	std::cout
-	    << "   > tcpspsuite -f /tmp/instance.json -s /tmp/db.sdlite -r testrun\n";
-	std::cout << "\n";
-	std::cout << " Read all instances from /tmp/instances, write results to "
-	             "/tmp/db.sqlite, stop solving after 15 minutes and do\n";
-	std::cout << " not duplicate results:\n";
-	std::cout
-	    << "   > tcpspsuite -d /tmp/instances -s /tmp/db.sdlite -l 900 -u\n";
-	std::cout << "\n";
-}
-
-void
 handle_uncaught()
 {
 	std::cout << std::flush;
@@ -182,7 +70,8 @@ handle_uncaught()
 	try {
 		std::rethrow_exception(exc);
 	} catch (const ArgumentException &) {
-		print_help();
+		std::cerr << "Illegal argument. Please run tcpspsuite --help to see a "
+		             "description of possible arguments.\n";
 		exit(-1);
 	} catch (...) {
 		// do nothing
@@ -201,6 +90,7 @@ handle_uncaught()
 		std::cout << e.what() << '\n';
 	}
 	// TODO move this to ilp.cpp
+
 #if defined(GUROBI_FOUND)
 	catch (const GRBException & e) {
 		std::cout << e.getMessage() << '\n';

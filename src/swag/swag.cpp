@@ -39,9 +39,9 @@ SWAGSolver<use_mes, use_eps>::SWAGSolver(
       deletion_undermove_penalty(3), last_complete_push(0), last_range_check(0),
       adjacency_list(instance_in.job_count()),
       rev_adjacency_list(instance_in.job_count()),
-      rsl((instance_in.resource_count() > 1)
-              ? ds::SkyLine{ds::RangedTreeSkyLine{&instance_in}}
-              : ds::SkyLine{ds::SingleRangedTreeSkyLine{&instance_in}}),
+      rsl((instance.resource_count() > 1)
+              ? ds::SkyLine{ds::RangedTreeSkyLine{&instance}}
+              : ds::SkyLine{ds::SingleRangedTreeSkyLine{&instance}}),
       earliest_starts(instance_in.job_count()),
       latest_finishs(instance_in.job_count()),
       best_score(std::numeric_limits<double>::max()),

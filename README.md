@@ -61,7 +61,26 @@ This will take a couple of minutes.
 Running
 -------
 
-If you run it without any arguments, it will print a usage help.
+If you run it without any arguments, it will print a usage help. To select which solvers should be run on your instances, you need to create a [solver configuration file](https://kit-algo.github.io/TCPSPSuite/solver_configurations.html). An example is provided in the example folder.
+
+TCPSPSuite needs at least two arguments to be run: A (sqlite3) file in which to store the results and an instance file or a directory in which to look for instance files. A simple invocation could therefore be:
+
+```
+tcpspsuite -s /path/to/storage.sqlite3 -f /path/to/my/instance.json
+```
+
+Or, if you want to solve all instances in a directory:
+
+```
+tcpspsuite -s /path/to/storage.sqlite3 -d /path/to/my/instance/directory
+```
+
+Let's add a solver configuration file:
+
+```
+tcpspsuite -s /path/to/storage.sqlite3 -d /path/to/my/instance/directory -c /path/to/the/solver/config.json
+```
+
 
 Getting Help
 ------------

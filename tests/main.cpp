@@ -12,7 +12,6 @@
 //#include "state_propagation/test_sp.hpp"
 //#include "state_propagation/test_propagator.hpp"
 #include "datastructures/test_intrusive_shared_ptr_pool.hpp"
-#include "datastructures/test_overlapping_jobs_generator.hpp"
 
 #if defined(GUROBI_FOUND)
 #include "ilp/test_ilp.hpp"

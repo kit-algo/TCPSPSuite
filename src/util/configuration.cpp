@@ -3,9 +3,11 @@
 //
 
 #include "configuration.hpp"
-#include "../datastructures/maybe.hpp"             // for Maybe
-#include "log.hpp"                                 // for Log
-#include "solverconfig.hpp"                        // for SolverConfig
+
+#include "../datastructures/maybe.hpp" // for Maybe
+#include "log.hpp"                     // for Log
+#include "solverconfig.hpp"            // for SolverConfig
+
 #include <boost/lexical_cast/bad_lexical_cast.hpp> // for bad_lexic...
 #include <boost/program_options.hpp>
 #include <fstream>  // for operator<<
@@ -52,14 +54,12 @@ Configuration::parse_cmdline(int argc, const char ** argv)
                     "<num> seconds. After that time, all solvers will be asked to quit. If -c is "
                     "used, the per-algorithm time limit supersedes this option.")
     ("memory-metrics,m", "Enables memory metrics, either via sampling RSS and DATA sizes or (if TCPSPSuite "
-                    "was compiled with INSTRUMENT_MALLOC) via malloc() instrumentation. If -c is "
-	            "used, the per-algorithm time limit supersedes this option.")
+     "was compiled with INSTRUMENT_MALLOC) via malloc() instrumentation.")
     ("memory-sampling-time", po::value<unsigned int>(), "Sets the time interval (in milliseconds) between "
      		    "two samplings of the DATA and RSS sizes. This is only meaningful if -m is active TCPSPSuite was "
-     		    "not compiled with INSTRUMENT_MALLOC. If -c is used, the per-algorithm time limit supersedes this option.")
+     "not compiled with INSTRUMENT_MALLOC.")
     ("papi-metrics", po::value<std::string>(), "PAPI metrics that should be collected, comma separated. If you have"
-     		    "papi-tools installed, the papi_avail binary will tell you which metrics are available on your system. "
-     		    "If -c is used, the per-algorithm time limit supersedes this option.")
+     "papi-tools installed, the papi_avail binary will tell you which metrics are available on your system. ")
     ("threads,t", po::value<unsigned int>(), "Sets the number of threads that solvers should "
                     "use, if they can use multithreading. Defaults to 1. If -c is used, the per-algortihm"
                     " thread option supersedes this option. Note that when using the parallel option, "
@@ -107,6 +107,13 @@ Configuration::parse_cmdline(int argc, const char ** argv)
 	po::notify(vm);
 
 	if (vm.count("help")) {
+		std::cout << desc << "\n";
+		return false;
+	}
+
+	if (argc == 1) {
+		std::cout << "\n\nERROR: You need to specify at least a storage file and "
+		             "some instance!\n\n";
 		std::cout << desc << "\n";
 		return false;
 	}
@@ -208,7 +215,7 @@ Configuration::parse_cmdline(int argc, const char ** argv)
 	if (vm.count("thread-check-time")) {
 		this->thread_check_time = vm["thread-check-time"].as<double>();
 	}
-	
+
 	if (this->partition_count.valid() != this->partition_number.valid()) {
 		BOOST_LOG(l.e())
 		    << "You must set both --partition-count and --partition-number!";

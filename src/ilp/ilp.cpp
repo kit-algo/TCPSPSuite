@@ -15,9 +15,8 @@
 #include "../util/solverconfig.hpp"
 #include "generated_config.hpp" // for DOUBLE_DELTA
 
-#include <algorithm> // for max, min
-#include <assert.h>  // for assert
-#include <chrono>
+#include <algorithm>          // for max, min
+#include <assert.h>           // for assert
 #include <ext/alloc_traits.h> // for __alloc_tra...
 #include <functional>         // for function
 #include <limits>             // for numeric_limits
@@ -43,8 +42,7 @@ ILPBase<SolverT>::ILPBase(const Instance & instance_in,
 {
 	this->seed = sconf.get_seed();
 	if (sconf.get_time_limit().valid()) {
-		this->timelimit =
-		    static_cast<int>(sconf.get_time_limit()); // TODO refactor this
+		this->timelimit = (int)sconf.get_time_limit(); // TODO refactor this
 	}
 
 	if (sconf.has_config("initialize_with_early")) {
@@ -105,8 +103,8 @@ ILPBase<SolverT>::compute_values()
 	// Adjust for possible deadline extension
 	this->latest_deadline += this->instance.get_window_extension_limit();
 	this->earliest_release = (unsigned int)std::max(
-	    0, static_cast<int>(this->earliest_release) -
-	           static_cast<int>(this->instance.get_window_extension_limit()));
+	    0, (int)this->earliest_release -
+	           (int)this->instance.get_window_extension_limit());
 }
 
 template <class SolverT>
@@ -203,7 +201,7 @@ ILPBase<SolverT>::base_run()
 	    Maybe<unsigned int>(),
 	    Maybe<double>(),
 	    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-	    {static_cast<int>(num_vars)}};
+	    {(int)num_vars}};
 	this->additional_storage.extended_measures.push_back(em_vars);
 
 	AdditionalResultStorage::ExtendedMeasure em_constr{
@@ -211,7 +209,7 @@ ILPBase<SolverT>::base_run()
 	    Maybe<unsigned int>(),
 	    Maybe<double>(),
 	    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-	    {static_cast<int>(num_constr)}};
+	    {(int)num_constr}};
 	this->additional_storage.extended_measures.push_back(em_constr);
 
 	AdditionalResultStorage::ExtendedMeasure em_nzs{
@@ -219,20 +217,8 @@ ILPBase<SolverT>::base_run()
 	    Maybe<unsigned int>(),
 	    Maybe<double>(),
 	    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-	    {static_cast<int>(num_nzs)}};
+	    {(int)num_nzs}};
 	this->additional_storage.extended_measures.push_back(em_nzs);
-
-	auto model_build_time = this->prepare_finished - this->prepare_started;
-	AdditionalResultStorage::ExtendedMeasure em_mbt{
-	    "MODEL_BUILD_TIME_ms",
-	    Maybe<unsigned int>(),
-	    Maybe<double>(),
-	    AdditionalResultStorage::ExtendedMeasure::TYPE_DOUBLE,
-	    {static_cast<double>(
-	        std::chrono::duration_cast<std::chrono::milliseconds>(
-	            model_build_time)
-	            .count())}};
-	this->additional_storage.extended_measures.push_back(em_mbt);
 
 	Maybe<unsigned int> time_limit;
 	if (this->timelimit > 0) {
@@ -255,7 +241,7 @@ ILPBase<SolverT>::base_run()
 			    Maybe<unsigned int>(),
 			    Maybe<double>(),
 			    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-			    {static_cast<int>(stats.stable.value_or(-1))}};
+			    {static_cast<int>(stats.stable.value_or(-1.0))}};
 			this->additional_storage.extended_measures.push_back(em_stable);
 
 			AdditionalResultStorage::ExtendedMeasure em_suspicious{
@@ -263,7 +249,7 @@ ILPBase<SolverT>::base_run()
 			    Maybe<unsigned int>(),
 			    Maybe<double>(),
 			    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-			    {static_cast<int>(stats.suspicious.value_or(-1))}};
+			    {static_cast<int>(stats.suspicious.value_or(-1.0))}};
 			this->additional_storage.extended_measures.push_back(em_suspicious);
 
 			AdditionalResultStorage::ExtendedMeasure em_unstable{
@@ -271,7 +257,7 @@ ILPBase<SolverT>::base_run()
 			    Maybe<unsigned int>(),
 			    Maybe<double>(),
 			    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-			    {static_cast<int>(stats.unstable.value_or(-1))}};
+			    {static_cast<int>(stats.unstable.value_or(-1.0))}};
 			this->additional_storage.extended_measures.push_back(em_unstable);
 
 			AdditionalResultStorage::ExtendedMeasure em_illposed{
@@ -279,7 +265,7 @@ ILPBase<SolverT>::base_run()
 			    Maybe<unsigned int>(),
 			    Maybe<double>(),
 			    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-			    {static_cast<int>(stats.illposed.value_or(-1))}};
+			    {static_cast<int>(stats.illposed.value_or(-1.0))}};
 			this->additional_storage.extended_measures.push_back(em_illposed);
 
 			AdditionalResultStorage::ExtendedMeasure em_kappamax{
@@ -287,7 +273,7 @@ ILPBase<SolverT>::base_run()
 			    Maybe<unsigned int>(),
 			    Maybe<double>(),
 			    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-			    {static_cast<int>(stats.kappamax.value_or(-1))}};
+			    {static_cast<int>(stats.kappamax.value_or(-1.0))}};
 			this->additional_storage.extended_measures.push_back(em_kappamax);
 
 			AdditionalResultStorage::ExtendedMeasure em_kappaattention{
@@ -295,7 +281,7 @@ ILPBase<SolverT>::base_run()
 			    Maybe<unsigned int>(),
 			    Maybe<double>(),
 			    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-			    {static_cast<int>(stats.attention.value_or(-1))}};
+			    {static_cast<int>(stats.attention.value_or(-1.0))}};
 			this->additional_storage.extended_measures.push_back(em_kappaattention);
 		}
 	}
@@ -310,8 +296,6 @@ ILPBase<SolverT>::prepare_pre()
 	this->model.set_param(ParamType::SEED, this->seed);
 
 	if (Configuration::get()->get_threads().valid()) {
-		BOOST_LOG(l.d(1)) << "Setting thread count to "
-		                  << Configuration::get()->get_threads().value();
 		this->model.set_param(ParamType::THREADS,
 		                      Configuration::get()->get_threads().value());
 	}
@@ -347,8 +331,6 @@ ILPBase<SolverT>::prepare_pre()
 		}
 	}
 
-	this->prepare_started = std::chrono::high_resolution_clock::now();
-
 	BOOST_LOG(l.d()) << "Preparing Base Variables";
 	this->prepare_base_variables();
 
@@ -366,13 +348,13 @@ ILPBase<SolverT>::generate_vars_start_points()
 
 	for (unsigned int i = 0; i < this->instance.job_count(); i++) {
 		const Job & job = this->instance.get_job(i);
-		int earliest_start_with_extension = std::max(
-		    (static_cast<int>(job.get_release()) -
-		     static_cast<int>(this->instance.get_window_extension_limit())),
-		    0);
+		int earliest_start_with_extension =
+		    std::max(((int)job.get_release() -
+		              (int)this->instance.get_window_extension_limit()),
+		             0);
 		int latest_finish_with_extension =
-		    static_cast<int>(job.get_deadline()) +
-		    static_cast<int>(this->instance.get_window_extension_limit());
+		    (int)job.get_deadline() +
+		    (int)this->instance.get_window_extension_limit();
 
 		// Start points
 		this->start_points[i] = this->model.add_var(
@@ -438,8 +420,6 @@ ILPBase<SolverT>::prepare_post()
 	this->prepare_edge_constraints();
 	BOOST_LOG(l.d()) << "Preparing Objective";
 	this->prepare_objective();
-
-	this->prepare_finished = std::chrono::high_resolution_clock::now();
 }
 
 template <class SolverT>
@@ -480,8 +460,7 @@ ILPBase<SolverT>::solve(Maybe<unsigned int> time_limit)
 
 	if (time_limit.valid()) {
 		BOOST_LOG(l.d(3)) << "Setting time limit: " << time_limit.value();
-		this->model.set_param(ParamType::TIME_LIMIT,
-		                      static_cast<int>(time_limit.value()));
+		this->model.set_param(ParamType::TIME_LIMIT, (int)time_limit.value());
 	} else {
 		BOOST_LOG(l.d(3)) << "Running without time limit.";
 		// this->model.set_param(ParamType::TIME_LIMIT,
@@ -501,11 +480,6 @@ ILPBase<SolverT>::solve(Maybe<unsigned int> time_limit)
 		break;
 	case ModelStatus::INFEASIBLE:
 		BOOST_LOG(l.e()) << "Model is infeasible!.";
-		if constexpr (decltype(this->env)::features()
-		                  .template has_feature<MIPFeatures::IIS>()) {
-			BOOST_LOG(l.w()) << "Writing IIS to /tmp/tcpspsuite_iis.ilp";
-			this->model.write_iis("/tmp/tcpspsuite_iis");
-		}
 		break;
 	case ModelStatus::UNBOUNDED:
 		BOOST_LOG(l.e()) << "Model is unbounded!.";
