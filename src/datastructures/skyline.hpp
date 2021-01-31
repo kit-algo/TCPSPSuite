@@ -9,6 +9,7 @@
 #include "../instance/job.hpp"                                  // for Job
 #include "../instance/resource.hpp"                             // for Resources
 #include "../util/template_magic.hpp" // for Optiona...
+#include "generated_config.hpp"
 
 #include <boost/container/flat_set.hpp> // for flat_set
 #include <boost/hana.hpp>               // for hana
@@ -187,6 +188,25 @@ private:
 	using MaxCombiner = typename decltype(compute_combiner_type())::type;
 	using Combiners = ygg::CombinerPack<unsigned int, ValueType, MaxCombiner>;
 
+#ifdef YGG_STORE_SEQUENCE_DST
+	class SequenceInterface {
+	public:
+		using ValueT = ValueType;
+
+		template <class Node>
+		static ValueT
+		get_value(const Node & n)
+		{
+			return n.usage;
+		}
+	};
+	using TreeOptions = ygg::TreeOptions<
+	    ygg::TreeFlags::MULTIPLE, ygg::TreeFlags::CONSTANT_TIME_SIZE,
+	    ygg::TreeFlags::template BENCHMARK_SEQUENCE_INTERFACE<SequenceInterface>>;
+#else
+	using TreeOptions = ygg::DefaultOptions;
+#endif
+
 	class Node
 	    : public ygg::DynSegTreeNodeBase<unsigned int, ValueType, ValueType,
 	                                     Combiners, ygg::UseDefaultZipTree> {
@@ -204,7 +224,7 @@ private:
 		static const ValueType & get_value(const Node & job);
 	};
 	using Tree = ygg::DynamicSegmentTree<Node, JobNodeTraits, Combiners,
-	                                     ygg::DefaultOptions, ygg::UseDefaultZipTree>;
+	                                     TreeOptions, ygg::UseDefaultZipTree>;
 	Tree t;
 
 public:

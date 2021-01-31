@@ -4,7 +4,18 @@
 
 #include "storage.hpp"
 
+#include "../instance/instance.hpp"
+#include "../manager/errors.hpp"
+#include "../util/fault_codes.hpp"
+#include "../util/git.hpp"
+#include "../util/solverconfig.hpp"
+#include "db_factory.hpp"
+#include "db_objects-odb-sqlite.hxx"
+#include "db_objects-odb.hxx"
+#include "generated_config.hpp"
+
 #include <boost/asio/ip/host_name.hpp>
+#include <chrono>
 #include <ctime>
 #include <odb/exceptions.hxx>
 #include <odb/schema-catalog.hxx>
@@ -12,19 +23,6 @@
 #include <odb/sqlite/database.hxx>
 #include <odb/transaction.hxx>
 #include <sstream>
-#include <chrono>
-
-#include "generated_config.hpp"
-
-#include "db_objects-odb-sqlite.hxx"
-#include "db_objects-odb.hxx"
-
-#include "../instance/instance.hpp"
-#include "../manager/errors.hpp"
-#include "../util/fault_codes.hpp"
-#include "../util/git.hpp"
-#include "../util/solverconfig.hpp"
-#include "db_factory.hpp"
 
 template <class T>
 std::string
@@ -349,11 +347,11 @@ Storage::check_error(std::vector<int> error_ids, std::vector<int> fault_codes,
 	BOOST_LOG(l.d(1)) << "Checking for error";
 
 	// ODB *should* handle locking
-	//std::lock_guard<std::mutex> guard(Storage::check_error_mutex);
+	// std::lock_guard<std::mutex> guard(Storage::check_error_mutex);
 
 	// TODO FIXME TMP
-	//BOOST_LOG(l.d(1)) << "Got the lock.";
-	
+	// BOOST_LOG(l.d(1)) << "Got the lock.";
+
 	for (unsigned int trial = 0; trial < this->retry_count; ++trial) {
 		try {
 			odb::transaction t(this->db->begin());
@@ -548,8 +546,8 @@ Storage::get_solverconfig(const SolverConfig & sc)
 	}
 
 	// TODO FIXME After merging, this seems to be broken?
-	//assert(dbcfg_ids.size() == 1);
-	
+	// assert(dbcfg_ids.size() == 1);
+
 	using query = odb::query<DBConfig>;
 	auto r = this->db->query<DBConfig>(query::id == query::_val(dbcfg_ids[0]));
 
@@ -583,8 +581,9 @@ Storage::get_results_for_config(const SolverConfig & sc)
 
 			return ret;
 		} catch (odb::recoverable & recoverable) {
-			BOOST_LOG(l.w()) << "Database get_results_for_config() operation failed. Try "
-			                 << (trial + 1) << "...";
+			BOOST_LOG(l.w())
+			    << "Database get_results_for_config() operation failed. Try "
+			    << (trial + 1) << "...";
 			BOOST_LOG(l.w()) << "Error message: " << recoverable.what();
 			std::this_thread::sleep_for(std::chrono::seconds(1));
 			continue;

@@ -47,8 +47,10 @@ Selector::run_all(const Instance & instance, const SolverConfig & solver_cfg)
 #ifdef GUROBI_FOUND
 			catch (GRBException & grb_ex) {
 				if (grb_ex.getErrorCode() == GRB_ERROR_OUT_OF_MEMORY) {
+					BOOST_LOG(l.w()) << "Gurobi went out of memory!";
 					bad_alloc = true;
 				} else {
+					BOOST_LOG(l.e()) << "Gurobi error: " << grb_ex.getMessage() << "\n";
 					throw;
 				}
 			}

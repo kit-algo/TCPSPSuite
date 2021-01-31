@@ -12,13 +12,23 @@ set(SOURCES instance/instance.cpp instance/job.cpp instance/resource.cpp
 				manager/parallelizer.cpp util/log.cpp
 				util/autotuneconfig.cpp util/parameter.cpp
         db/storage.cpp db/db_objects.cpp db/db_objects-odb.cxx
-        manager/memoryinfo.cpp util/thread_checker.cpp)
+        manager/memoryinfo.cpp util/thread_checker.cpp datastructures/overlapping_jobs_generator.cpp)
+			
+
+# The db objects are outside of our control, so we disable warnings for them
+set_source_files_properties(db/db_objects-odb.cxx PROPERTIES COMPILE_FLAGS -w)
+# ODB uses a lot of explicitly instantiated templates not visible in the respective translation units
+set_source_files_properties(db/storage.cpp PROPERTIES COMPILE_FLAGS -Wno-undefined-var-template)
 
 if (${ODB_SQLITE_FOUND})
    set(SOURCES ${SOURCES} db/db_objects-odb-sqlite.cxx db/db_objects-schema-sqlite.cxx)
+	 set_source_files_properties(db/db_objects-odb-sqlite.cxx PROPERTIES COMPILE_FLAGS -w)
+	 set_source_files_properties(db/db_objects-schema-sqlite.cxx PROPERTIES COMPILE_FLAGS -w)
 endif()
 if (${ODB_MYSQL_FOUND})
    set(SOURCES ${SOURCES} db/db_objects-odb-mysql.cxx db/db_objects-schema-mysql.cxx)
+	 set_source_files_properties(db/db_objects-odb-mysql.cxx PROPERTIES COMPILE_FLAGS -w)
+	 set_source_files_properties(db/db_objects-schema-mysql.cxx PROPERTIES COMPILE_FLAGS -w)
 endif()
 
 if (INSTRUMENT_MALLOC)
@@ -78,7 +88,11 @@ message(STATUS "========           Enabled Solvers          ========")
 message(STATUS "=====================================================")
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/state_propagation/")
+	if (${YGG_STORE_SEQUENCE} OR ${YGG_STORE_SEQUENCE_DST})
+		message(WARNING "Not enabling state propagation solver b/c of compatibility problems with YGG_STORE_SEQUENCE!")
+	else()
     add_subdirectory(state_propagation)
+	endif()
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/grasp/")
@@ -87,10 +101,6 @@ endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/peak_meta/")
     add_subdirectory(peak_meta)
-endif()
-
-if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/bnb/")
-    add_subdirectory(bnb)
 endif()
 
 if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/moveheuristic/")

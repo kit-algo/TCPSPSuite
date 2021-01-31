@@ -45,7 +45,7 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/contrib/sparsehash)
 
 # Find SQlite
 find_package(Sqlite REQUIRED)
-include_directories(${SQLITE_INCLUDE_DIRS})
+include_directories(${SQLITE_INCLUDE_DIR})
 set(LIBS ${LIBS} ${SQLITE_LIBRARIES})
 
 # Find libnuma, if we're optimizing for NUMA
@@ -60,6 +60,11 @@ include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/contrib/dyno/include)
 
 # Here's where the json header is
 include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/contrib/json)
+
+# If we're using Ygg's export-sequence feature, we need std::filesystem!
+if (YGG_STORE_SEQUENCE OR YGG_STORE_SEQUENCE_DST)
+	set(LIBS ${LIBS} stdc++fs)
+endif()
 
 # Find ODB
 find_package(ODB
@@ -108,11 +113,13 @@ message(STATUS "Adding ${CMAKE_CURRENT_BINARY_DIR}/src/contrib/odb_headers to in
 include_directories(SYSTEM ${CMAKE_CURRENT_BINARY_DIR}/src/contrib/odb_headers)
 message(STATUS "================  END OF ODB Patching =======================")
 
+# Include the auto-generated DB headers while suppressing errors
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/src/db/db_objects)
 
 # Find Gurobi
 find_package(GUROBI)
 if (GUROBI_FOUND)
-  include_directories(${GUROBI_INCLUDE_DIRS})
+  include_directories(SYSTEM ${GUROBI_INCLUDE_DIRS})
   set(LIBS ${LIBS} ${GUROBI_CXX_LIBRARY} ${GUROBI_LIBRARIES} ${GUROBI_CXX_LIBRARY})
 endif(GUROBI_FOUND)
 
@@ -146,7 +153,7 @@ endif()
 #==== Build type: default
 #===============================================
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -isystem ${CMAKE_CURRENT_SOURCE_DIR}/src/db/db_objects")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
 set(CMAKE_CXX_FLAGS "-std=c++17 ${CMAKE_C_FLAGS}")
 
 #===============================================
@@ -233,6 +240,7 @@ MARK_AS_ADVANCED(
 
 SET(INSTRUMENT_MALLOC "FALSE" CACHE BOOL "Instrument malloc() and related calls to profile memory usage.")
 SET(SOFT_FAIL "FALSE" CACHE BOOL "Try to fail softly whenever possible")
+SET(IGNORE_INCONSISTENT_OBJECTIVE "FALSE" CACHE BOOL "Ignore inconsistent reported objective values.")
 SET(ENABLE_CONSISTENCY_CHECKS "TRUE" CACHE BOOL "Enable consistency checks")
 SET(ENABLE_ASSERTIONS "TRUE" CACHE BOOL "Enable assertions")
 SET(OMG_VERIFY "FALSE" CACHE BOOL "Verify over 9000")
@@ -244,6 +252,10 @@ SET(NUMA_OPTIMIZE "FALSE" CACHE BOOL "Optimize for performance on NUMA enabled s
 SET(TIME_COMPILATION "FALSE" CACHE BOOL "Time individual compilation commands")
 SET(ALLOW_INCREMENTAL_LINKING  "FALSE" CACHE BOOL "Allow incremental linking if possible. May have a slight performance impact.")
 SET(USE_DEFAULT_LINKER  "FALSE" CACHE BOOL "Force the default linker to be used.")
+SET(YGG_STORE_SEQUENCE  "FALSE" CACHE BOOL "ONLY FOR INTERNAL USE.")
+mark_as_advanced(YGG_STORE_SEQUENCE)
+SET(YGG_STORE_SEQUENCE_DST  "FALSE" CACHE BOOL "ONLY FOR INTERNAL USE.")
+mark_as_advanced(YGG_STORE_SEQUENCE_DST)
 
 SET(MAX_DBG_LEVEL 5 CACHE INT "Maximum debug level")
 SET(OPTIMAL_RESOURCE_COUNT 1 CACHE INT "Optimize for this resource count")

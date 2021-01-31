@@ -1,6 +1,11 @@
 #include "dbmerger.hpp"
-#include "db/storage.hpp"                       // for Storage
-#include "util/log.hpp"                         // for Log
+
+#include "../db/db_objects-odb-sqlite.hxx"
+#include "../db/db_objects-odb.hxx"
+#include "db/storage.hpp" // for Storage
+#include "generated_config.hpp"
+#include "util/log.hpp" // for Log
+
 #include <algorithm>                            // for move
 #include <assert.h>                             // for assert
 #include <boost/log/core/record.hpp>            // for record
@@ -18,10 +23,10 @@
 #include <sstream>
 #include <stddef.h> // for size_t
 
-#include "generated_config.hpp"
-
-#include "../db/db_objects-odb-sqlite.hxx"
-#include "../db/db_objects-odb.hxx"
+// This is explicitly instantiated in the db objects
+extern template odb::query_column<long unsigned int> odb::query_columns<
+    DBResult, odb::id_common,
+    odb::access::object_traits_impl<::DBResult, odb::id_common>>::id;
 
 DBMerger::DBMerger(std::string dest_filename)
     : dest(dest_filename), l("DBMERGE")
@@ -272,7 +277,7 @@ main(int argc, char ** argv)
 
 	DBMerger merger{argv[1]};
 
-	for (unsigned int i = 2; i < argc; ++i) {
+	for (unsigned int i = 2; i < static_cast<unsigned int>(argc); ++i) {
 		merger.merge(argv[i]);
 	}
 }

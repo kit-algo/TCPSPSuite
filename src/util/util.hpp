@@ -1,6 +1,11 @@
 #ifndef UTIL_H
 #define UTIL_H
 
+#include "generated_config.hpp"
+#include <cstddef>
+#include <array>
+#include <functional>
+
 // consts-cast for range-based for on const objects
 template<typename T> constexpr const T &as_const(T &t) noexcept { return t; }
 
@@ -39,6 +44,10 @@ namespace std
 constexpr size_t clog2(size_t n)
 {
   return ( (n<2) ? 0 : 1+clog2(n/2));
+}
+
+inline constexpr bool double_eq(double lhs, double rhs) {
+	return (lhs <= rhs + DOUBLE_DELTA) && (lhs >= rhs - DOUBLE_DELTA);
 }
 
 #endif

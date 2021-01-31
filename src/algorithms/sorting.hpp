@@ -29,16 +29,11 @@ void apply_permutation(std::vector<T> & container, const IC & indices)
 		container[i] = container[index];
 
 		while (IndexGetter::get(indices[index]) != i) {
-			// TODO FIXME REMOVE
-			assert(!done[index]);
-
 			container[index] = container[IndexGetter::get(indices[index])];
 			done[index] = true;
 			index = IndexGetter::get(indices[index]);
 		}
 
-		// TODO FIXME REMOVE
-		assert(!done[index]);
 		container[index] = cpy;
 		done[index] = true;
 	}

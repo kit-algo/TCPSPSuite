@@ -142,7 +142,7 @@ implementation::GraspArray::operator()(std::vector<const Job *> & jobs,
 		if (candidates.empty()) {
 			continue;
 		}
-		
+
 		unsigned int selected =
 		    uniform(1, std::min(graspSelection, (unsigned int)candidates.size())) -
 		    1;
@@ -168,7 +168,8 @@ implementation::GraspArray::operator()(std::vector<const Job *> & jobs,
 		}
 
 		// Remove job from job list
-		jobs.erase(jobs.begin() + std::get<1>(candidates[selected]));
+		jobs.erase(jobs.begin() +
+		           static_cast<long>(std::get<1>(candidates[selected])));
 	}
 }
 
@@ -264,9 +265,11 @@ implementation::GraspSkyline::operator()(std::vector<const Job *> & jobs,
 				Resources cost =
 				    usage.get_maximum(startPos[i], startPos[i] + job->get_duration());
 				unsigned int s = startPos[i];
-				int l = startPos[i + 1] - startPos[i];
+				int l =
+				    static_cast<int>(startPos[i + 1]) - static_cast<int>(startPos[i]);
 				candidates.push_back({cost, jobno, s, l});
-				length_sum += l;
+				length_sum =
+				    static_cast<unsigned int>(static_cast<int>(length_sum) + l);
 			}
 
 			// Revert the changes we made to the usages
@@ -276,7 +279,7 @@ implementation::GraspSkyline::operator()(std::vector<const Job *> & jobs,
 		if (candidates.empty()) {
 			continue;
 		}
-		
+
 		std::sort(candidates.begin(), candidates.end());
 		int selected = (int)uniform(
 		    0, std::min(graspSelection - 1, (unsigned int)length_sum - 1));
@@ -285,8 +288,10 @@ implementation::GraspSkyline::operator()(std::vector<const Job *> & jobs,
 			if (selected < std::get<3>(candidates[i])) {
 				const Job * selectedJob = jobs[std::get<1>(candidates[i])];
 
-				starts[selectedJob->get_jid()] = std::get<2>(candidates[i]) + selected;
-				jobs.erase(jobs.begin() + std::get<1>(candidates[i]));
+				starts[selectedJob->get_jid()] =
+				    std::get<2>(candidates[i]) + static_cast<unsigned int>(selected);
+				jobs.erase(jobs.begin() +
+				           static_cast<long>(std::get<1>(candidates[i])));
 				usage.set_pos(*selectedJob, starts[selectedJob->get_jid()]);
 				break;
 			}

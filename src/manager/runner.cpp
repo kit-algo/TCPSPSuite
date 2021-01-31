@@ -24,6 +24,8 @@ Runner<Solver>::run(const Instance & instance_in)
 	Instance instance = instance_in.clone(); // mutable copy!
 
 	try {
+		BOOST_LOG(l.d()) << "Instance ID: " << instance.get_id();
+		
 		BOOST_LOG(l.i()) << "Deriving transformation path…";
 		TraitsRouter tr(TransformerManager::get().get_all());
 

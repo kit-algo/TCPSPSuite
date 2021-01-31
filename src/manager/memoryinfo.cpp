@@ -7,16 +7,15 @@
 
 #include "memoryinfo.hpp"
 
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <sys/time.h>
-#include <sys/resource.h>
-#include <unistd.h>
-
-#include <cassert>
 #include <algorithm>
+#include <cassert>
 #include <chrono>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <sys/resource.h>
+#include <sys/time.h>
+#include <unistd.h>
 using namespace std::chrono_literals;
 
 #ifdef PAPI_FOUND
@@ -36,16 +35,19 @@ namespace manager {
  **********************************************/
 
 #ifdef PAPI_FOUND
-PAPIPerformanceInfo::PAPIPerformanceInfo(const std::vector<std::string> & measurements_in) noexcept
-	: initialized(false), measurements(measurements_in), num_counters(0), l("PAPIPI")
+PAPIPerformanceInfo::PAPIPerformanceInfo(
+    const std::vector<std::string> & measurements_in) noexcept
+    : initialized(false), measurements(measurements_in), num_counters(0),
+      l("PAPIPI")
 {}
 
 void
 PAPIPerformanceInfo::initialize() noexcept
 {
-	this->num_counters = PAPI_num_counters();
+	this->num_counters = static_cast<size_t>(PAPI_num_counters());
 
-	BOOST_LOG(l.d(1)) << "Your system has " << this->num_counters << " PAPI counters available.";
+	BOOST_LOG(l.d(1)) << "Your system has " << this->num_counters
+	                  << " PAPI counters available.";
 
 	int event_code;
 	event_code = 0 | PAPI_NATIVE_MASK;
@@ -53,14 +55,16 @@ PAPIPerformanceInfo::initialize() noexcept
 	this->selected_events.clear();
 	this->selected_event_names.clear();
 	for (const std::string & event_str : this->measurements) {
-		if (PAPI_event_name_to_code(event_str.c_str(),&event_code) != PAPI_OK) {
-			BOOST_LOG(l.e()) << "PAPI event " << event_str << " not found! Not measuring.";
+		if (PAPI_event_name_to_code(event_str.c_str(), &event_code) != PAPI_OK) {
+			BOOST_LOG(l.e()) << "PAPI event " << event_str
+			                 << " not found! Not measuring.";
 			continue;
 		}
 
 		this->selected_event_names.push_back(event_str);
 		this->selected_events.push_back(event_code);
-		BOOST_LOG(l.d(3)) << "Registering PAPI event " << event_str << " (ID " << event_code << ")";
+		BOOST_LOG(l.d(3)) << "Registering PAPI event " << event_str << " (ID "
+		                  << event_code << ")";
 	}
 	this->event_counts.resize(this->selected_events.size());
 
@@ -74,7 +78,8 @@ PAPIPerformanceInfo::start() noexcept
 		this->initialize();
 	}
 
-	if (PAPI_start_counters(this->selected_events.data(), (int)this->selected_events.size()) != PAPI_OK) {
+	if (PAPI_start_counters(this->selected_events.data(),
+	                        (int)this->selected_events.size()) != PAPI_OK) {
 		BOOST_LOG(l.e()) << "Could not start PAPI measurements.";
 	}
 }
@@ -82,7 +87,8 @@ PAPIPerformanceInfo::start() noexcept
 void
 PAPIPerformanceInfo::stop() noexcept
 {
-	if (PAPI_stop_counters(this->event_counts.data(), (int)this->event_counts.size()) != PAPI_OK) {
+	if (PAPI_stop_counters(this->event_counts.data(),
+	                       (int)this->event_counts.size()) != PAPI_OK) {
 		BOOST_LOG(l.e()) << "Could not stop PAPI measurements.";
 	}
 }
@@ -91,7 +97,7 @@ std::vector<std::pair<std::string, long long>>
 PAPIPerformanceInfo::get_counts() const noexcept
 {
 	std::vector<std::pair<std::string, long long>> result;
-	for (unsigned int i = 0 ; i < this->selected_events.size() ; ++i) {
+	for (unsigned int i = 0; i < this->selected_events.size(); ++i) {
 		result.emplace_back(this->selected_event_names[i], this->event_counts[i]);
 	}
 
@@ -105,9 +111,9 @@ PAPIPerformanceInfo::get_counts() const noexcept
  **********************************************/
 
 LinuxMemoryInfo::LinuxMemoryInfo(unsigned int sampling_ms_in)
-	: sampling_ms(sampling_ms_in), page_size(sysconf(_SC_PAGE_SIZE))
-{
-}
+    : sampling_ms(sampling_ms_in),
+      page_size(static_cast<size_t>(sysconf(_SC_PAGE_SIZE)))
+{}
 
 size_t
 LinuxMemoryInfo::get_rss_bytes_max() const noexcept
@@ -170,8 +176,9 @@ LinuxMemoryInfo::reset() noexcept
 	this->data_max_pages = this->data_pages_before;
 #endif
 
-	this->get_mem_syscall_data(&this->major_pagefaults_before, &this->minor_pagefaults_before,
-														 &this->user_usecs_before, &this->system_usecs_before);
+	this->get_mem_syscall_data(
+	    &this->major_pagefaults_before, &this->minor_pagefaults_before,
+	    &this->user_usecs_before, &this->system_usecs_before);
 
 	this->stop_requested = false;
 }
@@ -196,14 +203,14 @@ LinuxMemoryInfo::run() noexcept
 		this->notifier.wait_for(lock, this->sampling_ms * 1ms);
 
 		switch (this->requested_action) {
-			case ACTION_MEASURE:
-				this->sample();
-				break;
-			case ACTION_FINISH:
-				return;
-				break;
-			default:
-				assert(false);
+		case ACTION_MEASURE:
+			this->sample();
+			break;
+		case ACTION_FINISH:
+			return;
+			break;
+		default:
+			assert(false);
 		}
 	}
 }
@@ -239,8 +246,9 @@ LinuxMemoryInfo::stop() noexcept
 	this->my_thread.join();
 #endif
 
-	this->get_mem_syscall_data(&this->major_pagefaults_after, &this->minor_pagefaults_after,
-														 &this->user_usecs_after, &this->system_usecs_after);
+	this->get_mem_syscall_data(
+	    &this->major_pagefaults_after, &this->minor_pagefaults_after,
+	    &this->user_usecs_after, &this->system_usecs_after);
 }
 
 void
@@ -255,8 +263,10 @@ LinuxMemoryInfo::sample() noexcept
 }
 
 void
-LinuxMemoryInfo::get_mem_syscall_data(size_t * major_pagefault_out, size_t * minor_pagefault_out,
-																			unsigned long * user_usecs_out, unsigned long * system_usecs_out) noexcept
+LinuxMemoryInfo::get_mem_syscall_data(size_t * major_pagefault_out,
+                                      size_t * minor_pagefault_out,
+                                      unsigned long * user_usecs_out,
+                                      unsigned long * system_usecs_out) noexcept
 {
 	struct rusage usage;
 	int result = getrusage(RUSAGE_SELF, &usage);
@@ -265,19 +275,21 @@ LinuxMemoryInfo::get_mem_syscall_data(size_t * major_pagefault_out, size_t * min
 	}
 
 	if (major_pagefault_out != nullptr) {
-		*major_pagefault_out = usage.ru_majflt;
+		*major_pagefault_out = static_cast<size_t>(usage.ru_majflt);
 	}
 
 	if (minor_pagefault_out != nullptr) {
-		*minor_pagefault_out = usage.ru_minflt;
+		*minor_pagefault_out = static_cast<size_t>(usage.ru_minflt);
 	}
 
 	if (user_usecs_out != nullptr) {
-		*user_usecs_out = (usage.ru_utime.tv_sec * 1000000) + usage.ru_utime.tv_usec;
+		*user_usecs_out = static_cast<size_t>((usage.ru_utime.tv_sec * 1000000) +
+		                                      usage.ru_utime.tv_usec);
 	}
 
 	if (system_usecs_out != nullptr) {
-		*system_usecs_out = (usage.ru_stime.tv_sec * 1000000) + usage.ru_stime.tv_usec;
+		*system_usecs_out = static_cast<size_t>((usage.ru_stime.tv_sec * 1000000) +
+		                                        usage.ru_stime.tv_usec);
 	}
 }
 
@@ -287,17 +299,17 @@ LinuxMemoryInfo::get_mem_proc_data(size_t * rss_out, size_t * data_out) noexcept
 	char line[BUFSIZE];
 	line[0] = 0;
 
-  FILE* file = fopen("/proc/self/statm", "r");
+	FILE * file = fopen("/proc/self/statm", "r");
 
-  fgets(line, BUFSIZE, file);
+	fgets(line, BUFSIZE, file);
 
-  // TODO use thread-safe version here?
-  // Size
+	// TODO use thread-safe version here?
+	// Size
 	strtok(line, " ");
 	// RSS
 	char * rss_str = strtok(nullptr, " ");
 	if (rss_out != nullptr) {
-		*rss_out = atoi(rss_str);
+		*rss_out = static_cast<size_t>(atoi(rss_str));
 	}
 	// Share
 	strtok(nullptr, " ");
@@ -308,10 +320,10 @@ LinuxMemoryInfo::get_mem_proc_data(size_t * rss_out, size_t * data_out) noexcept
 	// Data
 	char * data_str = strtok(nullptr, " ");
 	if (data_out != nullptr) {
-		*data_out = atoi(data_str);
+		*data_out = static_cast<size_t>(atoi(data_str));
 	}
 
-  fclose(file);
+	fclose(file);
 }
 
-}
+} // namespace manager

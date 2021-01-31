@@ -3,21 +3,22 @@
 //
 
 #include "parallelizer.hpp"
+
 #include "../datastructures/maybe.hpp" // for Maybe
 #include "../db/storage.hpp"
-#include "../instance/instance.hpp"                    // for Instance
-#include "../io/jsonreader.hpp"                        // for JsonReader
-#include "../util/configuration.hpp"                   // for Configuration
-#include "../util/git.hpp"                             // for GIT_SHA1
-#include "../util/randomizer.hpp"                      // for Randomizer
-#include "../util/solverconfig.hpp"                    // for SolverConfig
-#include "selector.hpp"                                // for Selector
+#include "../instance/instance.hpp"  // for Instance
+#include "../io/jsonreader.hpp"      // for JsonReader
+#include "../util/configuration.hpp" // for Configuration
+#include "../util/git.hpp"           // for GIT_SHA1
+#include "../util/randomizer.hpp"    // for Randomizer
+#include "../util/solverconfig.hpp"  // for SolverConfig
+#include "generated_config.hpp"
+#include "selector.hpp" // for Selector
+
 #include <algorithm>                                   // for min, sort
 #include <boost/log/core/record.hpp>                   // for record
 #include <boost/log/detail/attachable_sstream_buf.hpp> // for basic_ostring...
 #include <boost/log/sources/record_ostream.hpp>        // for basic_record_...
-
-#include "generated_config.hpp"
 
 #ifdef NUMA_OPTIMIZE
 #include <numa.h>
@@ -59,16 +60,15 @@ Parallelizer::run_in_parallel(const std::vector<std::string> & filenames,
 		};
 
 		double partition_size = (double)this->remaining_tasks.size() /
-			(double)cfg->get_partition_count();
+		                        (double)cfg->get_partition_count();
 
-		size_t partition_border_low = 
-			(size_t)(std::floor(partition_size * cfg->get_partition_number()));
+		size_t partition_border_low =
+		    (size_t)(std::floor(partition_size * cfg->get_partition_number()));
 		size_t partition_border_high =
-			std::min(
-			         this->remaining_tasks.size(),
-			         (size_t)(std::floor(partition_size * (cfg->get_partition_number() + 1))));
+		    std::min(this->remaining_tasks.size(),
+		             (size_t)(std::floor(partition_size *
+		                                 (cfg->get_partition_number() + 1))));
 
-		
 		auto low_it = this->remaining_tasks.begin() + (long)partition_border_low;
 		std::nth_element(this->remaining_tasks.begin(), low_it,
 		                 this->remaining_tasks.end(), cmp);
@@ -142,8 +142,26 @@ Parallelizer::run_thread(int thread_id)
 
 	while (task.valid()) {
 		std::string file_name = task.value().first;
-		JsonReader reader(file_name);
-		Instance * instance = reader.parse();
+		Instance * instance = nullptr;
+		try {
+			JsonReader reader(file_name);
+			instance = reader.parse();
+		} catch (json::parse_error e) {
+			BOOST_LOG(l.e()) << "JSON Parsing error in instance file.";
+			BOOST_LOG(l.e()) << "Problematic file: " << file_name;
+			BOOST_LOG(l.e()) << e.what();
+			BOOST_LOG(l.e()) << "Error is near: ";
+
+			util::FileContextGiver fcg(file_name, e.byte);
+
+			for (const auto & line : fcg.get_message()) {
+				BOOST_LOG(l.e()) << line;
+			}
+
+			// Or register error and continue with next instance?
+			throw std::move(e);
+		}
+
 		SolverConfig & solverConfig = task.value().second;
 
 		BOOST_LOG(l.i()) << "====================================================";

@@ -48,7 +48,9 @@ find_library( GUROBI_LIBRARY
         gurobi65
         gurobi70
         gurobi75
-	gurobi80
+				gurobi80
+				gurobi81
+				gurobi90
               PATHS "$ENV{GUROBI_HOME}/lib"
               )
 

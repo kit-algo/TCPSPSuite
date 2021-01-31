@@ -247,6 +247,7 @@ ArraySkyLineBase<support_it>::begin() noexcept
     return iterator(this, 0);
   } else {
     assert(false);
+    return iterator(nullptr, 0);
   }
 }
 
@@ -258,6 +259,7 @@ ArraySkyLineBase<support_it>::end() noexcept
     return iterator(this, this->events.size());
   } else {
     assert(false);
+    return iterator(nullptr, 0);
   }
 }
 
@@ -416,6 +418,7 @@ ArraySkyLineBase<support_it>::iterator::operator++() noexcept
     return *this;
   } else {
     assert(false);
+    return *this;
   }
 }
 
@@ -451,6 +454,7 @@ ArraySkyLineBase<support_it>::iterator::operator--() noexcept
     return *this;
   } else {
     assert(false);
+    return *this;
   }
 }
 

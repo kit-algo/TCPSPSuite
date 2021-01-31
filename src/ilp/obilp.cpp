@@ -1,5 +1,6 @@
 #include "obilp.hpp"
 
+#include "../algorithms/graphalgos.hpp"             // For CriticalPathComputer
 #include "../contrib/ilpabstraction/src/common.hpp" // for VariableType, Varia...
 #include "../instance/instance.hpp"                 // IWYU pragma: keep
 #include "../instance/job.hpp"                      // for Job
@@ -40,14 +41,15 @@ OBILP<SolverT>::generate_events() noexcept
 	this->events.clear();
 	this->events.reserve(2 * this->instance.job_count());
 
-	// TODO perform critical-path computation and use it instead of release /
-	// deadline
+	CriticalPathComputer cp(this->instance);
+	this->earliest_starts = cp.get_forward();
+	this->latest_finishs = cp.get_reverse();
 
 	for (unsigned int jid = 0; jid < this->instance.job_count(); ++jid) {
-		auto & job = this->instance.get_job(jid);
-		this->events.push_back({job.get_jid(), job.get_release(), true});
-		this->events.push_back({job.get_jid(), job.get_deadline(), false});
+		this->events.push_back({jid, this->earliest_starts[jid], true});
+		this->events.push_back({jid, this->latest_finishs[jid], false});
 	}
+
 	std::sort(this->events.begin(), this->events.end(),
 	          [](const Event & lhs, const Event & rhs) {
 		          if (lhs.time != rhs.time) {
@@ -80,8 +82,8 @@ OBILP<SolverT>::prepare_variables()
 				/*
 				 * After-Vars
 				 */
-				if (job_b.get_deadline() - job_b.get_duration() >=
-				    job_a.get_release() + job_a.get_duration()) {
+				if (this->latest_finishs[jid_b] - job_b.get_duration() >=
+				    this->earliest_starts[jid_a] + job_a.get_duration()) {
 					// b can be completely after a
 					this->disjunct_vars[jid_a].insert(
 					    {jid_b,
@@ -90,8 +92,8 @@ OBILP<SolverT>::prepare_variables()
 					                             std::string("_starts_after_") +
 					                             std::to_string(jid_b))});
 				}
-				if (job_a.get_deadline() - job_a.get_duration() >=
-				    job_b.get_release() + job_b.get_duration()) {
+				if (this->latest_finishs[jid_a] - job_a.get_duration() >=
+				    this->earliest_starts[jid_b] + job_b.get_duration()) {
 					// a can be completely after b
 					this->disjunct_vars[jid_b].insert(
 					    {jid_a,
@@ -104,11 +106,11 @@ OBILP<SolverT>::prepare_variables()
 				/*
 				 * Before-Vars
 				 */
-				if ((job_a.get_release() <=
-				     job_b.get_deadline() -
+				if ((this->earliest_starts[jid_a] <=
+				     this->latest_finishs[jid_b] -
 				         job_b.get_duration()) && // job_a not too late
-				    (job_a.get_deadline() - job_a.get_duration() >=
-				     job_b.get_release())) // job_a not too early
+				    (this->latest_finishs[jid_a] - job_a.get_duration() >=
+				     this->earliest_starts[jid_b])) // job_a not too early
 				{
 					this->order_vars[jid_a].insert(
 					    {jid_b,
@@ -118,10 +120,10 @@ OBILP<SolverT>::prepare_variables()
 					                             std::to_string(jid_b))});
 				}
 
-				if ((job_b.get_release() <=
-				     job_a.get_deadline() - job_a.get_duration()) &&
-				    (job_b.get_deadline() - job_b.get_duration() >=
-				     job_a.get_release())) {
+				if ((this->earliest_starts[jid_b] <=
+				     this->latest_finishs[jid_a] - job_a.get_duration()) &&
+				    (this->latest_finishs[jid_b] - job_b.get_duration() >=
+				     this->earliest_starts[jid_a])) {
 					// b can start before (or at the same time as) a starts
 					this->order_vars[jid_b].insert(
 					    {jid_a,
@@ -136,28 +138,6 @@ OBILP<SolverT>::prepare_variables()
 			open_jids.erase(jid_a);
 		}
 	}
-
-	/*
-	this->disjunct_vars.resize(this->instance.job_count());
-	for (unsigned int i = 0; i < this->instance.job_count(); ++i) {
-	  for (unsigned int j = 0; j < this->instance.job_count(); ++j) {
-	    this->disjunct_vars[i].push_back(this->model.add_var(
-	        ilpabstraction::VariableType::BINARY, 0, 1,
-	        std::to_string(j) + std::string("_starts_after_") +
-	            std::to_string(i)));
-	  }
-	}
-
-	this->order_vars.resize(this->instance.job_count());
-	for (unsigned int i = 0; i < this->instance.job_count(); ++i) {
-	  for (unsigned int j = 0; j < this->instance.job_count(); ++j) {
-	    this->order_vars[i].push_back(this->model.add_var(
-	        ilpabstraction::VariableType::BINARY, 0, 1,
-	        std::to_string(i) + std::string("_starts_before_") +
-	            std::to_string(j)));
-	  }
-	}
-	*/
 }
 
 template <class SolverT>
@@ -288,27 +268,27 @@ OBILP<SolverT>::prepare_start_usage_exprs()
 							           job_b.get_resource_usage(rid));
 						} else if (this->disjunct_vars[jid_b].find(jid_a) !=
 						           this->disjunct_vars[jid_b].end()) {
-							if (job_b.get_deadline() - job_b.get_duration() <
-							    job_a.get_release()) {
+							if (this->latest_finishs[jid_b] - job_b.get_duration() <
+							    this->earliest_starts[jid_a]) {
 								// job_b always starts before job_a.
 								expr_a += ((1 - this->disjunct_vars[jid_b].at(jid_a)) *
 								           job_b.get_resource_usage(rid));
 							} else {
 								// job_b *never* starts before job_a.
-								assert(job_a.get_deadline() - job_a.get_duration() <
-								       job_b.get_release());
+								assert(this->latest_finishs[jid_a] - job_a.get_duration() <
+								       this->earliest_starts[jid_b]);
 							}
 						} else {
 							// Nothing is there. If job_b always starts before job_a, add the
 							// usage, otherwise don't
-							if (job_b.get_deadline() - job_b.get_duration() <
-							    job_a.get_release()) {
+							if (this->latest_finishs[jid_b] - job_b.get_duration() <
+							    this->earliest_starts[jid_a]) {
 								// job_b always starts before job_a.
 								expr_a += job_b.get_resource_usage(rid);
 							} else {
 								// job_b *never* starts before job_a.
-								assert(job_a.get_deadline() - job_a.get_duration() <
-								       job_b.get_release());
+								assert(this->latest_finishs[jid_a] - job_a.get_duration() <
+								       this->earliest_starts[jid_b]);
 							}
 						}
 					};
@@ -358,9 +338,9 @@ OBILP<SolverT>::prepare_start_usage_exprs()
 	              i_job.get_resource_usage(rid);
 	    }
 
-	    this->start_usage[rid].push_back(expr);
+	    this->start_usage[rid].push_back(expr);*/
 
-	    /* TODO DEBUG */
+	/* TODO DEBUG */
 	/*
 	this->start_usage_var[rid].push_back(
 	                this->model.add_var(ilpabstraction::VariableType::CONTINUOUS,

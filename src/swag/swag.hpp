@@ -11,6 +11,7 @@
 #include "../util/log.hpp"        // for Log
 #include "elitepoolscorer.hpp"
 #include "matrixedgescorer.hpp"
+
 #include <bitset>
 #include <random>   // for mt1...
 #include <stddef.h> // for size_t
@@ -72,16 +73,6 @@ public:
 		this->flags[FLAG_INDEX_SEEN] = value;
 	}
 
-	Edge &
-	operator=(const Edge & other)
-	{
-		this->t = other.t;
-		this->rev_index = other.rev_index;
-		this->flags = other.flags;
-
-		return *this;
-	}
-
 private:
 	void
 	set_permanent(bool value) noexcept
@@ -99,15 +90,6 @@ struct ReverseEdge
 {
 	Job::JobId s;
 	size_t forward_index;
-
-	ReverseEdge &
-	operator=(const ReverseEdge & other)
-	{
-		this->s = other.s;
-		this->forward_index = other.forward_index;
-
-		return *this;
-	}
 };
 
 template <bool use_mes, bool use_eps>

@@ -1,12 +1,8 @@
-//
-// Created by lukas on 07.12.17.
-//
-
 #ifndef TCPSPSUITE_DTILP_HPP
 #define TCPSPSUITE_DTILP_HPP
 
-#include "ilp.hpp"
 #include "../manager/solvers.hpp"
+#include "ilp.hpp"
 
 #if defined(GUROBI_FOUND)
 #include "../contrib/ilpabstraction/src/ilpa_gurobi.hpp"
@@ -17,18 +13,19 @@
 #endif
 
 template <class MIPSolverT>
-class DTILP : public ILPBase<MIPSolverT>
-{
+class DTILP : public ILPBase<MIPSolverT> {
 public:
-	DTILP(const Instance &instance, AdditionalResultStorage & additional, const SolverConfig & sconf);
+	DTILP(const Instance & instance, AdditionalResultStorage & additional,
+	      const SolverConfig & sconf);
 
 	void prepare_warmstart();
-	void warmstart_with_fixed(std::vector<bool> fixed_jobs, std::vector<unsigned int> start_pos,
-													  unsigned int time_limit,
-													  Maybe<double> extension_time_usage_cost_coefficient,
-														Maybe<double> extension_job_usage_cost_coefficient,
+	void warmstart_with_fixed(std::vector<bool> fixed_jobs,
+	                          std::vector<unsigned int> start_pos,
+	                          unsigned int time_limit,
+	                          Maybe<double> extension_time_usage_cost_coefficient,
+	                          Maybe<double> extension_job_usage_cost_coefficient,
 	                          Maybe<unsigned int> extension_time_limit,
-														Maybe<unsigned int> extension_job_limit);
+	                          Maybe<unsigned int> extension_job_limit);
 	void run();
 	static std::string get_id();
 
@@ -50,10 +47,10 @@ private:
 	// Switch-On-Variables
 	std::vector<std::vector<Variable>> variables;
 
-	/* First entry: First time step at which the job can be executed (i.e., the time step
-	 * that the first switch-on variable is associated with).
-	 * Second entry: The number of switch-on variables, i.e., the window size (taking possible
-	 * window extension into account). */
+	/* First entry: First time step at which the job can be executed (i.e., the
+	 * time step that the first switch-on variable is associated with). Second
+	 * entry: The number of switch-on variables, i.e., the window size (taking
+	 * possible window extension into account). */
 	std::vector<std::pair<unsigned int, unsigned int>> time_step_bounds;
 
 	// Sum up duration, force overduration
@@ -70,7 +67,8 @@ private:
 	// job i
 	//   - has an overduration of at least y time steps
 	//   - and is switched on at (job-relative) time step x
-	std::vector<std::vector<std::vector<Variable>>> overduration_and_swon_variables;
+	std::vector<std::vector<std::vector<Variable>>>
+	    overduration_and_swon_variables;
 
 	void prepare_start_point_constraints();
 
@@ -97,7 +95,6 @@ private:
 	// IMPLEMENTATION must define these
 	std::vector<Variable> right_extension_var;
 
-
 	Variable window_extension_time_var;
 	Variable window_extension_job_var;
 	Constraint window_extension_time_constraint;
@@ -122,31 +119,37 @@ private:
 namespace solvers {
 #if defined(GUROBI_FOUND)
 template <>
-struct registry_hook<solvers::get_free_N<DTILP<ilpabstraction::GurobiInterface>>()>
+struct registry_hook<
+    solvers::get_free_N<DTILP<ilpabstraction::GurobiInterface>>()>
 {
-	constexpr static unsigned int my_N = solvers::get_free_N<DTILP<ilpabstraction::GurobiInterface>>();
+	constexpr static unsigned int my_N =
+	    solvers::get_free_N<DTILP<ilpabstraction::GurobiInterface>>();
 
 	auto
 	operator()()
 	{
-		return solvers::register_class < DTILP<ilpabstraction::GurobiInterface>, my_N > {}();
+		return solvers::register_class<DTILP<ilpabstraction::GurobiInterface>,
+		                               my_N>{}();
 	}
 };
 #endif
 
 #if defined(CPLEX_FOUND)
 template <>
-struct registry_hook<solvers::get_free_N<DTILP<ilpabstraction::CPLEXInterface>>()>
+struct registry_hook<
+    solvers::get_free_N<DTILP<ilpabstraction::CPLEXInterface>>()>
 {
-	constexpr static unsigned int my_N = solvers::get_free_N<DTILP<ilpabstraction::CPLEXInterface>>();
+	constexpr static unsigned int my_N =
+	    solvers::get_free_N<DTILP<ilpabstraction::CPLEXInterface>>();
 
 	auto
 	operator()()
 	{
-		return solvers::register_class < DTILP<ilpabstraction::CPLEXInterface>, my_N > {}();
+		return solvers::register_class<DTILP<ilpabstraction::CPLEXInterface>,
+		                               my_N>{}();
 	}
 };
 #endif
-}
+} // namespace solvers
 
-#endif //TCPSPSUITE_DTILP_HPP
+#endif // TCPSPSUITE_DTILP_HPP

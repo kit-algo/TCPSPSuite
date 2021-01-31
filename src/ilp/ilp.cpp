@@ -15,8 +15,9 @@
 #include "../util/solverconfig.hpp"
 #include "generated_config.hpp" // for DOUBLE_DELTA
 
-#include <algorithm>          // for max, min
-#include <assert.h>           // for assert
+#include <algorithm> // for max, min
+#include <assert.h>  // for assert
+#include <chrono>
 #include <ext/alloc_traits.h> // for __alloc_tra...
 #include <functional>         // for function
 #include <limits>             // for numeric_limits
@@ -42,17 +43,18 @@ ILPBase<SolverT>::ILPBase(const Instance & instance_in,
 {
 	this->seed = sconf.get_seed();
 	if (sconf.get_time_limit().valid()) {
-		this->timelimit = (int)sconf.get_time_limit(); // TODO refactor this
+		this->timelimit =
+		    static_cast<int>(sconf.get_time_limit()); // TODO refactor this
 	}
 
 	if (sconf.has_config("initialize_with_early")) {
-		this->initialize_with_early = (sconf["initialize_with_early"] == "yes");
+		this->initialize_with_early = sconf.as_bool("initialize_with_early");
 	} else {
 		this->initialize_with_early = true;
 	}
 
 	if (sconf.has_config("collect_kappa_stats")) {
-		this->collect_kappa_stats = (bool)sconf["collect_kappa_stats"];
+		this->collect_kappa_stats = sconf.as_bool("collect_kappa_stats");
 	}
 
 	// FIXME Require: flat-resource-availability, linear-costs
@@ -66,6 +68,8 @@ ILPBase<SolverT>::~ILPBase()
 	BOOST_LOG(l.d()) << "Freeing memory";
 }
 
+
+// TODO FIX THIS!
 template <class SolverT>
 const Traits ILPBase<SolverT>::required_traits =
     Traits(0, std::numeric_limits<unsigned int>::max(), {0.0, 1.0}, {0.0, 1.0});
@@ -103,8 +107,8 @@ ILPBase<SolverT>::compute_values()
 	// Adjust for possible deadline extension
 	this->latest_deadline += this->instance.get_window_extension_limit();
 	this->earliest_release = (unsigned int)std::max(
-	    0, (int)this->earliest_release -
-	           (int)this->instance.get_window_extension_limit());
+	    0, static_cast<int>(this->earliest_release) -
+	           static_cast<int>(this->instance.get_window_extension_limit()));
 }
 
 template <class SolverT>
@@ -171,7 +175,11 @@ ILPBase<SolverT>::base_run()
 {
 	if (this->sconf.has_config("dump_path")) {
 		std::string dump_path = this->sconf["dump_path"];
-		this->model.write(dump_path + std::string(".lp"));
+		if ((dump_path.substr(dump_path.size() - 3, 3).compare(".lp") != 0) &&
+		    (dump_path.substr(dump_path.size() - 4, 4).compare(".mps") != 0)) {
+			dump_path += std::string(".lp");
+		}
+		this->model.write(dump_path);
 	}
 
 	if (this->collect_kappa_stats) {
@@ -201,7 +209,7 @@ ILPBase<SolverT>::base_run()
 	    Maybe<unsigned int>(),
 	    Maybe<double>(),
 	    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-	    {(int)num_vars}};
+	    {static_cast<int>(num_vars)}};
 	this->additional_storage.extended_measures.push_back(em_vars);
 
 	AdditionalResultStorage::ExtendedMeasure em_constr{
@@ -209,7 +217,7 @@ ILPBase<SolverT>::base_run()
 	    Maybe<unsigned int>(),
 	    Maybe<double>(),
 	    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-	    {(int)num_constr}};
+	    {static_cast<int>(num_constr)}};
 	this->additional_storage.extended_measures.push_back(em_constr);
 
 	AdditionalResultStorage::ExtendedMeasure em_nzs{
@@ -217,8 +225,20 @@ ILPBase<SolverT>::base_run()
 	    Maybe<unsigned int>(),
 	    Maybe<double>(),
 	    AdditionalResultStorage::ExtendedMeasure::TYPE_INT,
-	    {(int)num_nzs}};
+	    {static_cast<int>(num_nzs)}};
 	this->additional_storage.extended_measures.push_back(em_nzs);
+
+	auto model_build_time = this->prepare_finished - this->prepare_started;
+	AdditionalResultStorage::ExtendedMeasure em_mbt{
+	    "MODEL_BUILD_TIME_ms",
+	    Maybe<unsigned int>(),
+	    Maybe<double>(),
+	    AdditionalResultStorage::ExtendedMeasure::TYPE_DOUBLE,
+	    {static_cast<double>(
+	        std::chrono::duration_cast<std::chrono::milliseconds>(
+	            model_build_time)
+	            .count())}};
+	this->additional_storage.extended_measures.push_back(em_mbt);
 
 	Maybe<unsigned int> time_limit;
 	if (this->timelimit > 0) {
@@ -296,6 +316,8 @@ ILPBase<SolverT>::prepare_pre()
 	this->model.set_param(ParamType::SEED, this->seed);
 
 	if (Configuration::get()->get_threads().valid()) {
+		BOOST_LOG(l.d(1)) << "Setting thread count to "
+		                  << Configuration::get()->get_threads().value();
 		this->model.set_param(ParamType::THREADS,
 		                      Configuration::get()->get_threads().value());
 	}
@@ -331,6 +353,8 @@ ILPBase<SolverT>::prepare_pre()
 		}
 	}
 
+	this->prepare_started = std::chrono::high_resolution_clock::now();
+
 	BOOST_LOG(l.d()) << "Preparing Base Variables";
 	this->prepare_base_variables();
 
@@ -348,13 +372,12 @@ ILPBase<SolverT>::generate_vars_start_points()
 
 	for (unsigned int i = 0; i < this->instance.job_count(); i++) {
 		const Job & job = this->instance.get_job(i);
-		int earliest_start_with_extension =
-		    std::max(((int)job.get_release() -
-		              (int)this->instance.get_window_extension_limit()),
-		             0);
-		int latest_finish_with_extension =
-		    (int)job.get_deadline() +
-		    (int)this->instance.get_window_extension_limit();
+		int earliest_start_with_extension = std::max(
+		    (static_cast<int>(job.get_release()) -
+		     static_cast<int>(this->instance.get_window_extension_limit())),
+		    0);
+		unsigned int latest_finish_with_extension =
+		    job.get_deadline() + this->instance.get_window_extension_limit();
 
 		// Start points
 		this->start_points[i] = this->model.add_var(
@@ -420,34 +443,49 @@ ILPBase<SolverT>::prepare_post()
 	this->prepare_edge_constraints();
 	BOOST_LOG(l.d()) << "Preparing Objective";
 	this->prepare_objective();
+
+	this->prepare_finished = std::chrono::high_resolution_clock::now();
 }
 
 template <class SolverT>
 void
 ILPBase<SolverT>::do_initialization()
 {
-	if (!this->initialize_with_early) {
-		return;
-	}
-
 	if (!this->start_points_set) {
 		BOOST_LOG(l.d(1))
-		    << "Start points not set. Cannot initialize with EarlyScheduler.";
+		    << "Start points not set. Cannot initialize start variables.";
 		return;
 	}
 
-	BOOST_LOG(l.d(1)) << "Initializing with EarlyScheduler results";
+	if (this->initialize_with_early) {
+		BOOST_LOG(l.d(1)) << "Initializing with EarlyScheduler results";
 
-	AdditionalResultStorage dummy_storage;
-	EarlyScheduler es(this->instance, dummy_storage,
-	                  SolverConfig("DUMMY", "DUMMY", {}, Maybe<unsigned int>(),
-	                               false, 1, {},
-	                               Maybe<int>(this->sconf.get_seed())));
-	es.run();
-	Solution es_sol = es.get_solution();
+		AdditionalResultStorage dummy_storage;
+		EarlyScheduler es(this->instance, dummy_storage,
+		                  SolverConfig("DUMMY", "DUMMY", {}, Maybe<unsigned int>(),
+		                               false, 1, {},
+		                               Maybe<int>(this->sconf.get_seed())));
+		es.run();
+		Solution es_sol = es.get_solution();
+		BOOST_LOG(l.d(2)) << "ES Solution quality: " << es_sol.get_costs();
 
+		for (unsigned int jid = 0; jid < this->instance.job_count(); ++jid) {
+			this->model.set_start(this->start_points[jid],
+			                      es_sol.get_start_time(jid));
+		}
+	}
+
+	size_t hinted_count = 0;
 	for (unsigned int jid = 0; jid < this->instance.job_count(); ++jid) {
-		this->model.set_start(this->start_points[jid], es_sol.get_start_time(jid));
+		if (this->instance.get_job(jid).get_hint().valid()) {
+			this->model.set_start(this->start_points[jid],
+			                      this->instance.get_job(jid).get_hint().value());
+			hinted_count++;
+		}
+	}
+
+	if (hinted_count > 0) {
+		BOOST_LOG(l.d(1)) << "Provided hints for " << hinted_count << " jobs.";
 	}
 }
 
@@ -460,7 +498,8 @@ ILPBase<SolverT>::solve(Maybe<unsigned int> time_limit)
 
 	if (time_limit.valid()) {
 		BOOST_LOG(l.d(3)) << "Setting time limit: " << time_limit.value();
-		this->model.set_param(ParamType::TIME_LIMIT, (int)time_limit.value());
+		this->model.set_param(ParamType::TIME_LIMIT,
+		                      static_cast<int>(time_limit.value()));
 	} else {
 		BOOST_LOG(l.d(3)) << "Running without time limit.";
 		// this->model.set_param(ParamType::TIME_LIMIT,
@@ -480,6 +519,11 @@ ILPBase<SolverT>::solve(Maybe<unsigned int> time_limit)
 		break;
 	case ModelStatus::INFEASIBLE:
 		BOOST_LOG(l.e()) << "Model is infeasible!.";
+		if constexpr (decltype(this->env)::features()
+		                  .template has_feature<MIPFeatures::IIS>()) {
+			BOOST_LOG(l.w()) << "Writing IIS to /tmp/tcpspsuite_iis.ilp";
+			this->model.write_iis("/tmp/tcpspsuite_iis");
+		}
 		break;
 	case ModelStatus::UNBOUNDED:
 		BOOST_LOG(l.e()) << "Model is unbounded!.";
@@ -524,43 +568,46 @@ ILPBase<SolverT>::get_solution_by_start_vars()
 	             this->get_lower_bound());
 
 	if (this->model.has_feasible()) { // otherwise, everything is bogus
-		if ((sol.get_costs() < this->model.get_objective_value() * 0.99) ||
-		    (sol.get_costs() > this->model.get_objective_value() * 1.01)) {
-			// TODO make this depend on the MIP gap threshold
-
-			sol.print_jobs();
-			// sol.print();
-			sol.print_profile();
-
-			// this->print_profile();
-			BOOST_LOG(l.d(1)) << "Solution quality computed: " << sol.get_costs();
-			BOOST_LOG(l.d(1)) << " -> Overshoot costs computed: "
-			                  << sol.get_overshoot_costs();
-			BOOST_LOG(l.d(1)) << " -> Investment costs computed: "
-			                  << sol.get_investment_costs();
-			BOOST_LOG(l.d(1)) << "Solution quality reported: "
-			                  << this->model.get_objective_value();
-
-			BOOST_LOG(l.d(1)) << " -> Overshoot costs reported: "
-			                  << this->model.get_variable_assignment(
-			                         this->overshoot_cost_variable);
-			// this->overshoot_cost_variable.get(GRB_DoubleAttr_X) ;
-			BOOST_LOG(l.d(1)) << " -> Investment costs reported: "
-			                  << this->model.get_variable_assignment(
-			                         this->investment_cost_variable);
-			// this->investment_cost_variable.get(GRB_DoubleAttr_X) ;
-
-			for (unsigned int r = 0; r < this->instance.resource_count(); ++r) {
-				double usage =
-				    this->model.get_variable_assignment(this->max_usage_variables[r]);
-				BOOST_LOG(l.d(1)) << " --> Resource investment amount for " << r << ": "
-				                  << usage;
-			}
-
-			throw InconsistentResultError(this->instance, this->seed,
-			                              FAULT_INCONSISTENT_OBJVALS,
-			                              "Inconsistent objective values");
-		}
+		                                /*
+		                                  For now, some MIP formulations do not set all variables optimally
+		                                if ((sol.get_costs() < this->model.get_objective_value() * 0.99) ||
+		                                    (sol.get_costs() > this->model.get_objective_value() * 1.01)) {
+		                                  // TODO make this depend on the MIP gap threshold
+		                            
+		                                  sol.print_jobs();
+		                                  // sol.print();
+		                                  sol.print_profile();
+		                            
+		                                  // this->print_profile();
+		                                  BOOST_LOG(l.d(1)) << "Solution quality computed: " << sol.get_costs();
+		                                  BOOST_LOG(l.d(1)) << " -> Overshoot costs computed: "
+		                                                    << sol.get_overshoot_costs();
+		                                  BOOST_LOG(l.d(1)) << " -> Investment costs computed: "
+		                                                    << sol.get_investment_costs();
+		                                  BOOST_LOG(l.d(1)) << "Solution quality reported: "
+		                                                    << this->model.get_objective_value();
+		                            
+		                                  BOOST_LOG(l.d(1)) << " -> Overshoot costs reported: "
+		                                                    << this->model.get_variable_assignment(
+		                                                           this->overshoot_cost_variable);
+		                                  // this->overshoot_cost_variable.get(GRB_DoubleAttr_X) ;
+		                                  BOOST_LOG(l.d(1)) << " -> Investment costs reported: "
+		                                                    << this->model.get_variable_assignment(
+		                                                           this->investment_cost_variable);
+		                                  // this->investment_cost_variable.get(GRB_DoubleAttr_X) ;
+		                            
+		                                  for (unsigned int r = 0; r < this->instance.resource_count(); ++r) {
+		                                    double usage =
+		                                        this->model.get_variable_assignment(this->max_usage_variables[r]);
+		                                    BOOST_LOG(l.d(1)) << " --> Resource investment amount for " << r << ": "
+		                                                      << usage;
+		                                  }
+		                            
+		                                  throw InconsistentResultError(this->instance, this->seed,
+		                                                                FAULT_INCONSISTENT_OBJVALS,
+		                                                                "Inconsistent objective values");
+		                                }
+		                                */
 	}
 	return sol;
 #else

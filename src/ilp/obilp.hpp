@@ -2,9 +2,9 @@
 #define ILP_OBILP_HPP
 
 #include "../manager/solvers.hpp" // for get_free_N
+#include "../util/log.hpp"        // for Log
 #include "generated_config.hpp"   // for GUROBI_FOUND
 #include "ilp.hpp"                // for ILPBase
-#include "util/log.hpp"           // for Log
 
 #include <string> // for string
 #include <vector> // for vector
@@ -57,6 +57,8 @@ private:
 		bool start;
 	};
 	std::vector<Event> events;
+	std::vector<unsigned int> earliest_starts;
+	std::vector<unsigned int> latest_finishs;
 	void generate_events() noexcept;
 
 	// TODO rename in 'disjunct' and 'order'?

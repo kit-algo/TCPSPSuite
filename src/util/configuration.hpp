@@ -2,10 +2,12 @@
 #define CONFIGURATION_H
 
 #include "../datastructures/maybe.hpp" // for Maybe
-#include "../util/log.hpp"             // for Log
-#include "solverconfig.hpp"            // for SolverConfig
-#include <string>                      // for string, allocator
-#include <vector>                      // for vector
+#include "../util/filetools.hpp"
+#include "../util/log.hpp"  // for Log
+#include "solverconfig.hpp" // for SolverConfig
+
+#include <string> // for string, allocator
+#include <vector> // for vector
 
 using json = nlohmann::json;
 
@@ -38,7 +40,21 @@ public:
 	void
 	read_solver_config(std::string filename)
 	{
-		this->solver_cfgs = SolverConfig::read_configs(filename);
+		try {
+			this->solver_cfgs = SolverConfig::read_configs(filename);
+		} catch (json::parse_error e) {
+			BOOST_LOG(l.e()) << "JSON Parsing error in solver configuration.";
+			BOOST_LOG(l.e()) << e.what();
+			BOOST_LOG(l.e()) << "Error is near: ";
+
+			util::FileContextGiver fcg(filename, e.byte);
+
+			for (const auto & line : fcg.get_message()) {
+				BOOST_LOG(l.e()) << line;
+			}
+
+			throw std::move(e);
+		}
 	}
 
 	const std::vector<SolverConfig> &

@@ -15,4 +15,5 @@
 #define FAULT_TIME_LIMIT_NEEDED						12
 #define FAULT_DATABASE_FAILED							13
 #define FAULT_OUT_OF_MEMORY               14
+#define FAULT_WINDOW_EXTENSION_HARD_DEADLINE    15
 #endif
