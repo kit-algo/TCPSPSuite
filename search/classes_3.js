@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['solution',['Solution',['../classSolution.html',1,'']]]
+  ['solution_54',['Solution',['../classSolution.html',1,'']]]
 ];

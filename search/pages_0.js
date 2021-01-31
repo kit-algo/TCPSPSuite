@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['available_20solvers',['Available Solvers',['../solvers.html',1,'']]]
+  ['available_20solvers_100',['Available Solvers',['../solvers.html',1,'']]]
 ];

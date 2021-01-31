@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['instance',['Instance',['../classInstance.html',1,'']]]
+  ['instance_52',['Instance',['../classInstance.html',1,'']]]
 ];
