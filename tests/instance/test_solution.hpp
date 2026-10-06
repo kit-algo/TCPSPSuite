@@ -147,6 +147,27 @@ TEST(SolutionTest, TestOvershootWithChangingAvailability)
 	ASSERT_EQ(sol.get_costs(), 55); // (10 * 1 + 5 * 7 + 5 * 2)
 }
 
+
+TEST(SolutionTest, TestCalculateMaxCostsUsesHalfOpenIntervals)
+{
+	Instance instance;
+	Resource resource(0);
+	resource.set_investment_costs({{1.0, 1.0}});
+	instance.add_resource(std::move(resource));
+
+	instance.add_job(Job(0, 3, 1, {5.0}, 0));
+	instance.add_job(Job(0, 3, 1, {7.0}, 1));
+
+	// Overlap, adjacency, and a one-step gap.
+	for (unsigned int second_start : {0U, 1U, 2U}) {
+		Solution sol(instance, true, {{0}, {second_start}}, Maybe<double>());
+		ASSERT_TRUE(sol.verify(0));
+		const double expected = second_start == 0 ? 12.0 : 7.0;
+		ASSERT_DOUBLE_EQ(sol.get_costs(), expected);
+		ASSERT_DOUBLE_EQ(instance.calculate_max_costs({0, second_start}), expected);
+	}
+}
+
 } // namespace instance
 } // namespace test
 

@@ -405,7 +405,7 @@ Instance::calculate_max_costs(const std::vector<unsigned int> & solution) const
 		// happen...
 		events.insert(std::make_tuple(solution[job.get_jid()], +1, job.get_jid()));
 		events.insert(std::make_tuple(
-		    solution[job.get_jid()] + 1 + job.get_duration(), -1, job.get_jid()));
+		    solution[job.get_jid()] + job.get_duration(), -1, job.get_jid()));
 	}
 	ResVec ressources(resource_count());
 	for (auto event : events) {
